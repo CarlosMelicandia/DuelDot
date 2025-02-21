@@ -1,5 +1,5 @@
 {
-  "name": "my-project",
+  "name": "DuelDot",
   "version": "1.0.0",
   "scripts": {
     "dev": "live-server ."
