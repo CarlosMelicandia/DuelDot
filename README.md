@@ -5,7 +5,7 @@ This is a starter project for the [Chris Courses Online Multiplayer Game Tutoria
 
 To get started, download this repo and double click `index.html` to see the single-player game we'll base our multiplayer-game off on.
 
-To run a liver server locally:
+To run a liver server locally from github:
 1. create a codespace within GitHub.
 2. On the console type npm install.
 3. Then type npm run dev.
