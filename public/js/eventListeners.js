@@ -26,5 +26,3 @@ addEventListener('keydown', function(e) {
     if (e.code == 'KeyS') vy = 0
     if (e.code == 'KeyA') vx = 0
   })
-
- 
