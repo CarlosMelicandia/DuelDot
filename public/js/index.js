@@ -9,7 +9,8 @@ canvas.height = innerHeight
 const x = canvas.width / 2
 const y = canvas.height / 2
 
-const player = new Player(x, y, 10, 'white')
+
+const player = new Player(x, y, 10, 'white',54,54,54)
 const projectiles = []
 const enemies = []
 const particles = []
@@ -49,6 +50,7 @@ function animate() {
   c.fillStyle = 'rgba(0, 0, 0, 0.1)'
   c.fillRect(0, 0, canvas.width, canvas.height)
 
+  //calling the players body to be drawn (game functions without it)
   player.draw()
 
   for (let index = particles.length - 1; index >= 0; index--) {
@@ -84,7 +86,7 @@ function animate() {
 
     const dist = Math.hypot(player.x - enemy.x, player.y - enemy.y)
 
-    //end game
+    //end game ( we have to modify this to subtract health )
     if (dist - enemy.radius - player.radius < 1) {
       cancelAnimationFrame(animationId)
     }
@@ -115,7 +117,7 @@ function animate() {
             )
           )
         }
-        // this is where we shrink our enemy
+        // this is where we shrink our enemy (to subtract health)
         if (enemy.radius - 10 > 5) {
           score += 100
           scoreEl.innerHTML = score
@@ -124,7 +126,7 @@ function animate() {
           })
           projectiles.splice(projectilesIndex, 1)
         } else {
-          // remove enemy if they are too small
+          // remove enemy if they are too small (kill if health gets to low)
           score += 150
           scoreEl.innerHTML = score
 
@@ -135,6 +137,29 @@ function animate() {
     }
   }
 }
-
+// Calling functions
 animate()
 spawnEnemies()
+
+
+// Movement 
+window.addEventListener('keydown', (event) => {
+  switch(event.code) {
+
+  case'KeyW':
+     player.y -= 5
+    break;
+
+  case'KeyA':
+    player.x -=5
+    break;
+
+  case'KeyS':
+    player.y +=5
+    break;
+
+  case'KeyD':
+    player.x +=5
+    break;
+  }
+})
