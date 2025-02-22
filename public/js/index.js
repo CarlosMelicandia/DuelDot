@@ -10,14 +10,15 @@ const x = canvas.width / 2
 const y = canvas.height / 2
 
 
-const player = new Player(x, y, 10, 'white',54,54,54)
+
+const player = new Player(x, y, 10, 'white')
 const projectiles = []
 const enemies = []
 const particles = []
 
 function spawnEnemies() {
   setInterval(() => {
-    const radius =25
+    const radius = 25
 // const radius = Math.random() * (30 - 4) + 4
     let x
     let y
@@ -88,8 +89,15 @@ function animate() {
 
     //end game ( we have to modify this to subtract health )
     if (dist - enemy.radius - player.radius < 1) {
+      player.health -= 50
+      enemies.splice(index, 1)
+     // cancelAnimationFrame(animationId)
+  
+    if(player.health <= 0){
       cancelAnimationFrame(animationId)
     }
+  }
+  console.log(player.health)
 
     for (
       let projectilesIndex = projectiles.length - 1;

@@ -1,9 +1,10 @@
 class Player {
-  constructor(x, y, radius, color) {
+  constructor(x, y, radius, color,health) {
     this.x = x
     this.y = y
     this.radius = radius
     this.color = color
+    this.health = 100
   }
 
   draw() {
