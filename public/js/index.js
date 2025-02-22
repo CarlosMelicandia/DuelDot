@@ -166,4 +166,3 @@ animate()
 spawnEnemies()
 
 const myDivButton = document.createElement('div')
-

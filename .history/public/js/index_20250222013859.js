@@ -2,6 +2,7 @@ const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
 
 const scoreEl = document.querySelector('#scoreEl')
+const healthEl = document.querySelector('#healthEl')
 
 canvas.width = innerWidth
 canvas.height = innerHeight
@@ -10,8 +11,8 @@ const x = canvas.width / 2
 const y = canvas.height / 2
 
 
-
-const player = new Tank(x, y, 10,'red',50,50);
+const player = new Mage(x, y);
+healthEl.innerHTML = player.health
 const projectiles = []
 const enemies = []
 const particles = []
@@ -46,6 +47,8 @@ function spawnEnemies() {
 
 let animationId
 let score = 0
+let vx = 0
+let vy = 0
 function animate() {
   animationId = requestAnimationFrame(animate)
   c.fillStyle = 'rgba(0, 0, 0, 0.1)'
@@ -53,6 +56,10 @@ function animate() {
 
   //calling the players body to be drawn (game functions without it)
   player.draw()
+
+  // updates movement based on key press
+  player.x += vx
+  player.y += vy
 
   for (let index = particles.length - 1; index >= 0; index--) {
     const particle = particles[index]
@@ -90,6 +97,7 @@ function animate() {
     //end game ( we have to modify this to subtract health )
     if (dist - enemy.radius - player.radius < 1) {
       player.health -= 50
+      healthEl.innerHTML = player.health
       enemies.splice(index, 1)
      // cancelAnimationFrame(animationId)
   
@@ -97,7 +105,6 @@ function animate() {
       cancelAnimationFrame(animationId)
     }
   }
-  console.log(player.health)
 
     for (
       let projectilesIndex = projectiles.length - 1;
@@ -160,24 +167,3 @@ spawnEnemies()
 
 const myDivButton = document.createElement('div')
 
-// Movement 
-window.addEventListener('keydown', (event) => {
-  switch(event.code) {
-
-  case'KeyW':
-     player.y -= 5
-    break;
-
-  case'KeyA':
-    player.x -=5
-    break;
-
-  case'KeyS':
-    player.y +=5
-    break;
-
-  case'KeyD':
-    player.x +=5
-    break;
-  }
-})

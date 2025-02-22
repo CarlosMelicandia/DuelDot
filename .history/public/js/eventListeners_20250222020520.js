@@ -14,10 +14,10 @@ addEventListener('click', (event) => {
 
 // Movement
 addEventListener('keydown', function(e) {
-  if (e.code == 'KeyW') vy = -2
-  if (e.code == 'KeyD') vx = 2
-  if (e.code == 'KeyS') vy = 2
-  if (e.code == 'KeyA') vx = -2
+  if (e.code == 'KeyW') vy = -2 * player.speed
+  if (e.code == 'KeyD') vx = 2 * player.speed
+  if (e.code == 'KeyS') vy = 2 * player.speed
+  if (e.code == 'KeyA') vx = -2 * player.speed
 })
 
 addEventListener('keyup', function(e) {

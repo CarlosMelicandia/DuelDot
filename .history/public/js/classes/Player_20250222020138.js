@@ -1,10 +1,13 @@
 class Player {
-  constructor(x, y, radius, color,health) {
+  constructor(x, y) {
+  constructor(x, y) {
     this.x = x
     this.y = y
-    this.radius = radius
-    this.color = color
+    this.radius = 10
+    this.color = 'white'
     this.health = 100
+    healthEl.innerHTML = this.health
+    this.speed = 1
   }
 
   draw() {
