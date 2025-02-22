@@ -2,6 +2,7 @@ const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
 
 const scoreEl = document.querySelector('#scoreEl')
+const healthEl = document.querySelector('#healthEl')
 
 canvas.width = innerWidth
 canvas.height = innerHeight
@@ -9,9 +10,7 @@ canvas.height = innerHeight
 const x = canvas.width / 2
 const y = canvas.height / 2
 
-
-
-const player = new Player(x, y, 10, 'white')
+const player = new Player(x, y, 10, 'white', 150)
 const projectiles = []
 const enemies = []
 const particles = []
@@ -46,6 +45,8 @@ function spawnEnemies() {
 
 let animationId
 let score = 0
+let vx = 0
+let vy = 0
 function animate() {
   animationId = requestAnimationFrame(animate)
   c.fillStyle = 'rgba(0, 0, 0, 0.1)'
@@ -53,6 +54,10 @@ function animate() {
 
   //calling the players body to be drawn (game functions without it)
   player.draw()
+
+  // updates movement based on key press
+  player.x += vx
+  player.y += vy
 
   for (let index = particles.length - 1; index >= 0; index--) {
     const particle = particles[index]
@@ -90,14 +95,14 @@ function animate() {
     //end game ( we have to modify this to subtract health )
     if (dist - enemy.radius - player.radius < 1) {
       player.health -= 50
+      healthEl.innerHTML = player.health
       enemies.splice(index, 1)
-     // cancelAnimationFrame(animationId)
-  
-    if(player.health <= 0){
-      cancelAnimationFrame(animationId)
-    }
+      console.log('hit')
+
+      if(player.health <= 0){
+        cancelAnimationFrame(animationId)
+      }
   }
-  console.log(player.health)
 
     for (
       let projectilesIndex = projectiles.length - 1;
@@ -129,8 +134,8 @@ function animate() {
             )
           )
         }
-        // this is where we shrink our enemy (to subtract health)
 
+        // this is where we shrink our enemy (to subtract health)
         if (enemy.health <=50) {
 
           score += 100
@@ -156,27 +161,4 @@ function animate() {
 }
 // Calling functions
 animate()
-spawnEnemies()
-
-
-// Movement 
-window.addEventListener('keydown', (event) => {
-  switch(event.code) {
-
-  case'KeyW':
-     player.y -= 5
-    break;
-
-  case'KeyA':
-    player.x -=5
-    break;
-
-  case'KeyS':
-    player.y +=5
-    break;
-
-  case'KeyD':
-    player.x +=5
-    break;
-  }
-})
+spawnEnemies() 

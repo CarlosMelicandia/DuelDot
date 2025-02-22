@@ -11,3 +11,20 @@ addEventListener('click', (event) => {
     new Projectile(player.x, player.y, 5, 'white', velocity, 33.5)
   )
 })
+
+// Movement
+addEventListener('keydown', function(e) {
+    if (e.code == 'KeyW') vy = -2
+    if (e.code == 'KeyD') vx = 2
+    if (e.code == 'KeyS') vy = 2
+    if (e.code == 'KeyA') vx = -2
+  })
+
+  addEventListener('keyup', function(e) {
+    if (e.code == 'KeyW') vy = 0
+    if (e.code == 'KeyD') vx = 0
+    if (e.code == 'KeyS') vy = 0
+    if (e.code == 'KeyA') vx = 0
+  })
+
+ 
