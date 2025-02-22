@@ -10,8 +10,8 @@ canvas.height = innerHeight
 const x = canvas.width / 2
 const y = canvas.height / 2
 
-
-const player = new Tank(x, y, 10,'red',50,50);
+// calling class for player
+const player = new Player(x, y, 10,'red',);
 const projectiles = []
 const enemies = []
 const particles = []
