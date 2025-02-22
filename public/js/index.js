@@ -17,8 +17,8 @@ const particles = []
 
 function spawnEnemies() {
   setInterval(() => {
-    const radius = Math.random() * (30 - 4) + 4
-
+    const radius =25
+// const radius = Math.random() * (30 - 4) + 4
     let x
     let y
 
@@ -39,7 +39,7 @@ function spawnEnemies() {
       y: Math.sin(angle)
     }
 
-    enemies.push(new Enemy(x, y, radius, color, velocity))
+    enemies.push(new Enemy(x, y, radius, color, velocity, 100))
   }, 1000)
 }
 
@@ -102,6 +102,7 @@ function animate() {
 
       // when projectiles touch enemy
       if (dist - enemy.radius - projectile.radius < 1) {
+        enemy.health -= projectile.damage
         // create explosions
         for (let i = 0; i < enemy.radius * 2; i++) {
           particles.push(
@@ -118,14 +119,17 @@ function animate() {
           )
         }
         // this is where we shrink our enemy (to subtract health)
-        if (enemy.radius - 10 > 5) {
+
+        if (enemy.health <=50) {
           score += 100
           scoreEl.innerHTML = score
           gsap.to(enemy, {
-            radius: enemy.radius - 10
+            radius: enemy.radius - ((projectile.damage / 4)*.73)
           })
           projectiles.splice(projectilesIndex, 1)
-        } else {
+
+
+        } else if (enemy.health <=0) {
           // remove enemy if they are too small (kill if health gets to low)
           score += 150
           scoreEl.innerHTML = score
