@@ -1,5 +1,6 @@
 class Player {
   constructor(x, y) {
+  constructor(x, y) {
     this.x = x
     this.y = y
     this.radius = 10

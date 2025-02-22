@@ -10,8 +10,9 @@ canvas.height = innerHeight
 const x = canvas.width / 2
 const y = canvas.height / 2
 
-// calling class for player
-const player = new Player(x, y, 10,'red',);
+
+const player = new Mage(x, y);
+healthEl.innerHTML = player.health
 const projectiles = []
 const enemies = []
 const particles = []
