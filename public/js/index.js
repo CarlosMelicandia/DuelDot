@@ -11,7 +11,7 @@ const y = canvas.height / 2
 
 
 
-const player = new Player(x, y, 10, 'white')
+const player = new Tank(x, y, 10,'red',50,50);
 const projectiles = []
 const enemies = []
 const particles = []
@@ -158,6 +158,7 @@ function animate() {
 animate()
 spawnEnemies()
 
+const myDivButton = document.createElement('div')
 
 // Movement 
 window.addEventListener('keydown', (event) => {

@@ -3,13 +3,15 @@ This is the Tank Class
 */
 
 class Tank extends Player{
-    constructor (x, y, radius, color, health, shield, speed) {
+    constructor (x, y, radius, color,shield, speed,health) {
         super(x, y, radius, color)
-        this.health = health;
         this.shield = shield;
         this.speed = speed;
-      
+        this.health = 150;
+
         }
+
+    
 
 }
 
