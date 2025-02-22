@@ -8,10 +8,9 @@ canvas.width = innerWidth
 canvas.height = innerHeight
 
 const x = canvas.width / 2
-const y = canvas.height / 2
+const y= canvas.height / 2
 
-
-const player = new Rouge(x, y);
+const player = new Tank(x, y);
 healthEl.innerHTML = player.health
 const projectiles = []
 const enemies = []
@@ -34,18 +33,8 @@ function spawnEnemies() {
 
     const color = `hsl(${Math.random() * 360}, 50%, 50%)`
 
-    //This makes the angle of enemies being spawned towards the player
-    const angle = Math.atan2(player.y - y, player.x - x)
-    //Under is the original code of the enemy trajectory
-    //const angle = Math.atan2(canvas.height / 2 - y, canvas.width / 2 - x)
-
-    const velocity = {
-      x: Math.cos(angle),
-      y: Math.sin(angle)
-    }
-
-    enemies.push(new Enemy(x, y, radius, color, 100))
-  }, 1000) // was 1000
+    enemies.push(new Enemy(x, y, radius, color, 100)) // Creates an enemy and adds it to the enemies array
+  }, 1000) // Sets the time rate at which enemies spawn
 }
 
 let animationId
