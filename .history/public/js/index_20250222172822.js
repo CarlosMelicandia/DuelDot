@@ -44,7 +44,7 @@ function spawnEnemies() {
       y: Math.sin(angle)
     }
 
-    enemies.push(new Enemy(x, y, radius, color, velocity, 100))
+    enemies.push(new Enemy(x, y, radius, color, 100))
   }, 1000) // was 1000
 }
 

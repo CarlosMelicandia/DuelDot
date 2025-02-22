@@ -34,17 +34,7 @@ function spawnEnemies() {
 
     const color = `hsl(${Math.random() * 360}, 50%, 50%)`
 
-    //This makes the angle of enemies being spawned towards the player
-    const angle = Math.atan2(player.y - y, player.x - x)
-    //Under is the original code of the enemy trajectory
-    //const angle = Math.atan2(canvas.height / 2 - y, canvas.width / 2 - x)
-
-    const velocity = {
-      x: Math.cos(angle),
-      y: Math.sin(angle)
-    }
-
-    enemies.push(new Enemy(x, y, radius, color, velocity, 100))
+    enemies.push(new Enemy(x, y, radius, color, 100))
   }, 1000) // was 1000
 }
 

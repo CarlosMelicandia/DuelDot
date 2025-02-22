@@ -1,9 +1,10 @@
 class Enemy {
-  constructor(x, y, radius, color, health) {
+  constructor(x, y, radius, color, velocity, health) {
     this.x = x
     this.y = y
     this.radius = radius
     this.color = color
+    this.velocity = velocity
     this.health = health
   }
 
@@ -14,7 +15,7 @@ class Enemy {
     c.fill()
   }
 
-  // Moves the enemy to the players position
+  // Moves the enemy to the plyers position
   moveToPlayer(){
     const enemySpeed = 1
     let directionX = player.x - this.x // Detects the direction the enemy should move
@@ -30,6 +31,8 @@ class Enemy {
 
   update() {
     this.draw()
+    //this.x = this.x + this.velocity.x
+    //this.y = this.y + this.velocity.y
     this.moveToPlayer()
   }
 }
