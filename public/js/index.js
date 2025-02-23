@@ -10,7 +10,7 @@ canvas.height = innerHeight
 const x = canvas.width / 2
 const y= canvas.height / 2
 
-const player = new Tank(x, y);
+const player = new Mage(x, y);
 healthEl.innerHTML = player.health
 const projectiles = []
 const enemies = []
