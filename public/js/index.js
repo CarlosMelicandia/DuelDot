@@ -36,6 +36,7 @@ function spawnEnemies() {
   }, 1000) // Sets the time rate at which enemies spawn (Default = 1000)
 }
 
+//Speed upgrades 
 let upgrades = []
 function spawnUpgradeOrbs() {
   const max = canvas.width - 50
@@ -57,6 +58,7 @@ let animationId
 let score = 0
 let vx = 0
 let vy = 0
+// Background
 function animate() {
   animationId = requestAnimationFrame(animate)
   c.fillStyle = 'rgba(0, 0, 0, 0.1)'
