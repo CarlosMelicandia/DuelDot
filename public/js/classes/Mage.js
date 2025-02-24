@@ -1,8 +1,8 @@
 /* 
 This is the Mage Class
 */
-class Mage extends Player{
-    constructor(x,y){
+class Mage extends Player {
+    constructor(x, y) {
         super(x, y)
         this.radius = 10
         this.color = 'blue'

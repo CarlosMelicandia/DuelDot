@@ -8,18 +8,19 @@ canvas.width = innerWidth
 canvas.height = innerHeight
 
 const x = canvas.width / 2
-const y= canvas.height / 2
+const y = canvas.height / 2
 
-const player = new Tank(x, y);
+const player = new Rouge(x, y);
 healthEl.innerHTML = player.health
-const projectiles = []
-const enemies = []
-const particles = []
 
+let projectiles = []
+let particles = []
+
+const enemies = []
 function spawnEnemies() {
   setInterval(() => {
     const radius = 25
-// const radius = Math.random() * (30 - 4) + 4
+    // const radius = Math.random() * (30 - 4) + 4
     let x
     let y
 
@@ -34,7 +35,18 @@ function spawnEnemies() {
     const color = `hsl(${Math.random() * 360}, 50%, 50%)`
 
     enemies.push(new Enemy(x, y, radius, color, 100)) // Creates an enemy and adds it to the enemies array
-  }, 1000) // Sets the time rate at which enemies spawn
+  }, 1000) // Sets the time rate at which enemies spawn (Default = 1000)
+}
+
+let upgrades = []
+function spawnUpgradeOrbs() {
+  const max = canvas.width - 50
+  const min = 50
+  setInterval(() => {
+    let spawnX = Math.random() * (max - min) + min // generates a random number between 50 and width - 50
+    let spawnY = Math.random() * (max - min) + min
+    upgrades.push(new SpeedUpgrade(spawnX, spawnY))
+  }, 5000) // Sets the time rate at which orbs spawn (Default = 5000)
 }
 
 let animationId
@@ -53,6 +65,17 @@ function animate() {
   player.x += vx
   player.y += vy
 
+  upgrades = upgrades.filter(upgrade => {
+    upgrade.update()
+
+    if (upgrade.isCollided()) {
+      return false
+    }
+    return true
+  })
+
+  console.log(player.speed)
+
   for (let index = particles.length - 1; index >= 0; index--) {
     const particle = particles[index]
 
@@ -63,21 +86,22 @@ function animate() {
     }
   }
 
-  for (let index = projectiles.length - 1; index >= 0; index--) {
-    const projectile = projectiles[index]
-
+  /**
+   * .filter return a shallow copy of projectiles
+   * For element (projectile) in projectiles it first updates the projectile and checks if its within bounds
+   * return false (meaning filtered out of projectiles array) if its out of bounds
+   */
+  projectiles = projectiles.filter(projectile => {
     projectile.update()
-
-    // remove from edges of screen
-    if (
+    return !(
+      // Checks to see whether they are on screen, if they are returns false meaning they are removed
       projectile.x - projectile.radius < 0 ||
       projectile.x - projectile.radius > canvas.width ||
       projectile.y + projectile.radius < 0 ||
       projectile.y - projectile.radius > canvas.height
-    ) {
-      projectiles.splice(index, 1)
-    }
-  }
+    )
+  })
+
 
   for (let index = enemies.length - 1; index >= 0; index--) {
     const enemy = enemies[index]
@@ -91,12 +115,13 @@ function animate() {
       player.health -= 50
       healthEl.innerHTML = player.health
       enemies.splice(index, 1)
-     // cancelAnimationFrame(animationId)
-  
-    if(player.health <= 0){
-      cancelAnimationFrame(animationId)
+      // cancelAnimationFrame(animationId)
+
+      if (player.health <= 0) {
+        cancelAnimationFrame(animationId)
+        return
+      }
     }
-  }
 
     for (
       let projectilesIndex = projectiles.length - 1;
@@ -112,7 +137,6 @@ function animate() {
         projectiles.splice(projectilesIndex, 1)
 
         enemy.health -= projectile.damage
-        console.log(enemy.health)
         // create explosions
         for (let i = 0; i < enemy.radius * 2; i++) {
           particles.push(
@@ -128,9 +152,8 @@ function animate() {
             )
           )
         }
-        // this is where we shrink our enemy (to subtract health)
 
-        if (enemy.health <=50) {
+        if (enemy.health <= 50) {
 
           score += 100
           scoreEl.innerHTML = score
@@ -138,10 +161,10 @@ function animate() {
             radius: enemy.radius - (5)
             //((projectile.damage / 6)*.73)
           })
-        //  projectiles.splice(projectilesIndex, 1)
+          //  projectiles.splice(projectilesIndex, 1)
 
 
-        } if (enemy.health <=0) {
+        } if (enemy.health <= 0) {
           // remove enemy if they are too small (kill if health gets to low)
           score += 150
           scoreEl.innerHTML = score
@@ -153,8 +176,10 @@ function animate() {
     }
   }
 }
+
 // Calling functions
 animate()
 spawnEnemies()
+spawnUpgradeOrbs()
 
 const myDivButton = document.createElement('div')
