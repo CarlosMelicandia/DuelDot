@@ -17,6 +17,7 @@ class SpeedUpgrade {
       const dist = Math.hypot(player.x - this.x, player.y - this.y)
       if (dist - player.radius - (this.width + this.height) < 1) {
         player.speed *= 1.05
+          speedEl.innerHTML = player.speed;
         return true
       }
       return false

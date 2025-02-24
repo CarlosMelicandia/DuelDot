@@ -1,5 +1,5 @@
 /* 
-This is the Mage Class
+This is the Rouge Class
 */
 class Rouge extends Player{
     constructor(x,y){
@@ -7,6 +7,6 @@ class Rouge extends Player{
         this.radius = 10
         this.color = 'Green'
         this.speed = 1.80;
-        this.health = 80;
+        this.health = 50;
     }
 }

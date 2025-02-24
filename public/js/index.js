@@ -3,7 +3,7 @@ const c = canvas.getContext('2d')
 
 const scoreEl = document.querySelector('#scoreEl')
 const healthEl = document.querySelector('#healthEl')
-
+const speedEl = document.querySelector('#speedEl')
 canvas.width = innerWidth
 canvas.height = innerHeight
 
@@ -173,11 +173,20 @@ function animate() {
 
         } if (enemy.health <= 0) {
           // remove enemy if they are too small (kill if health gets to low)
+
+          // PASSIVE ABILITY FOR ROUGE: Speed Boost (Each kill grants a speed boost) (will add a max later)
+          if (score >= 150 & player instanceof Rouge) {
+            console.log('test123')
+            player.speed*=1.05
+            // Added a speed label in the top left along with score
+            speedEl.innerHTML = player.speed;
+          }
           score += 150
           scoreEl.innerHTML = score
 
           enemies.splice(index, 1)
           projectiles.splice(projectilesIndex, 1)
+
         }
       }
     }
