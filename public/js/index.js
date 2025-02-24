@@ -10,9 +10,7 @@ canvas.height = innerHeight
 const x = canvas.width / 2
 const y = canvas.height / 2
 
-const player = new Rouge(x, y);
-healthEl.innerHTML = player.health
-
+let player
 let projectiles = []
 let particles = []
 
@@ -49,6 +47,12 @@ function spawnUpgradeOrbs() {
   }, 5000) // Sets the time rate at which orbs spawn (Default = 5000)
 }
 
+function checkPlayer(){
+  if (!player){
+    return 
+  }
+}
+
 let animationId
 let score = 0
 let vx = 0
@@ -58,12 +62,16 @@ function animate() {
   c.fillStyle = 'rgba(0, 0, 0, 0.1)'
   c.fillRect(0, 0, canvas.width, canvas.height)
 
-  //calling the players body to be drawn (game functions without it)
-  player.draw()
+  if (!player){
+    return 
+  }
 
+  //calling the players body to be drawn (game functions without it)
+    player.draw()
   // updates movement based on key press
-  player.x += vx
-  player.y += vy
+    player.x += vx
+    player.y += vy
+  
 
   upgrades = upgrades.filter(upgrade => {
     upgrade.update()
@@ -73,8 +81,6 @@ function animate() {
     }
     return true
   })
-
-  console.log(player.speed)
 
   for (let index = particles.length - 1; index >= 0; index--) {
     const particle = particles[index]
@@ -95,13 +101,12 @@ function animate() {
     projectile.update()
     return !(
       // Checks to see whether they are on screen, if they are returns false meaning they are removed
-      projectile.x - projectile.radius < 0 ||
+      projectile.x + projectile.radius < 0 ||
       projectile.x - projectile.radius > canvas.width ||
       projectile.y + projectile.radius < 0 ||
       projectile.y - projectile.radius > canvas.height
     )
   })
-
 
   for (let index = enemies.length - 1; index >= 0; index--) {
     const enemy = enemies[index]
@@ -176,10 +181,5 @@ function animate() {
     }
   }
 }
-
-// Calling functions
-animate()
-spawnEnemies()
-spawnUpgradeOrbs()
 
 const myDivButton = document.createElement('div')

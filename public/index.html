@@ -19,6 +19,10 @@
     >
       <span>Score: <span id="scoreEl">0</span></span>
       <span>Health: <span id="healthEl">0</span></span>
+     <button class = "buttonToRemove" onclick = "tankSelected()">Tank</button>
+     <button class = "buttonToRemove" onclick = "mageSelected()">Mage</button>
+     <button class = "buttonToRemove" onclick = "rougeSelected()"">Rouge</button>
+     <button class = "buttonToRemove" onclick = "playerSelected()"  >Player</button>
     </div>
     <canvas></canvas>
 
@@ -27,14 +31,16 @@
       integrity="sha512-kVlGhj2qFy+KBCFuvjBJTGUMxbdqJKs4yK2jh0e0VPhWUPiPC87bzm4THmaaIee3Oj7j6sDpTTgm2EPPiESqBg=="
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
-    ></script>
+    >
+  </script>
     <script src="./js/classes/Enemy.js"></script>
-    <script src="./js/classes/Player.js"></script>
     <script src="./js/classes/Particle.js"></script>
     <script src="./js/classes/Projectile.js"></script>
-    <script src="./js/classes/Tank.js"></script>
-    <script src="./js/classes/Mage.js"></script>
-    <script src="./js/classes/Rouge.js"></script>
+    <script src="./js/Player classes/Player.js"></script>
+    <script src="./js/player classes/Tank.js"></script>
+    <script src="./js/player classes/Mage.js"></script>
+    <script src="./js/player classes/Rouge.js"></script>
+    <script src="./js/classes/ClassButton.js"></script>
     <script src="./js/powerups/SpeedUpgrade.js"></script>
     <script src="./js/eventListeners.js"></script>
     <script src="./js/index.js"></script>
