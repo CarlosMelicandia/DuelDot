@@ -8,6 +8,6 @@ To get started, download this repo and double click `index.html` to see the sing
 To run a liver server locally from github:
 1. create a codespace within GitHub.
 2. On the console type npm install.
-3. Then type npm run dev.
-4. Then it will open a browser with the .HTML file running.
-5. If you close it by accident you can reopen it by ctrl + right-clicking http://127.0.0.1:8080 in the console.
+3. Then type node backend.js.
+4. Then type locahost:3000 on your browser
+
