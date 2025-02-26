@@ -15,12 +15,65 @@ c.scale(devicePixelRatio, devicePixelRatio)
 const x = canvas.width / 2
 const y = canvas.height / 2
 
-const frontEndPlayers = {}
-const frontEndProjectiles = {}
+const playerNames = [
+  "Shadow",
+  "Raven",
+  "Phoenix",
+  "Blaze",
+  "Viper",
+  "Maverick",
+  "Rogue",
+  "Hunter",
+  "Nova",
+  "Zephyr",
+  "Falcon",
+  "Titan",
+  "Specter",
+  "Cyclone",
+  "Inferno",
+  "Reaper",
+  "Stalker",
+  "Venom",
+  "Glitch",
+  "Banshee",
+  "Shadowstrike",
+  "Onyx",
+  "Rebel",
+  "Fury",
+  "Apex",
+  "Crimson",
+  "Nightfall",
+  "Saber",
+  "Tempest",
+  "Lightning",
+  "Bullet",
+  "Vortex",
+  "Echo",
+  "Blitz",
+  "Rift"
+]
 
-socket.on('updateProjectiles', (backEndProjectiles) => {
-  for (const id in backEndProjectiles) {
-    const backEndProjectile = backEndProjectiles[id]
+
+/**
+ * ------------------------------
+ * Data Structures for Game Objects
+ * ------------------------------
+ */
+const frontEndPlayers = {} // Object to keep track of all player objects on the client
+const frontEndProjectiles = {}  // Object to keep track of all projectile objects on the client
+
+/**
+ * ------------------------------
+ * Handling Server Updates for Projectiles
+ * ------------------------------
+ */
+/**
+ * Keeps the front end (client-side) projectiles in sync with the back end (server).
+ * When the server emits 'updateProjectiles', iterate over each projectile.
+ */
+socket.on('updateProjectiles', (backEndProjectiles) => { // Waits until the server emits an "updateProjectiles" event
+  for (const id in backEndProjectiles) { // Loop over each projectile from the server (each has a unique id)
+    const backEndProjectile = backEndProjectiles[id] 
 
     if (!frontEndProjectiles[id]) {
       frontEndProjectiles[id] = new Projectile({
@@ -116,9 +169,10 @@ socket.on('updatePlayers', (backEndPlayers) => {
       const divToDelete = document.querySelector(`div[data-id="${id}"]`)
       divToDelete.parentNode.removeChild(divToDelete)
 
-      if (id === socket.id) {
-        document.querySelector('#usernameForm').style.display = 'block'
-      }
+       // If the local player has been removed, show the username form again
+      // if (id === socket.id) {
+      //   document.querySelector('#usernameForm').style.display = 'block'
+      // }
 
       delete frontEndPlayers[id]
     }
@@ -250,13 +304,41 @@ window.addEventListener('keyup', (event) => {
   }
 })
 
-document.querySelector('#usernameForm').addEventListener('submit', (event) => {
-  event.preventDefault()
-  document.querySelector('#usernameForm').style.display = 'none'
-  socket.emit('initGame', {
+// ------------------------------
+// Username Form Handling
+// ------------------------------
+/**
+ * When the player submits their username:
+ * - Prevent the default form submission (which would reload the page)
+ * - Hide the username form
+ * - Emit an "initGame" event to the server with canvas settings and the username,
+ *   so the server can initialize and track the new player.
+ */
+
+
+// document.querySelector('#usernameForm').addEventListener('submit', (event) => {
+//   event.preventDefault() // Prevents the form from refreshing the page on submission
+//   document.querySelector('#usernameForm').style.display = 'none' // Hides the username form
+//   // Sends initGame which tells the server to track this player with their settings 
+// socket.emit('initGame', {
+//     width: canvas.width,
+//     height: canvas.height,
+//     devicePixelRatio,
+//     username: document.querySelector('#usernameInput').value
+//   })
+// })
+
+// Randomly selects a number from 0 to playerNames.length - 1
+playerNameNumber = Math.floor(Math.random() * (playerNames.length))
+for (const id in frontEndPlayers){
+  frontEndPlayer = frontEndPlayers[id]
+  if (frontEndPlayer.username == playerNames[playerNameNumber]) // Ensures that no name is repeated
+    playerNameNumber = Math.floor(Math.random() * (playerNames.length))
+}
+
+socket.emit('initGame', {
     width: canvas.width,
     height: canvas.height,
     devicePixelRatio,
-    username: document.querySelector('#usernameInput').value
-  })
+    username: playerNames[playerNameNumber]
 })
