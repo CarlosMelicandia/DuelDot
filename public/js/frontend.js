@@ -328,12 +328,18 @@ window.addEventListener('keyup', (event) => {
 //   })
 // })
 
-// Randomly selects a number from 0 to playerNames.length - 1
-playerNameNumber = Math.floor(Math.random() * (playerNames.length))
-for (const id in frontEndPlayers){
-  frontEndPlayer = frontEndPlayers[id]
-  if (frontEndPlayer.username == playerNames[playerNameNumber]) // Ensures that no name is repeated
-    playerNameNumber = Math.floor(Math.random() * (playerNames.length))
+function isNameTaken(name) {
+  for (const id in frontEndPlayers) {
+    if (frontEndPlayers[id].username === name) {
+      return true;
+    }
+  }
+  return false;
+}
+
+let playerNameNumber = Math.floor(Math.random() * playerNames.length);
+while (isNameTaken(playerNames[playerNameNumber])) {
+  playerNameNumber = Math.floor(Math.random() * playerNames.length);
 }
 
 socket.emit('initGame', {
