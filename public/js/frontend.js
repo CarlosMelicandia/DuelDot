@@ -1,16 +1,29 @@
+// ------------------------------
+// Canvas and Context Setup
+// ------------------------------
 const canvas = document.querySelector('canvas') // Finds the canvas element from the HTML file
 const ctx = canvas.getContext('2d') // Context in which the canvas is being made
 
+// ------------------------------
+// Socket.IO and DOM Element Setup
+// ------------------------------
 const socket = io() // This is what allows for communication to happen between the client and the server and vice versa
 
 const scoreEl = document.querySelector('#scoreEl') // Finds the element with id "scoreEL" from html file 
 
-const devicePixelRatio = window.devicePixelRatio || 1 // Establishes the number of CSS pixels correspond to a pixel or falls back to 1
+// ------------------------------
+// Device Pixel Ratio and Canvas Dimensions
+// ------------------------------
+const devicePixelRatio = window.devicePixelRatio || 1 // Gets the device's pixel ratio (for high-DPI displays), defaulting to 1 if unavailable
+
+// Assigns the canvas height and width to variables
+const GAME_WIDTH = 1024 // (default 1024)
+const GAME_HEIGHT = 576 // (default 576)
 
 // Sets the canvas’s internal width and height
 // Adjusts te canvas width and height to ensure proper resolution on multiple devices
-canvas.width = 1024 * devicePixelRatio 
-canvas.height = 576 * devicePixelRatio
+canvas.width = GAME_WIDTH * devicePixelRatio 
+canvas.height = GAME_HEIGHT * devicePixelRatio
 
 ctx.scale(devicePixelRatio, devicePixelRatio) // Scales the drawing context so that drawing commands correspond to CSS pixels (ensuring a 1:1 ratio)
 
@@ -18,20 +31,31 @@ ctx.scale(devicePixelRatio, devicePixelRatio) // Scales the drawing context so t
 const x = canvas.width / 2
 const y = canvas.height / 2
 
-// Empty objects to track number of players and projectiles
-const frontEndPlayers = {}
-const frontEndProjectiles = {}
+/**
+ * ------------------------------
+ * Data Structures for Game Objects
+ * ------------------------------
+ */
+const frontEndPlayers = {} // Object to keep track of all player objects on the client
+const frontEndProjectiles = {}  // Object to keep track of all projectile objects on the client
 
 /**
- * This method keeps the client (front end) projectiles list in sync with the server (back end) projectile list
+ * ------------------------------
+ * Handling Server Updates for Projectiles
+ * ------------------------------
+ */
+/**
+ * Keeps the front end (client-side) projectiles in sync with the back end (server).
+ * When the server emits 'updateProjectiles', iterate over each projectile.
  */
 socket.on('updateProjectiles', (backEndProjectiles) => { // Waits until the server emits an "updateProjectiles" event
-  for (const id in backEndProjectiles) { // Every server projectile is assigned an id
+  for (const id in backEndProjectiles) { // Loop over each projectile from the server (each has a unique id)
     const backEndProjectile = backEndProjectiles[id] 
 
-    /** If a client projectile with the same id as the server is not found then it will 
-    create a projectile object with x, y, radius, color, and velocity that match the server's projectile
-    */
+    /**
+     * If a projectile with this id doesn't exist on the client,
+     * create a new Projectile object using the server's data.
+     */
     if (!frontEndProjectiles[id]) { 
       frontEndProjectiles[id] = new Projectile({
         x: backEndProjectile.x,
@@ -48,9 +72,8 @@ socket.on('updateProjectiles', (backEndProjectiles) => { // Waits until the serv
   }
 
 
-  /**
-   * Checks for every client side projectile ID in all Client projectiles to see if it exists in server projectiles
-   * if not it gets deleted from the client side projectiles list
+ /**
+   * Remove any client-side projectiles that are no longer present on the server.
    */
   for (const frontEndProjectileId in frontEndProjectiles) { 
     if (!backEndProjectiles[frontEndProjectileId]) {
@@ -59,16 +82,21 @@ socket.on('updateProjectiles', (backEndProjectiles) => { // Waits until the serv
   }
 })
 
+// ------------------------------
+// Handling Server Updates for Players
+// ------------------------------
 /**
- * This method keeps the client (front end) players list in sync with the server (back end) players list 
+ * Keeps the front end (client side) players in sync with the back end (server).
+ * When the server emits 'updatePlayers', update or create player objects as needed.
  */
 socket.on('updatePlayers', (backEndPlayers) => { // Waits until the server emits an "updatePlayers" event
-  for (const id in backEndPlayers) { // For every ID in server players
+  for (const id in backEndPlayers) { // Loop over each player received from the server
     const backEndPlayer = backEndPlayers[id] // Assigns backEndPlayer to each player's ID
 
-     /** If a client player with the same id as the server is not found then it will 
-    create a player object with x, y, radius, color, and username that match the server's player
-    */
+     /**
+     * If a player with this id does not exist on the client,
+     * create a new Player object using the server's data.
+     */
     if (!frontEndPlayers[id]) {
       frontEndPlayers[id] = new Player ({
         x: backEndPlayer.x,
@@ -89,15 +117,14 @@ socket.on('updatePlayers', (backEndPlayers) => { // Waits until the server emits
      * descending order
      */
     else {
-      document.querySelector( // Updates the username of the player in the leaderboard to display their score
-        `div[data-id="${id}"]`
-      ).innerHTML = `${backEndPlayer.username}: ${backEndPlayer.score}`
+      // Updates the username of the player in the leaderboard to display their new score
+      document.querySelector(`div[data-id="${id}"]`).innerHTML = 
+      `${backEndPlayer.username}: ${backEndPlayer.score}`
 
-      document
-        .querySelector(`div[data-id="${id}"]`) // Selects a DOM element that matches the player's id
-        .setAttribute('data-score', backEndPlayer.score) // Updates the label in HTML to show the players latest score from the server
+      document.querySelector(`div[data-id="${id}"]`) // Selects a DOM element that matches the player's id
+              .setAttribute('data-score', backEndPlayer.score) // Updates the label in HTML to show the players latest score from the server
 
-      // sorts the players divs
+      // Sort the leaderboard entries so that players with higher scores appear first
       const parentDiv = document.querySelector('#playerLabels') // Assigns parentDiv to an html element with ID playerLabels
       const childDivs = Array.from(parentDiv.querySelectorAll('div')) // Assigns a copy of an Array of all players with their username and score so we can sort them
 
@@ -106,15 +133,15 @@ socket.on('updatePlayers', (backEndPlayers) => { // Waits until the server emits
         const scoreA = Number(a.getAttribute('data-score'))
         const scoreB = Number(b.getAttribute('data-score'))
 
-        return scoreB - scoreA // If the result is negative scoreA is bigger, if the result is positive scoreB is bigger
+        return scoreB - scoreA // Descending order: higher scores first
       })
 
-      // removes child divs from the parent (outdated spots)
+      // Remove the old leaderboard entries
       childDivs.forEach((div) => {
         parentDiv.removeChild(div)
       })
 
-      // Re-adds them but in a sorted way from higher to lower, shows the new score ranking
+      // Re-adds them in sorted order
       childDivs.forEach((div) => {
         parentDiv.appendChild(div)
       })
@@ -127,7 +154,7 @@ socket.on('updatePlayers', (backEndPlayers) => { // Waits until the server emits
 
       // Checks if the player id matches clients id to run code specifically for that player
       if (id === socket.id) {
-        const lastBackendInputIndex = playerInputs.findIndex((input) => { // Gets the last input from the server of that user
+        const lastBackendInputIndex = playerInputs.findIndex((input) => { // Gets the last input from the server of that player
           return backEndPlayer.sequenceNumber === input.sequenceNumber
         })
 
@@ -144,12 +171,13 @@ socket.on('updatePlayers', (backEndPlayers) => { // Waits until the server emits
     }
   }
 
-  // Removes any player that no longer exists in backEndPLayers (server side)
+  // Removes any client side players that no longer exists in backEndPLayers (server side)
   for (const id in frontEndPlayers) {
     if (!backEndPlayers[id]) {
       const divToDelete = document.querySelector(`div[data-id="${id}"]`)
       divToDelete.parentNode.removeChild(divToDelete)
 
+       // If the local player has been removed, show the username form again
       if (id === socket.id) {
         document.querySelector('#usernameForm').style.display = 'block'
       }
@@ -159,9 +187,14 @@ socket.on('updatePlayers', (backEndPlayers) => { // Waits until the server emits
   }
 })
 
+// ------------------------------
+// Animation Loop (Game Rendering)
+// ------------------------------
 /**
- * Function that updates the player position by moving them closer to their target and draws 
- * each player and projectile by recursively calling itself
+ * Continuously updates the game state:
+ * - Clears the canvas
+ * - Moves players toward their target positions via interpolation
+ * - Draws all players and projectiles
  */
 let animationId
 function animate() {
@@ -190,6 +223,7 @@ function animate() {
     frontEndProjectile.draw()
   }
 
+  // (Optional commented-out code for updating projectiles if needed)
   // for (let i = frontEndProjectiles.length - 1; i >= 0; i--) {
   //   const frontEndProjectile = frontEndProjectiles[i]
   //   frontEndProjectile.update()
@@ -198,61 +232,62 @@ function animate() {
 
 animate() // Calls the animate function
 
+// ------------------------------
+// Player Input Handling (Movement)
+// ------------------------------
 /**
- * Stores which movement key is being pressed
+ * Tracks which movement keys (W, A, S, D) are currently pressed.
+ * This object is used to generate movement inputs.
  */
 const keys = {
-  w: {
-    pressed: false
-  },
-  a: {
-    pressed: false
-  },
-  s: {
-    pressed: false
-  },
-  d: {
-    pressed: false
-  }
+  w: {pressed: false},
+  a: {pressed: false},
+  s: {pressed: false},
+  d: {pressed: false}
 }
 
 const SPEED = 5 // How fast the player moves per tick
 const playerInputs = [] // Stores the local inputs of a player
 let sequenceNumber = 0 // Counts the number of movement inputs sent to the server
+/**
+ * Every 15 milliseconds, check which keys are pressed.
+ * If a key is pressed, record the input and send it to the server.
+ */
 setInterval(() => {
   if (keys.w.pressed) {
     sequenceNumber++
     playerInputs.push({ sequenceNumber, dx: 0, dy: -SPEED }) // Adds the playersInput info to the playerInputs Array
-    // frontEndPlayers[socket.id].y -= SPEED
     socket.emit('keydown', { keycode: 'KeyW', sequenceNumber }) // Sends the information to the server
   }
 
   if (keys.a.pressed) {
     sequenceNumber++
     playerInputs.push({ sequenceNumber, dx: -SPEED, dy: 0 })
-    // frontEndPlayers[socket.id].x -= SPEED
     socket.emit('keydown', { keycode: 'KeyA', sequenceNumber })
   }
 
   if (keys.s.pressed) {
     sequenceNumber++
     playerInputs.push({ sequenceNumber, dx: 0, dy: SPEED })
-    // frontEndPlayers[socket.id].y += SPEED
     socket.emit('keydown', { keycode: 'KeyS', sequenceNumber })
   }
 
   if (keys.d.pressed) {
     sequenceNumber++
     playerInputs.push({ sequenceNumber, dx: SPEED, dy: 0 })
-    // frontEndPlayers[socket.id].x += SPEED
     socket.emit('keydown', { keycode: 'KeyD', sequenceNumber })
   }
-}, 15) // Checks which keys are pressed every 15 ms (Default: 15)
+}, 15) // (Default: 15)
 
+// ------------------------------
+// Event Listeners for Key Presses
+// ------------------------------
 /**
- * Checks when a key is pressed and sets the value to true
+ * Listen for keydown events and mark the corresponding key as pressed.
+ * This helps in tracking continuous movement.
  */
 window.addEventListener('keydown', (event) => {
+  // If the local player's data is not yet available, ignore input events
   if (!frontEndPlayers[socket.id]) return
 
   switch (event.code) {
@@ -275,7 +310,7 @@ window.addEventListener('keydown', (event) => {
 })
 
 /**
- * Checks when a key is released and sets the value to false
+ * Listen for keyup events and mark the corresponding key as no longer pressed.
  */
 window.addEventListener('keyup', (event) => {
   if (!frontEndPlayers[socket.id]) return
@@ -299,7 +334,16 @@ window.addEventListener('keyup', (event) => {
   }
 })
 
-// Checks when the user has submitted their username
+// ------------------------------
+// Username Form Handling
+// ------------------------------
+/**
+ * When the player submits their username:
+ * - Prevent the default form submission (which would reload the page)
+ * - Hide the username form
+ * - Emit an "initGame" event to the server with canvas settings and the username,
+ *   so the server can initialize and track the new player.
+ */
 document.querySelector('#usernameForm').addEventListener('submit', (event) => {
   event.preventDefault() // Prevents the form from refreshing the page on submission
   document.querySelector('#usernameForm').style.display = 'none' // Hides the username form
