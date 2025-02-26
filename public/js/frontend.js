@@ -16,41 +16,24 @@ const x = canvas.width / 2
 const y = canvas.height / 2
 
 const playerNames = [
-  "Shadow",
-  "Raven",
-  "Phoenix",
-  "Blaze",
-  "Viper",
-  "Maverick",
-  "Rogue",
-  "Hunter",
-  "Nova",
-  "Zephyr",
-  "Falcon",
-  "Titan",
-  "Specter",
-  "Cyclone",
-  "Inferno",
-  "Reaper",
-  "Stalker",
-  "Venom",
-  "Glitch",
-  "Banshee",
-  "Shadowstrike",
-  "Onyx",
-  "Rebel",
-  "Fury",
-  "Apex",
-  "Crimson",
-  "Nightfall",
-  "Saber",
-  "Tempest",
-  "Lightning",
-  "Bullet",
-  "Vortex",
-  "Echo",
-  "Blitz",
-  "Rift"
+  "Shadow","Raven",
+  "Phoenix","Blaze",
+  "Viper","Maverick",
+  "Rogue","Hunter",
+  "Nova","Zephyr",
+  "Falcon","Titan",
+  "Specter","Cyclone",
+  "Inferno","Reaper",
+  "Stalker","Venom",
+  "Glitch","Banshee",
+  "Shadowstrike","Onyx",
+  "Rebel","Fury",
+  "Apex","Crimson",
+  "Nightfall","Saber",
+  "Tempest","Lightning",
+  "Bullet","Vortex",
+  "Echo","Blitz",
+  "Rift", "BOB"
 ]
 
 
@@ -168,11 +151,11 @@ socket.on('updatePlayers', (backEndPlayers) => {
     if (!backEndPlayers[id]) {
       const divToDelete = document.querySelector(`div[data-id="${id}"]`)
       divToDelete.parentNode.removeChild(divToDelete)
-
-       // If the local player has been removed, show the username form again
-      // if (id === socket.id) {
-      //   document.querySelector('#usernameForm').style.display = 'block'
-      // }
+       
+      // If the local player has been removed, show the username form again
+      if (id === socket.id) {
+        document.querySelector('#usernameForm').style.display = 'block'
+      }
 
       delete frontEndPlayers[id]
     }
@@ -305,7 +288,7 @@ window.addEventListener('keyup', (event) => {
 })
 
 // ------------------------------
-// Username Form Handling
+// Random Username Handling
 // ------------------------------
 /**
  * When the player submits their username:
@@ -314,37 +297,32 @@ window.addEventListener('keyup', (event) => {
  * - Emit an "initGame" event to the server with canvas settings and the username,
  *   so the server can initialize and track the new player.
  */
-
-
-// document.querySelector('#usernameForm').addEventListener('submit', (event) => {
-//   event.preventDefault() // Prevents the form from refreshing the page on submission
-//   document.querySelector('#usernameForm').style.display = 'none' // Hides the username form
-//   // Sends initGame which tells the server to track this player with their settings 
-// socket.emit('initGame', {
-//     width: canvas.width,
-//     height: canvas.height,
-//     devicePixelRatio,
-//     username: document.querySelector('#usernameInput').value
-//   })
-// })
-
-function isNameTaken(name) {
-  for (const id in frontEndPlayers) {
-    if (frontEndPlayers[id].username === name) {
-      return true;
+function selectName() {
+  let playerNameNumber = Math.floor(Math.random() * playerNames.length);
+  let name = playerNames[playerNameNumber] 
+  for (const id in frontEndPlayers) { 
+    if (frontEndPlayers[id].username === name) { // Ensure name is not repeated
+      selectName(); // runs this function recursively until the name is not repeated
     }
   }
-  return false;
+  return name;
 }
 
-let playerNameNumber = Math.floor(Math.random() * playerNames.length);
-while (isNameTaken(playerNames[playerNameNumber])) {
-  playerNameNumber = Math.floor(Math.random() * playerNames.length);
-}
+let playerName = selectName() // Gets the name
+document.querySelector('#selectedRandomName').textContent = playerName // Assigns a name to the user
 
-socket.emit('initGame', {
-    width: canvas.width,
-    height: canvas.height,
-    devicePixelRatio,
-    username: playerNames[playerNameNumber]
+document.querySelector('#randomNameBtn').addEventListener('click', (event) => { // If the user click to create a new random name
+  playerName = selectName() // Generates a new random name
+  document.querySelector('#selectedRandomName').textContent = playerName
+})
+
+document.querySelector('#usernameForm').addEventListener('submit', (event) => { // When the user submits it starts the game
+  event.preventDefault() // Prevents the form from refreshing the page on submission
+  document.querySelector('#usernameForm').style.display = 'none' // Hides the username form
+  socket.emit('initGame', { // Lets the server know to start the game
+      width: canvas.width,
+      height: canvas.height,
+      devicePixelRatio,
+      username: playerName
+  })
 })

@@ -43,34 +43,34 @@
       <div
         style="
           display: flex;
+          flex-direction: column;
           align-items: center;
           justify-content: center;
           position: absolute;
-          top: 0;
-          right: 0;
-          bottom: 0;
-          left: 0;
-        "
-      >
-        <!-- <form id="usernameForm">
-          <div>
-            <input
-              id="usernameInput"
-              type="text"
-              placeholder="Username"
-              style="
-                padding: 12px;
-                border-radius: 5px;
-                border: none;
-                background: #475569;
-                color: #cbd5e1;
-              "
-            />
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          text-align: center;
+        ">
+        <form id="usernameForm">
+          <div 
+            id="selectedRandomName"
+            type = "text"
+            style="
+            width: 187px;
+            padding: 10px;
+            box-sizing: border-box;
+            border-radius: 5px;
+            border: none;
+            background: #475569;
+            color: #cbd5e1;
+          ">
           </div>
-          <div style="text-align: center; margin-top: 8px">
+          <div style="margin-top: 8px; display: flex; gap: 5px;">
             <button
+              type = "submit"
               style="
-                padding: 8px 20px;
+                padding: 8px 20px; 
                 border-radius: 5px;
                 border: none;
                 background-image: linear-gradient(
@@ -79,13 +79,27 @@
                   rgb(59, 130, 246)
                 );
                 color: white;
-                cursor: pointer;
-              "
-            >
+                cursor: pointer;">
               Start!
             </button>
+            <button
+              type="button"
+              id = "randomNameBtn"
+              style="
+                padding: 8px 10px;
+                border-radius: 5px;
+                border: none;
+                background-image: linear-gradient(
+                  to right,
+                  rgb(6, 182, 212),
+                  rgb(59, 130, 246)
+                );
+                color: white;
+                cursor: pointer;">
+              Random Name
+            </button>
           </div>
-        </form> -->
+        </form>
       </div>
       <!-- username input end -->
     </div>
