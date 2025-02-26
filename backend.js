@@ -36,6 +36,10 @@ app.get('/', (req, res) => {
 const backEndPlayers = {} // List of objects that contain amount of players server side
 const backEndProjectiles = {} // List of objects that contain amount of projectiles server side
 
+// Assigns the canvas height and width to variables
+const GAME_WIDTH = 1024 // (default 1024)
+const GAME_HEIGHT = 576 // (default 576)
+
 const SPEED = 5 // Movement speed of the player (default: 5)
 const RADIUS = 10 // Radius of the player (default: 10)
 const PROJECTILE_RADIUS = 5 // Radius of the projectile (default: 10) 
