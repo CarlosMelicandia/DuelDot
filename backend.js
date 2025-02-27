@@ -53,7 +53,8 @@ io.on('connection', (socket) => {
       color: `hsl(${360 * Math.random()}, 100%, 50%)`,
       sequenceNumber: 0,
       score: 0,
-      username
+      username,
+      health: 100  //initialize health
     }
 
     // where we init our canvas
@@ -147,12 +148,21 @@ setInterval(() => {
         DISTANCE < PROJECTILE_RADIUS + backEndPlayer.radius &&
         backEndProjectiles[id].playerId !== playerId
       ) {
-        if (backEndPlayers[backEndProjectiles[id].playerId])
+      // Award points to the shooter
+      if (backEndPlayers[backEndProjectiles[id].playerId])
           backEndPlayers[backEndProjectiles[id].playerId].score++
-
-        console.log(backEndPlayers[backEndProjectiles[id].playerId])
-        delete backEndProjectiles[id]
+        
+      // Deal 25 damage instead of instant death
+      if (!backEndPlayers[playerId].health) backEndPlayers[playerId].health = 100 // Fallback
+       backEndPlayers[playerId].health -= 25
+        
+      // Delete the projectile that hit
+      delete backEndProjectiles[id]
+        
+      // If health reaches 0 or below, remove the player
+      if (backEndPlayers[playerId].health <= 0) {
         delete backEndPlayers[playerId]
+        }
         break
       }
     }

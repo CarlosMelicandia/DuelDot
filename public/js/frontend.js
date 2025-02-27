@@ -89,13 +89,16 @@ socket.on('updatePlayers', (backEndPlayers) => {
         y: backEndPlayer.y,
         radius: 10,
         color: backEndPlayer.color,
-        username: backEndPlayer.username
+        username: backEndPlayer.username,
+        health: backEndPlayer.health || 100 // Set health from server or default to 100
       })
 
       document.querySelector(
         '#playerLabels'
       ).innerHTML += `<div data-id="${id}" data-score="${backEndPlayer.score}">${backEndPlayer.username}: ${backEndPlayer.score}</div>`
     } else {
+      // Update player health
+      frontEndPlayers[id].health = backEndPlayer.health
       document.querySelector(
         `div[data-id="${id}"]`
       ).innerHTML = `${backEndPlayer.username}: ${backEndPlayer.score}`
