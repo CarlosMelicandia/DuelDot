@@ -83,6 +83,8 @@ socket.on('updatePlayers', (backEndPlayers) => {
   for (const id in backEndPlayers) {
     const backEndPlayer = backEndPlayers[id]
 
+    console.log(backEndPlayer.health)
+
     if (!frontEndPlayers[id]) {
       frontEndPlayers[id] = new Player({
         x: backEndPlayer.x,
@@ -290,6 +292,22 @@ window.addEventListener('keyup', (event) => {
   }
 })
 
+const classSelectors = ["Tank", "Player", "Rogue", "Mage"]
+let classSelection = 0
+
+function nextClass(){
+  classSelection = (classSelection + 1) % (classSelectors.length) // Goes through the class selector array
+  return classSelectors[classSelection]
+}
+
+let className = nextClass()
+document.querySelector('#classSelector').textContent = "Class: " + className // Shows this to the player
+
+document.querySelector('#classSelector').addEventListener('click', (event) => { // When class button is clicked 
+  className = nextClass() // Goes to next class
+  document.querySelector('#classSelector').textContent = "Class: " + className
+})
+
 // ------------------------------
 // Random Username Handling
 // ------------------------------
@@ -320,12 +338,14 @@ document.querySelector('#randomNameBtn').addEventListener('click', (event) => { 
 })
 
 document.querySelector('#usernameForm').addEventListener('submit', (event) => { // When the user submits it starts the game
+  console.log(className)
   event.preventDefault() // Prevents the form from refreshing the page on submission
   document.querySelector('#usernameForm').style.display = 'none' // Hides the username form
   socket.emit('initGame', { // Lets the server know to start the game
       width: canvas.width,
       height: canvas.height,
       devicePixelRatio,
-      username: playerName
+      username: playerName,
+      className
   })
 })

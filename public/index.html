@@ -39,7 +39,7 @@
       </div>
       <canvas></canvas>
 
-      <!-- username input -->
+      <!-- Username and Class Selection Form -->
       <div
         style="
           display: flex;
@@ -52,20 +52,40 @@
           transform: translate(-50%, -50%);
           text-align: center;
         ">
+
         <form id="usernameForm">
           <div 
             id="selectedRandomName"
             type = "text"
             style="
-            width: 187px;
-            padding: 10px;
-            box-sizing: border-box;
-            border-radius: 5px;
-            border: none;
-            background: #475569;
-            color: #cbd5e1;
+              width: 187px;
+              padding: 10px;
+              box-sizing: border-box;
+              border-radius: 5px;
+              border: none;
+              background: #475569;
+              color: #cbd5e1;
           ">
           </div>
+          <div>
+            <button 
+            type = "button"
+            id ="classSelector"
+            style="
+              padding: 8px 20px; 
+              border-radius: 5px;
+              border: none;
+              background-image: linear-gradient(
+                to right,
+                rgb(6, 182, 212),
+                rgb(59, 130, 246)
+              );
+              color: white;
+              cursor: pointer;"
+            > 
+            </button>
+          </div>
+           <!-- Action buttons -->
           <div style="margin-top: 8px; display: flex; gap: 5px;">
             <button
               type = "submit"
@@ -103,6 +123,7 @@
       </div>
       <!-- username input end -->
     </div>
+    
 
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.2/gsap.min.js"

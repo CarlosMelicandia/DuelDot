@@ -7,6 +7,7 @@ class Player {
     this.username = username
     this.health = health // Initialize with 100 health
     this.maxHealth = 100 // Store max health for calculations
+    this.speed = 1
   }
 
   draw() {

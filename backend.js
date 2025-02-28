@@ -44,9 +44,34 @@ io.on('connection', (socket) => {
     }
 
     console.log(backEndProjectiles)
+    console.log(backEndPlayers[socket.id].health, backEndPlayers[socket.id].speed)
   })
 
-  socket.on('initGame', ({ username, width, height }) => {
+  // Checks what class the user selected and gives them an updated stats
+  function serverClassStats(className){
+    switch (className) {
+      case "Tank":
+        console.log("Tank Selected")
+        backEndPlayers[socket.id].color = "red"
+        backEndPlayers[socket.id].health = 150 // Initialize with 150 health
+        backEndPlayers[socket.id].maxHealth = 150 // Store max health for calculations
+        break
+      case "Mage":
+        console.log("Mage Selected")
+        backEndPlayers[socket.id].color = "blue"
+        backEndPlayers[socket.id].health = 100 // Initialize with 150 health
+        backEndPlayers[socket.id].maxHealth = 100 // Store max health for calculations
+        break
+      case "Rogue":
+        console.log("Rogue Selected")
+        backEndPlayers[socket.id].color = "green"
+        backEndPlayers[socket.id].health = 80 // Initialize with 150 health
+        backEndPlayers[socket.id].maxHealth = 80 // Store max health for calculations
+        break
+    }
+  }
+
+  socket.on('initGame', ({ username, width, height, className }) => {
     backEndPlayers[socket.id] = {
       x: 1024 * Math.random(),
       y: 576 * Math.random(),
@@ -56,6 +81,7 @@ io.on('connection', (socket) => {
       username,
       health: 100  //initialize health
     }
+    serverClassStats(className)
 
     // where we init our canvas
     backEndPlayers[socket.id].canvas = {
