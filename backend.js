@@ -35,6 +35,7 @@ app.get('/', (req, res) => {
 // ------------------------------
 const backEndPlayers = {} // List of objects that contain amount of players server side
 const backEndProjectiles = {} // List of objects that contain amount of projectiles server side
+const powerUps = {} // Store active power-ups
 
 // Assigns the canvas height and width to variables
 const GAME_WIDTH = 1024 // (default 1024)
@@ -44,13 +45,32 @@ const SPEED = 5 // Movement speed of the player (default: 5)
 const RADIUS = 10 // Radius of the player (default: 10)
 const PROJECTILE_RADIUS = 5 // Radius of the projectile (default: 10) 
 let projectileId = 0 // A unique id counter for each projectile created
+let powerUpId = 0 // Unique id counter for each power up
+
+// ------------------------------
+// Power-up Spawner Logic
+// ------------------------------
+function spawnPowerUp() {
+  const x = Math.random() * GAME_WIDTH;
+  const y = Math.random() * GAME_HEIGHT;
+  const type = 'speed'; // Example power-up type
+  const id = powerUpId++;
+
+  const powerUpData = { x, y, type, id }; // Create the power-up object
+
+  powerUps[id] = powerUpData; // Store it on the server
+  io.emit('spawnPowerUp', powerUpData); // Send to all clients
+}
+
+setInterval(spawnPowerUp, 2000)
+
 
 // ------------------------------
 // Socket.IO Connection and Event Handlers
 // ------------------------------
 io.on('connection', (socket) => { //  io.on listens for an event that is sent to the server via .emit()
   console.log('a user connected') // logs that a player has connected
-
+  socket.emit('existingPowerUps', powerUps);
   io.emit('updatePlayers', backEndPlayers) // Send the current list of players to all connected clients
 
   /**
@@ -95,6 +115,20 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
     }
 
     backEndPlayers[socket.id].radius = RADIUS // Sets the player radius
+  })
+
+  /**
+   * Listens for player collision with power ups
+   */
+  socket.on('collectPowerUp', ({playerId, powerUpId}) => {
+    if (powerUps[powerUpId]) {
+      if (powerUps[powerUpId].type === 'speed') {
+        backEndPlayers[playerId].speed = 8; // Increase speed
+        setTimeout(() => backEndPlayers[playerId].speed = 5, 5000); // Reset after 5 sec
+      }
+      delete powerUps[powerUpId];
+      io.emit('removePowerUp', powerUpId);
+    }
   })
 
   /**

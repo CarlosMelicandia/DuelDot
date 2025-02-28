@@ -38,6 +38,7 @@ const y = canvas.height / 2
  */
 const frontEndPlayers = {} // Object to keep track of all player objects on the client
 const frontEndProjectiles = {}  // Object to keep track of all projectile objects on the client
+const frontEndPowerUps = {}
 
 /**
  * ------------------------------
@@ -188,6 +189,23 @@ socket.on('updatePlayers', (backEndPlayers) => { // Waits until the server emits
 })
 
 // ------------------------------
+// Handling Server Updates for Power ups
+// ------------------------------
+socket.on('spawnPowerUp', (powerUpData) => {
+  frontEndPowerUps[powerUpData.id] = new PowerUp(powerUpData);
+});
+
+socket.on('removePowerUp', (powerUpId) => {
+  delete frontEndPowerUps[powerUpId];
+});
+
+socket.on('existingPowerUps', (serverPowerUps) => {
+  for (const id in serverPowerUps) {
+    frontEndPowerUps[id] = new PowerUp(serverPowerUps[id]);
+  }
+});
+
+// ------------------------------
 // Animation Loop (Game Rendering)
 // ------------------------------
 /**
@@ -228,6 +246,11 @@ function animate() {
   //   const frontEndProjectile = frontEndProjectiles[i]
   //   frontEndProjectile.update()
   // }
+
+  for (const id in frontEndPowerUps) {
+    frontEndPowerUps[id].draw();
+  }
+
 }
 
 animate() // Calls the animate function
