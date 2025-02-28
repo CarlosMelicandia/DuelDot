@@ -1,22 +1,27 @@
 class Player {
-  constructor({ x, y, radius, color, username, health = 100 }) {
+  constructor({ x, y, radius, color, username, health , speed }) {
     this.x = x
     this.y = y
     this.radius = radius
     this.color = color
     this.username = username
     this.health = health // Initialize with 100 health
-    this.maxHealth = 100 // Store max health for calculations
-    this.speed = 1
+    this.maxHealth = health // Store max health for calculations
+    this.speed = speed
   }
 
   draw() {
     c.font = '12px sans-serif'
     c.fillStyle = 'white'
-    c.fillText(this.username, this.x - 10, this.y + 20)
+    const textWidth = c.measureText(this.username).width;
+    // Center the text under the player
+    const textX = this.x - textWidth / 2;
+    const textY = this.y + this.radius + 15;
+    
+    c.fillText(this.username, textX, textY);
 
     // Draw health bar
-    const healthBarWidth = 30
+    const healthBarWidth = 40
     const healthBarHeight = 4
     const healthPercentage = this.health / this.maxHealth
     

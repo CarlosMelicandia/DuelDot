@@ -1,6 +1,11 @@
 const express = require('express')
 const app = express()
 
+const Tank = require('./Tank.js')
+const Mage = require('./Mage.js')
+const Rogue = require('./Rogue.js')
+const Gunner = require('./Gunner.js')
+
 // socket.io setup
 const http = require('http')
 const server = http.createServer(app)
@@ -18,9 +23,6 @@ app.get('/', (req, res) => {
 const backEndPlayers = {}
 const backEndProjectiles = {}
 
-const SPEED = 5
-const RADIUS = 10
-const PROJECTILE_RADIUS = 5
 let projectileId = 0
 
 io.on('connection', (socket) => {
@@ -44,52 +46,35 @@ io.on('connection', (socket) => {
     }
 
     console.log(backEndProjectiles)
-    console.log(backEndPlayers[socket.id].health, backEndPlayers[socket.id].speed)
   })
-
-  // Checks what class the user selected and gives them an updated stats
-  function serverClassStats(className){
-    switch (className) {
-      case "Tank":
-        console.log("Tank Selected")
-        backEndPlayers[socket.id].color = "red"
-        backEndPlayers[socket.id].health = 150 // Initialize with 150 health
-        backEndPlayers[socket.id].maxHealth = 150 // Store max health for calculations
-        break
-      case "Mage":
-        console.log("Mage Selected")
-        backEndPlayers[socket.id].color = "blue"
-        backEndPlayers[socket.id].health = 100 // Initialize with 150 health
-        backEndPlayers[socket.id].maxHealth = 100 // Store max health for calculations
-        break
-      case "Rogue":
-        console.log("Rogue Selected")
-        backEndPlayers[socket.id].color = "green"
-        backEndPlayers[socket.id].health = 80 // Initialize with 150 health
-        backEndPlayers[socket.id].maxHealth = 80 // Store max health for calculations
-        break
-    }
-  }
+  
 
   socket.on('initGame', ({ username, width, height, className }) => {
-    backEndPlayers[socket.id] = {
-      x: 1024 * Math.random(),
-      y: 576 * Math.random(),
-      color: `hsl(${360 * Math.random()}, 100%, 50%)`,
-      sequenceNumber: 0,
-      score: 0,
-      username,
-      health: 100  //initialize health
+    let x = 1024 * Math.random()
+    let y = 576 * Math.random()
+    const Classes = {
+      Tank: Tank,
+      Mage: Mage,
+      Rogue: Rogue,
+      Gunner: Gunner
     }
-    serverClassStats(className)
+
+    const newPlayer = new Classes[className]({
+      username: username, 
+      x: x, 
+      y: y,
+      score: 0,
+      sequenceNumber: 0
+    })
+    
+    backEndPlayers[socket.id] = newPlayer
 
     // where we init our canvas
     backEndPlayers[socket.id].canvas = {
       width,
       height
     }
-
-    backEndPlayers[socket.id].radius = RADIUS
+    console.log("Class:", backEndPlayers[socket.id].class,"\nHealth:", backEndPlayers[socket.id].health, "\nRadius:", backEndPlayers[socket.id].radius, "\nSpeed:", backEndPlayers[socket.id].speed)
   })
 
   socket.on('disconnect', (reason) => {
@@ -106,19 +91,19 @@ io.on('connection', (socket) => {
     backEndPlayers[socket.id].sequenceNumber = sequenceNumber
     switch (keycode) {
       case 'KeyW':
-        backEndPlayers[socket.id].y -= SPEED
+        backEndPlayers[socket.id].y -= 5 * backEndPlayer.speed
         break
 
       case 'KeyA':
-        backEndPlayers[socket.id].x -= SPEED
+        backEndPlayers[socket.id].x -= 5 * backEndPlayer.speed
         break
 
       case 'KeyS':
-        backEndPlayers[socket.id].y += SPEED
+        backEndPlayers[socket.id].y += 5 * backEndPlayer.speed
         break
 
       case 'KeyD':
-        backEndPlayers[socket.id].x += SPEED
+        backEndPlayers[socket.id].x += 5 * backEndPlayer.speed
         break
     }
 
@@ -174,21 +159,19 @@ setInterval(() => {
         DISTANCE < PROJECTILE_RADIUS + backEndPlayer.radius &&
         backEndProjectiles[id].playerId !== playerId
       ) {
-      // Award points to the shooter
-      if (backEndPlayers[backEndProjectiles[id].playerId])
-          backEndPlayers[backEndProjectiles[id].playerId].score++
         
       // Deal 25 damage instead of instant death
       if (!backEndPlayers[playerId].health) backEndPlayers[playerId].health = 100 // Fallback
        backEndPlayers[playerId].health -= 25
         
+      // If health reaches 0 or below, remove the player and give the shooter a point
+      if (backEndPlayers[playerId].health <= 0) {
+        backEndPlayers[backEndProjectiles[id].playerId].score++
+        delete backEndPlayers[playerId]
+      }
+        
       // Delete the projectile that hit
       delete backEndProjectiles[id]
-        
-      // If health reaches 0 or below, remove the player
-      if (backEndPlayers[playerId].health <= 0) {
-        delete backEndPlayers[playerId]
-        }
         break
       }
     }

@@ -2,6 +2,7 @@
   "name": "dueldot",
   "version": "1.0.0",
   "scripts": {
+    "start": "node Server1/backend.js",
     "dev": "live-server ."
   },
   "dependencies": {

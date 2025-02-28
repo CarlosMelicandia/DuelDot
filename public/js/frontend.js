@@ -82,17 +82,15 @@ socket.on('updateProjectiles', (backEndProjectiles) => { // Waits until the serv
 socket.on('updatePlayers', (backEndPlayers) => {
   for (const id in backEndPlayers) {
     const backEndPlayer = backEndPlayers[id]
-
-    console.log(backEndPlayer.health)
-
     if (!frontEndPlayers[id]) {
       frontEndPlayers[id] = new Player({
         x: backEndPlayer.x,
         y: backEndPlayer.y,
-        radius: 10,
+        radius: backEndPlayer.radius,
         color: backEndPlayer.color,
         username: backEndPlayer.username,
-        health: backEndPlayer.health || 100 // Set health from server or default to 100
+        health: backEndPlayer.health,
+        speed: backEndPlayer.speed
       })
 
       document.querySelector(
@@ -150,7 +148,6 @@ socket.on('updatePlayers', (backEndPlayers) => {
       }
     }
   }
-
   // this is where we delete frontend players
   for (const id in frontEndPlayers) {
     if (!backEndPlayers[id]) {
@@ -191,11 +188,6 @@ function animate() {
     const frontEndProjectile = frontEndProjectiles[id]
     frontEndProjectile.draw()
   }
-
-  // for (let i = frontEndProjectiles.length - 1; i >= 0; i--) {
-  //   const frontEndProjectile = frontEndProjectiles[i]
-  //   frontEndProjectile.update()
-  // }
 }
 
 animate()
@@ -215,37 +207,43 @@ const keys = {
   }
 }
 
-const SPEED = 5
 const playerInputs = []
 let sequenceNumber = 0
 setInterval(() => {
+  // Ensure player exists before trying to access speed
+  const player = frontEndPlayers[socket.id]
+  if (!player) {
+    console.log("no")
+    return
+  } // If the player isn't initialized yet, skip this frame
+
+  const SPEED = 5 * player.speed // Dynamically get the player's speed
+
   if (keys.w.pressed) {
     sequenceNumber++
     playerInputs.push({ sequenceNumber, dx: 0, dy: -SPEED })
-    // frontEndPlayers[socket.id].y -= SPEED
     socket.emit('keydown', { keycode: 'KeyW', sequenceNumber })
   }
 
   if (keys.a.pressed) {
     sequenceNumber++
     playerInputs.push({ sequenceNumber, dx: -SPEED, dy: 0 })
-    // frontEndPlayers[socket.id].x -= SPEED
     socket.emit('keydown', { keycode: 'KeyA', sequenceNumber })
   }
 
   if (keys.s.pressed) {
     sequenceNumber++
     playerInputs.push({ sequenceNumber, dx: 0, dy: SPEED })
-    // frontEndPlayers[socket.id].y += SPEED
     socket.emit('keydown', { keycode: 'KeyS', sequenceNumber })
   }
 
   if (keys.d.pressed) {
     sequenceNumber++
     playerInputs.push({ sequenceNumber, dx: SPEED, dy: 0 })
-    // frontEndPlayers[socket.id].x += SPEED
     socket.emit('keydown', { keycode: 'KeyD', sequenceNumber })
   }
+
+  console.log(playerInputs)
 }, 15)
 
 window.addEventListener('keydown', (event) => {
@@ -292,7 +290,7 @@ window.addEventListener('keyup', (event) => {
   }
 })
 
-const classSelectors = ["Tank", "Player", "Rogue", "Mage"]
+const classSelectors = ["Tank", "Rogue", "Mage", "Gunner"]
 let classSelection = 0
 
 function nextClass(){
@@ -338,7 +336,6 @@ document.querySelector('#randomNameBtn').addEventListener('click', (event) => { 
 })
 
 document.querySelector('#usernameForm').addEventListener('submit', (event) => { // When the user submits it starts the game
-  console.log(className)
   event.preventDefault() // Prevents the form from refreshing the page on submission
   document.querySelector('#usernameForm').style.display = 'none' // Hides the username form
   socket.emit('initGame', { // Lets the server know to start the game
