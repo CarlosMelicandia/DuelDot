@@ -118,11 +118,11 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
   })
 
   /**
-   * Listens for player collision with power ups
+   * Listens for player collision with power ups-- need to implement collision detection for this to happen
    */
   socket.on('collectPowerUp', ({playerId, powerUpId}) => {
     if (powerUps[powerUpId]) {
-      if (powerUps[powerUpId].type === 'speed') {
+      if (powerUps[powerUpId].type === 'speed') { // modular
         backEndPlayers[playerId].speed = 8; // Increase speed
         setTimeout(() => backEndPlayers[playerId].speed = 5, 5000); // Reset after 5 sec
       }
