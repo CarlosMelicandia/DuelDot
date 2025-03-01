@@ -1,20 +1,32 @@
-const canvas = document.querySelector('canvas')
-const c = canvas.getContext('2d')
+// ------------------------------
+// Canvas and Context Setup
+// ------------------------------
+const canvas = document.querySelector('canvas') // Finds the canvas element from the HTML file
+const c = canvas.getContext('2d') // Context in which the canvas is being made
 
-const socket = io()
+// ------------------------------
+// Socket.IO and DOM Element Setup
+// ------------------------------
+const socket = io() // Allows for communication between the client and the server
+const scoreEl = document.querySelector('#scoreEl') // Finds the element with ID "scoreEl" from the HTML file
 
-const scoreEl = document.querySelector('#scoreEl')
+// ------------------------------
+// Device Pixel Ratio and Canvas Dimensions
+// ------------------------------
+const devicePixelRatio = window.devicePixelRatio || 1 // Gets the device's pixel ratio (for high-DPI displays), defaulting to 1 if unavailable
 
-const devicePixelRatio = window.devicePixelRatio || 1
+canvas.width = 1024 * devicePixelRatio // Sets the canvas’s internal width
+canvas.height = 576 * devicePixelRatio // Sets the canvas’s internal height
 
-canvas.width = 1024 * devicePixelRatio
-canvas.height = 576 * devicePixelRatio
+c.scale(devicePixelRatio, devicePixelRatio) // Scales the drawing context so that drawing commands correspond to CSS pixels
 
-c.scale(devicePixelRatio, devicePixelRatio)
-
+// Center of the canvas
 const x = canvas.width / 2
 const y = canvas.height / 2
 
+// ------------------------------
+// Possible Random Player Names
+// ------------------------------
 const playerNames = [
   "Shadow","Raven",
   "Phoenix","Blaze",
@@ -36,14 +48,13 @@ const playerNames = [
   "Rift", "BOB"
 ]
 
-
 /**
  * ------------------------------
  * Data Structures for Game Objects
  * ------------------------------
  */
-const frontEndPlayers = {} // Object to keep track of all player objects on the client
-const frontEndProjectiles = {}  // Object to keep track of all projectile objects on the client
+const frontEndPlayers = {}  // Object to keep track of all player objects on the client
+const frontEndProjectiles = {} // Object to keep track of all projectile objects on the client
 
 /**
  * ------------------------------
@@ -52,12 +63,18 @@ const frontEndProjectiles = {}  // Object to keep track of all projectile object
  */
 /**
  * Keeps the front end (client-side) projectiles in sync with the back end (server).
- * When the server emits 'updateProjectiles', iterate over each projectile.
+ * When the server emits 'updateProjectiles', iterate over each projectile and
+ * create or update them locally.
  */
-socket.on('updateProjectiles', (backEndProjectiles) => { // Waits until the server emits an "updateProjectiles" event
-  for (const id in backEndProjectiles) { // Loop over each projectile from the server (each has a unique id)
-    const backEndProjectile = backEndProjectiles[id] 
+socket.on('updateProjectiles', (backEndProjectiles) => { 
+  // Loop over each projectile from the server (each has a unique id)
+  for (const id in backEndProjectiles) {
+    const backEndProjectile = backEndProjectiles[id]
 
+    /**
+     * If a projectile with this id doesn't exist on the client,
+     * create a new Projectile object using the server's data.
+     */
     if (!frontEndProjectiles[id]) {
       frontEndProjectiles[id] = new Projectile({
         x: backEndProjectile.x,
@@ -67,11 +84,15 @@ socket.on('updateProjectiles', (backEndProjectiles) => { // Waits until the serv
         velocity: backEndProjectile.velocity
       })
     } else {
+      // Update the client projectile’s position based on the server’s velocity
       frontEndProjectiles[id].x += backEndProjectiles[id].velocity.x
       frontEndProjectiles[id].y += backEndProjectiles[id].velocity.y
     }
   }
 
+  /**
+   * Remove any client-side projectiles that are no longer present on the server.
+   */
   for (const frontEndProjectileId in frontEndProjectiles) {
     if (!backEndProjectiles[frontEndProjectileId]) {
       delete frontEndProjectiles[frontEndProjectileId]
@@ -79,68 +100,83 @@ socket.on('updateProjectiles', (backEndProjectiles) => { // Waits until the serv
   }
 })
 
+/**
+ * ------------------------------
+ * Handling Server Updates for Players
+ * ------------------------------
+ */
+/**
+ * Keeps the front end (client side) players in sync with the back end (server).
+ * When the server emits 'updatePlayers', update or create player objects as needed.
+ */
 socket.on('updatePlayers', (backEndPlayers) => {
   for (const id in backEndPlayers) {
     const backEndPlayer = backEndPlayers[id]
+
+    /**
+     * If a player with this id does not exist on the client,
+     * create a new Player object using the server's data.
+     */
     if (!frontEndPlayers[id]) {
       frontEndPlayers[id] = new Player({
         x: backEndPlayer.x,
         y: backEndPlayer.y,
-        radius: backEndPlayer.radius,
+        radius: backEndPlayer.radius, // The Test branch uses the server-provided radius
         color: backEndPlayer.color,
         username: backEndPlayer.username,
-        health: backEndPlayer.health,
-        speed: backEndPlayer.speed
+        health: backEndPlayer.health,   // Extra property in Test branch
+        speed: backEndPlayer.speed      // Extra property in Test branch
       })
 
-      document.querySelector(
-        '#playerLabels'
-      ).innerHTML += `<div data-id="${id}" data-score="${backEndPlayer.score}">${backEndPlayer.username}: ${backEndPlayer.score}</div>`
+      // Add this player to the leaderboard 
+      document.querySelector('#playerLabels').innerHTML += 
+        `<div data-id="${id}" data-score="${backEndPlayer.score}">
+          ${backEndPlayer.username}: ${backEndPlayer.score}
+         </div>`
     } else {
-      // Update player health
+      // Update player health in the frontend
       frontEndPlayers[id].health = backEndPlayer.health
-      document.querySelector(
-        `div[data-id="${id}"]`
-      ).innerHTML = `${backEndPlayer.username}: ${backEndPlayer.score}`
+
+      // Update the player’s score in the leaderboard
+      document.querySelector(`div[data-id="${id}"]`).innerHTML = 
+        `${backEndPlayer.username}: ${backEndPlayer.score}`
 
       document
         .querySelector(`div[data-id="${id}"]`)
         .setAttribute('data-score', backEndPlayer.score)
 
-      // sorts the players divs
+      // Sort the players displayed in descending order by score
       const parentDiv = document.querySelector('#playerLabels')
       const childDivs = Array.from(parentDiv.querySelectorAll('div'))
-
       childDivs.sort((a, b) => {
         const scoreA = Number(a.getAttribute('data-score'))
         const scoreB = Number(b.getAttribute('data-score'))
-
         return scoreB - scoreA
       })
-
-      // removes old elements
       childDivs.forEach((div) => {
         parentDiv.removeChild(div)
       })
-
-      // adds sorted elements
       childDivs.forEach((div) => {
         parentDiv.appendChild(div)
       })
 
+      // Used for interpolation (moving the player closer to its new position)
       frontEndPlayers[id].target = {
         x: backEndPlayer.x,
         y: backEndPlayer.y
       }
 
+      // If we're updating our own player, handle local input reconciliation
       if (id === socket.id) {
         const lastBackendInputIndex = playerInputs.findIndex((input) => {
           return backEndPlayer.sequenceNumber === input.sequenceNumber
         })
 
-        if (lastBackendInputIndex > -1)
+        if (lastBackendInputIndex > -1) {
           playerInputs.splice(0, lastBackendInputIndex + 1)
+        }
 
+        // Reapply remaining inputs
         playerInputs.forEach((input) => {
           frontEndPlayers[id].target.x += input.dx
           frontEndPlayers[id].target.y += input.dy
@@ -148,32 +184,42 @@ socket.on('updatePlayers', (backEndPlayers) => {
       }
     }
   }
-  // this is where we delete frontend players
+
+  // Remove any client-side players that no longer exist on the server
   for (const id in frontEndPlayers) {
     if (!backEndPlayers[id]) {
       const divToDelete = document.querySelector(`div[data-id="${id}"]`)
       divToDelete.parentNode.removeChild(divToDelete)
-       
+
       // If the local player has been removed, show the username form again
       if (id === socket.id) {
         document.querySelector('#usernameForm').style.display = 'block'
       }
-
       delete frontEndPlayers[id]
     }
   }
 })
 
+// ------------------------------
+// Animation Loop (Game Rendering)
+// ------------------------------
+/**
+ * Continuously updates the game state:
+ * 1) Clears the canvas
+ * 2) Moves players toward their target positions via interpolation
+ * 3) Draws all players and projectiles
+ */
 let animationId
 function animate() {
-  animationId = requestAnimationFrame(animate)
-  // c.fillStyle = 'rgba(0, 0, 0, 0.1)'
-  c.clearRect(0, 0, canvas.width, canvas.height)
+  animationId = requestAnimationFrame(animate) // Tells the browser we want to perform an animation
+  // c.fillStyle = 'rgba(0, 0, 0, 0.1)' // Optional "ghosting" effect if needed
+  c.clearRect(0, 0, canvas.width, canvas.height) // Clears the entire canvas
 
+  // Interpolate and draw each player
   for (const id in frontEndPlayers) {
     const frontEndPlayer = frontEndPlayers[id]
 
-    // linear interpolation
+    // linear interpolation (move the player closer to its target)
     if (frontEndPlayer.target) {
       frontEndPlayers[id].x +=
         (frontEndPlayers[id].target.x - frontEndPlayers[id].x) * 0.5
@@ -184,6 +230,7 @@ function animate() {
     frontEndPlayer.draw()
   }
 
+  // Draw each projectile
   for (const id in frontEndProjectiles) {
     const frontEndProjectile = frontEndProjectiles[id]
     frontEndProjectile.draw()
@@ -192,31 +239,39 @@ function animate() {
 
 animate()
 
+// ------------------------------
+// Player Input Handling (Movement)
+// ------------------------------
+/**
+ * Tracks which movement keys (W, A, S, D) are currently pressed.
+ * This object is used to generate movement inputs.
+ */
 const keys = {
-  w: {
-    pressed: false
-  },
-  a: {
-    pressed: false
-  },
-  s: {
-    pressed: false
-  },
-  d: {
-    pressed: false
-  }
+  w: { pressed: false },
+  a: { pressed: false },
+  s: { pressed: false },
+  d: { pressed: false }
 }
 
+/**
+ * We keep a local buffer (playerInputs) of all unacknowledged inputs. 
+ * The server eventually sends back a sequenceNumber acknowledging the last
+ * processed input, and we remove old inputs from this list.
+ */
 const playerInputs = []
 let sequenceNumber = 0
-setInterval(() => {
-  // Ensure player exists before trying to access speed
-  const player = frontEndPlayers[socket.id]
-  if (!player) {
-    return
-  } // If the player isn't initialized yet, skip this frame
 
-  const SPEED = 5 * player.speed // Dynamically get the player's speed
+/**
+ * Every 15 milliseconds, check which keys are pressed.
+ * If a key is pressed, record the input and send it to the server.
+ */
+setInterval(() => {
+  // Ensure the local player exists before trying to move
+  const player = frontEndPlayers[socket.id]
+  if (!player) return
+
+  // Dynamically get the player's speed
+  const SPEED = 5 * player.speed 
 
   if (keys.w.pressed) {
     sequenceNumber++
@@ -245,6 +300,13 @@ setInterval(() => {
   console.log(playerInputs)
 }, 15)
 
+// ------------------------------
+// Event Listeners for Key Presses
+// ------------------------------
+/**
+ * Listen for keydown events and mark the corresponding key as pressed.
+ * This allows for continuous movement while the key is held.
+ */
 window.addEventListener('keydown', (event) => {
   if (!frontEndPlayers[socket.id]) return
 
@@ -252,21 +314,21 @@ window.addEventListener('keydown', (event) => {
     case 'KeyW':
       keys.w.pressed = true
       break
-
     case 'KeyA':
       keys.a.pressed = true
       break
-
     case 'KeyS':
       keys.s.pressed = true
       break
-
     case 'KeyD':
       keys.d.pressed = true
       break
   }
 })
 
+/**
+ * Listen for keyup events and mark the corresponding key as no longer pressed.
+ */
 window.addEventListener('keyup', (event) => {
   if (!frontEndPlayers[socket.id]) return
 
@@ -274,42 +336,53 @@ window.addEventListener('keyup', (event) => {
     case 'KeyW':
       keys.w.pressed = false
       break
-
     case 'KeyA':
       keys.a.pressed = false
       break
-
     case 'KeyS':
       keys.s.pressed = false
       break
-
     case 'KeyD':
       keys.d.pressed = false
       break
   }
 })
 
-const classSelectors = ["Tank", "Rogue", "Mage", "Gunner"]
-let classSelection = 0
-let className = classSelectors[classSelection]
+// ------------------------------
+// Class Selection Handling
+// ------------------------------
+const classSelectors = ["Tank", "Rogue", "Mage", "Gunner"] // Possible classes
+let classSelection = 0 // Starts in Tank
+let className = classSelectors[classSelection] // Selects the class
 
-function nextClass(){
-  classSelection = (classSelection + 1) % (classSelectors.length) // Goes through the class selector array
+/**
+ * Cycles forward in the array
+ * @returns the selected class
+ */
+function nextClass() {
+  classSelection = (classSelection + 1) % (classSelectors.length)
   return classSelectors[classSelection]
 }
-function previousClass(){
-  classSelection = (classSelection - 1 + classSelectors.length) % classSelectors.length // Goes through the class selector array backwards
+
+/**
+ * Cycles Backwards in the array
+ * @returns the selected class
+ */
+function previousClass() {
+  classSelection = (classSelection - 1 + classSelectors.length) % classSelectors.length
   return classSelectors[classSelection]
 }
 
-document.querySelector('#showClass').textContent = "Class: " + className // Shows this to the player
+document.querySelector('#showClass').textContent = "Class: " + className // Displays the first class
 
-document.querySelector('#classSelectorRight').addEventListener('click', (event) => { // When class button is clicked 
+// When the user clicks the -> arrow it goes to the next class  
+document.querySelector('#classSelectorRight').addEventListener('click', () => { 
   className = nextClass()
   document.querySelector('#showClass').textContent = "Class: " + className
 })
 
-document.querySelector('#classSelectorLeft').addEventListener('click', (event) => { // When class button is clicked 
+// When the user clicks the <- arrow it goes to the previous class 
+document.querySelector('#classSelectorLeft').addEventListener('click', () => {
   className = previousClass()
   document.querySelector('#showClass').textContent = "Class: " + className
 })
@@ -318,39 +391,49 @@ document.querySelector('#classSelectorLeft').addEventListener('click', (event) =
 // Random Username Handling
 // ------------------------------
 /**
- * When the player submits their username:
- * - Prevent the default form submission (which would reload the page)
- * - Hide the username form
- * - Emit an "initGame" event to the server with canvas settings and the username,
- *   so the server can initialize and track the new player.
+ * Generate a random name that isn't already in use by another player on the client.
+ * If the generated name is taken, recurse until a unique name is found.
  */
 function selectName() {
-  let playerNameNumber = Math.floor(Math.random() * playerNames.length);
+  let playerNameNumber = Math.floor(Math.random() * playerNames.length)
   let name = playerNames[playerNameNumber] 
   for (const id in frontEndPlayers) { 
-    if (frontEndPlayers[id].username === name) { // Ensure name is not repeated
-      selectName(); // runs this function recursively until the name is not repeated
+    if (frontEndPlayers[id].username === name) {
+      // If name is already taken by a current player, try again
+      return selectName()
     }
   }
-  return name;
+  return name
 }
 
-let playerName = selectName() // Gets the name
-document.querySelector('#selectedRandomName').textContent = playerName // Assigns a name to the user
+let playerName = selectName()
+document.querySelector('#selectedRandomName').textContent = playerName
 
-document.querySelector('#randomNameBtn').addEventListener('click', (event) => { // If the user click to create a new random name
-  playerName = selectName() // Generates a new random name
+document.querySelector('#randomNameBtn').addEventListener('click', () => {
+  // Generate a new random name when clicked
+  playerName = selectName()
   document.querySelector('#selectedRandomName').textContent = playerName
 })
 
-document.querySelector('#usernameForm').addEventListener('submit', (event) => { // When the user submits it starts the game
-  event.preventDefault() // Prevents the form from refreshing the page on submission
+// ------------------------------
+// Username Form Handling
+// ------------------------------
+/**
+ * When the player submits their username (or chosen random name):
+ * - Prevent default form submission
+ * - Hide the username form
+ * - Emit an 'initGame' event to the server with our chosen data
+ */
+document.querySelector('#usernameForm').addEventListener('submit', (event) => {
+  event.preventDefault() // Prevents the form from refreshing
   document.querySelector('#usernameForm').style.display = 'none' // Hides the username form
-  socket.emit('initGame', { // Lets the server know to start the game
-      width: canvas.width,
-      height: canvas.height,
-      devicePixelRatio,
-      username: playerName,
-      className
+
+  // Send data to the server to initialize the player
+  socket.emit('initGame', {
+    width: canvas.width,
+    height: canvas.height,
+    devicePixelRatio,
+    username: playerName,
+    className
   })
 })

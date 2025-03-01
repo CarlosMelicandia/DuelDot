@@ -1,15 +1,23 @@
 const BasePlayer = require('./BasePlayer.js')
 
+/**
+ * This class represents the Gunner player type.
+ * Gunners have moderate health, speed, and a larger hitbox.
+ */
 class Gunner extends BasePlayer {
-    constructor (props) {
-        super(props)
-        this.class = "Gunner"
+    /**
+     * Constructor for the Gunner class.
+     * @param {Object} props - The configuration object for the player.
+     */
+    constructor(props) {
+        super(props) // Calls BasePlayer constructor
+        this.class = "Gunner" 
         this.health = 100
-        this.maxHealth = 100
+        this.maxHealth = 100 
         this.radius = 14
-        this.color = 'grey'
-        this.speed = 1
+        this.color = 'grey' 
+        this.speed = 1 
     }
 }
 
-module.exports = Gunner
+module.exports = Gunner // Exports the class for use in other files

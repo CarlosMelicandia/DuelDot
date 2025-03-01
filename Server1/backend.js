@@ -1,57 +1,91 @@
-const express = require('express')
-const app = express()
+// ------------------------------
+// Module Imports and Server Setup
+// ------------------------------
+const express = require('express') // Imports the express module
+const app = express() // Creates an instance of an Express application
 
+// Importing different player classes
 const Tank = require('./Tank.js')
 const Mage = require('./Mage.js')
 const Rogue = require('./Rogue.js')
 const Gunner = require('./Gunner.js')
 
-// socket.io setup
-const http = require('http')
-const server = http.createServer(app)
-const { Server } = require('socket.io')
+// ------------------------------
+// Socket.IO Setup
+// ------------------------------
+const http = require('http') // Import Node's built-in HTTP module
+const server = http.createServer(app) // Create an HTTP server using the Express app
+const { Server } = require('socket.io')  // Import the Socket.IO Server class
+
+/**
+ * Creates a Socket.io server instance
+ * - `pingInterval`: Interval (2 seconds) at which the server sends ping packets to the client.
+ * - `pingTimeout`: Maximum time (5 seconds) the server waits for a pong response before considering the client disconnected.
+ */
 const io = new Server(server, { pingInterval: 2000, pingTimeout: 5000 })
 
-const port = 3000
+const port = 3000 // Default port in which the server runs as LocalHost
 
-app.use(express.static('public'))
+// ------------------------------
+// Express Middleware and Routes
+// ------------------------------
+app.use(express.static('public')) // Any files placed in the public folder become accessible to clients via HTTP requests
 
+// When a player visits the root URL (e.g., http://localhost:3000/), they receive the index.html file
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html')
+  res.sendFile(__dirname + '/index.html') //_dirname is this file's absolute path
 })
 
-const backEndPlayers = {}
-const backEndProjectiles = {}
+// ------------------------------
+// Server-side Data Structures
+// ------------------------------
+const backEndPlayers = {} // List of player objects server-side
+const backEndProjectiles = {} // List of projectiles server-side
 
-let projectileId = 0
+// Assigns the canvas height and width to variables
+const GAME_WIDTH = 1024 // Default width
+const GAME_HEIGHT = 576 // Default height
 
-io.on('connection', (socket) => {
-  console.log('a user connected')
+const PROJECTILE_RADIUS = 5 // Radius of projectiles
+let projectileId = 0 // Unique ID counter for each projectile created
 
-  io.emit('updatePlayers', backEndPlayers)
+// ------------------------------
+// Socket.IO Connection and Event Handlers
+// ------------------------------
+io.on('connection', (socket) => { //  io.on listens for an event that is sent to the server via .emit()
+  console.log('A user connected') // Logs that a player has connected
 
-  socket.on('shoot', ({ x, y, angle }) => {
-    projectileId++
+  io.emit('updatePlayers', backEndPlayers) // Send the current list of players to all connected clients
 
+  /**
+   * When the client emits a 'shoot' event, a new projectile is created.
+   */
+  socket.on('shoot', ({ x, y, angle }) => { 
+    projectileId++ // Increment the projectile ID
+
+    // Calculate the velocity of the projectile based on the angle provided by the client
     const velocity = {
       x: Math.cos(angle) * 5,
       y: Math.sin(angle) * 5
     }
 
+    // Create a new server-side projectile
     backEndProjectiles[projectileId] = {
       x,
       y,
       velocity,
       playerId: socket.id
     }
-
-    console.log(backEndProjectiles)
   })
-  
 
+  /**
+   * Listens for an 'initGame' event from the client to create a new player.
+   */
   socket.on('initGame', ({ username, width, height, className }) => {
-    let x = 1024 * Math.random()
-    let y = 576 * Math.random()
+    let x = GAME_WIDTH * Math.random()
+    let y = GAME_HEIGHT * Math.random()
+
+    // Object storing the different player class constructors
     const Classes = {
       Tank: Tank,
       Mage: Mage,
@@ -59,6 +93,7 @@ io.on('connection', (socket) => {
       Gunner: Gunner
     }
 
+    // Create a new player object of the selected class
     const newPlayer = new Classes[className]({
       username: username, 
       x: x, 
@@ -69,44 +104,51 @@ io.on('connection', (socket) => {
     
     backEndPlayers[socket.id] = newPlayer
 
-    // where we init our canvas
+    // Store the canvas settings for the player
     backEndPlayers[socket.id].canvas = {
       width,
       height
     }
-    console.log("Class:", backEndPlayers[socket.id].class,"\nHealth:", backEndPlayers[socket.id].health, "\nRadius:", backEndPlayers[socket.id].radius, "\nSpeed:", backEndPlayers[socket.id].speed)
+
+    console.log(`Class: ${backEndPlayers[socket.id].constructor.name}, Health: ${backEndPlayers[socket.id].health}, Radius: ${backEndPlayers[socket.id].radius}, Speed: ${backEndPlayers[socket.id].speed}`)
   })
 
+  /**
+   * Handles player disconnection.
+   */
   socket.on('disconnect', (reason) => {
-    console.log(reason)
-    delete backEndPlayers[socket.id]
-    io.emit('updatePlayers', backEndPlayers)
+    console.log(reason) // Logs why the player disconnected
+    delete backEndPlayers[socket.id] // Remove the player from the server's list
+    io.emit('updatePlayers', backEndPlayers) // Send an updated player list to all clients
   })
 
+  /**
+   * Handles player movement via key presses.
+   */
   socket.on('keydown', ({ keycode, sequenceNumber }) => {
-    const backEndPlayer = backEndPlayers[socket.id]
+    const backEndPlayer = backEndPlayers[socket.id] // Assigns backEndPlayer with the player's current info
 
-    if (!backEndPlayers[socket.id]) return
+    if (!backEndPlayer) return // Ensure player exists before proceeding
 
-    backEndPlayers[socket.id].sequenceNumber = sequenceNumber
+    backEndPlayers[socket.id].sequenceNumber = sequenceNumber // Sync the sequence number from the client
+    
+    // Move the player based on the key pressed
     switch (keycode) {
       case 'KeyW':
         backEndPlayers[socket.id].y -= 5 * backEndPlayer.speed
         break
-
       case 'KeyA':
         backEndPlayers[socket.id].x -= 5 * backEndPlayer.speed
         break
-
       case 'KeyS':
         backEndPlayers[socket.id].y += 5 * backEndPlayer.speed
         break
-
       case 'KeyD':
         backEndPlayers[socket.id].x += 5 * backEndPlayer.speed
         break
     }
 
+    // Prevent the player from moving out of bounds
     const playerSides = {
       left: backEndPlayer.x - backEndPlayer.radius,
       right: backEndPlayer.x + backEndPlayer.radius,
@@ -115,63 +157,57 @@ io.on('connection', (socket) => {
     }
 
     if (playerSides.left < 0) backEndPlayers[socket.id].x = backEndPlayer.radius
-
-    if (playerSides.right > 1024)
-      backEndPlayers[socket.id].x = 1024 - backEndPlayer.radius
-
+    if (playerSides.right > GAME_WIDTH) backEndPlayers[socket.id].x = GAME_WIDTH - backEndPlayer.radius
     if (playerSides.top < 0) backEndPlayers[socket.id].y = backEndPlayer.radius
-
-    if (playerSides.bottom > 576)
-      backEndPlayers[socket.id].y = 576 - backEndPlayer.radius
+    if (playerSides.bottom > GAME_HEIGHT) backEndPlayers[socket.id].y = GAME_HEIGHT - backEndPlayer.radius
   })
 })
 
-// backend ticker
+// ------------------------------
+// Backend Ticker (Game Loop)
+// ------------------------------
 setInterval(() => {
-  // update projectile positions
+  // Update projectile positions
   for (const id in backEndProjectiles) {
     backEndProjectiles[id].x += backEndProjectiles[id].velocity.x
     backEndProjectiles[id].y += backEndProjectiles[id].velocity.y
 
-    const PROJECTILE_RADIUS = 5
+    // Remove projectiles that go out of bounds
     if (
-      backEndProjectiles[id].x - PROJECTILE_RADIUS >=
-        backEndPlayers[backEndProjectiles[id].playerId]?.canvas?.width ||
+      backEndProjectiles[id].x - PROJECTILE_RADIUS >= GAME_WIDTH ||
       backEndProjectiles[id].x + PROJECTILE_RADIUS <= 0 ||
-      backEndProjectiles[id].y - PROJECTILE_RADIUS >=
-        backEndPlayers[backEndProjectiles[id].playerId]?.canvas?.height ||
+      backEndProjectiles[id].y - PROJECTILE_RADIUS >= GAME_HEIGHT ||
       backEndProjectiles[id].y + PROJECTILE_RADIUS <= 0
     ) {
       delete backEndProjectiles[id]
       continue
     }
 
+    // Detect projectile collisions with players
     for (const playerId in backEndPlayers) {
       const backEndPlayer = backEndPlayers[playerId]
 
+      // Calculate the distance between the player and the projectile
       const DISTANCE = Math.hypot(
         backEndProjectiles[id].x - backEndPlayer.x,
         backEndProjectiles[id].y - backEndPlayer.y
       )
 
-      // collision detection
-      if (
-        DISTANCE < PROJECTILE_RADIUS + backEndPlayer.radius &&
-        backEndProjectiles[id].playerId !== playerId
-      ) {
-        
-      // Deal 25 damage instead of instant death
-      if (!backEndPlayers[playerId].health) backEndPlayers[playerId].health = 100 // Fallback
-       backEndPlayers[playerId].health -= 25
-        
-      // If health reaches 0 or below, remove the player and give the shooter a point
-      if (backEndPlayers[playerId].health <= 0) {
-        backEndPlayers[backEndProjectiles[id].playerId].score++
-        delete backEndPlayers[playerId]
-      }
-        
-      // Delete the projectile that hit
-      delete backEndProjectiles[id]
+      // Check if a collision occurred
+      if (DISTANCE < PROJECTILE_RADIUS + backEndPlayer.radius &&
+          backEndProjectiles[id].playerId !== playerId) {
+
+        // Reduce the player's health when hit
+        backEndPlayers[playerId].health -= 25
+
+        // If health reaches 0, remove the player and reward the shooter
+        if (backEndPlayers[playerId].health <= 0) {
+          backEndPlayers[backEndProjectiles[id].playerId].score++
+          delete backEndPlayers[playerId]
+        }
+
+        // Remove the projectile
+        delete backEndProjectiles[id]
         break
       }
     }
@@ -181,8 +217,11 @@ setInterval(() => {
   io.emit('updatePlayers', backEndPlayers)
 }, 15)
 
+// ------------------------------
+// Start the Server
+// ------------------------------
 server.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+  console.log(`Server running at http://localhost:${port}/`)
 })
 
-console.log('server did load')
+console.log('Server did load')
