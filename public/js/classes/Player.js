@@ -17,7 +17,7 @@ class Player {
     ctx.beginPath() // Clears the path so that the new shape isn't connected to the previous one
     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false) // Creates the circle for the player
     ctx.fillStyle = this.color // Colors the inside of the player to match player color
-    ctx.fill() // Draws the actual circle of the
+    ctx.fill() // Draws the actual circle of the player
     ctx.restore()
   }
 }

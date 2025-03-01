@@ -62,7 +62,7 @@ function spawnPowerUp() {
   io.emit('spawnPowerUp', powerUpData); // Send to all clients
 }
 
-setInterval(spawnPowerUp, 2000)
+setInterval(spawnPowerUp, 10000) // How often power ups spawn.
 
 
 // ------------------------------
@@ -121,12 +121,33 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
    * Listens for player collision with power ups-- need to implement collision detection for this to happen
    */
   socket.on('collectPowerUp', ({playerId, powerUpId}) => {
-    if (powerUps[powerUpId]) {
-      if (powerUps[powerUpId].type === 'speed') { // modular
-        backEndPlayers[playerId].speed = 8; // Increase speed
-        setTimeout(() => backEndPlayers[playerId].speed = 5, 5000); // Reset after 5 sec
+    if (powerUps[powerUpId] && backEndPlayers[playerId]) {
+      const powerUp = powerUps[powerUpId];
+      
+      if (powerUp.type === 'speed') {
+        // Store the player's original speed if not already stored
+        if (!backEndPlayers[playerId].originalSpeed) {
+          backEndPlayers[playerId].originalSpeed = SPEED;
+        }
+        
+        // Apply speed boost
+        backEndPlayers[playerId].speed = SPEED * 1.8; // 80% speed boost
+        
+        // When applying a power-up on the server
+        backEndPlayers[playerId].hasPowerUp = true; // doesnt do anything yet
+
+        // Set a timeout to reset the speed
+        setTimeout(() => {
+          if (backEndPlayers[playerId]) {  // Check if player still exists
+            backEndPlayers[playerId].speed = backEndPlayers[playerId].originalSpeed || SPEED
+          }
+        }, 5000); // 5 seconds duration  
       }
+      
+      // Remove the power-up from the server
       delete powerUps[powerUpId];
+      
+      // Notify all clients to remove this power-up
       io.emit('removePowerUp', powerUpId);
     }
   })
@@ -151,21 +172,23 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
     backEndPlayers[socket.id].sequenceNumber = sequenceNumber // Syncs the player's stored sequence number with the client's latest sequence number
     
     // Moves the player based on the key pressed
+
+    const playerSpeed = backEndPlayers[socket.id].speed || SPEED
     switch (keycode) {
       case 'KeyW':
-        backEndPlayers[socket.id].y -= SPEED
+        backEndPlayers[socket.id].y -= playerSpeed
         break
 
       case 'KeyA':
-        backEndPlayers[socket.id].x -= SPEED
+        backEndPlayers[socket.id].x -= playerSpeed
         break
 
       case 'KeyS':
-        backEndPlayers[socket.id].y += SPEED
+        backEndPlayers[socket.id].y += playerSpeed
         break
 
       case 'KeyD':
-        backEndPlayers[socket.id].x += SPEED
+        backEndPlayers[socket.id].x += playerSpeed
         break
     }
 

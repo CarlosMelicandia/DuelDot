@@ -251,6 +251,23 @@ function animate() {
     frontEndPowerUps[id].draw();
   }
 
+  if (frontEndPlayers[socket.id]) {
+    const currentPlayer = frontEndPlayers[socket.id]
+
+    for (const id in frontEndPowerUps) {
+      const powerUp = frontEndPowerUps[id]
+
+      if (powerUp.checkCollision(currentPlayer)) {
+        socket.emit('collectPowerUp', {
+          playerId: socket.id,
+          powerUpId: powerUp.id
+        })
+
+        delete frontEndPowerUps[id]
+      }
+    }
+  }
+
 }
 
 animate() // Calls the animate function
