@@ -213,7 +213,6 @@ setInterval(() => {
   // Ensure player exists before trying to access speed
   const player = frontEndPlayers[socket.id]
   if (!player) {
-    console.log("no")
     return
   } // If the player isn't initialized yet, skip this frame
 
@@ -292,18 +291,27 @@ window.addEventListener('keyup', (event) => {
 
 const classSelectors = ["Tank", "Rogue", "Mage", "Gunner"]
 let classSelection = 0
+let className = classSelectors[classSelection]
 
 function nextClass(){
   classSelection = (classSelection + 1) % (classSelectors.length) // Goes through the class selector array
   return classSelectors[classSelection]
 }
+function previousClass(){
+  classSelection = (classSelection - 1 + classSelectors.length) % classSelectors.length // Goes through the class selector array backwards
+  return classSelectors[classSelection]
+}
 
-let className = nextClass()
-document.querySelector('#classSelector').textContent = "Class: " + className // Shows this to the player
+document.querySelector('#showClass').textContent = "Class: " + className // Shows this to the player
 
-document.querySelector('#classSelector').addEventListener('click', (event) => { // When class button is clicked 
-  className = nextClass() // Goes to next class
-  document.querySelector('#classSelector').textContent = "Class: " + className
+document.querySelector('#classSelectorRight').addEventListener('click', (event) => { // When class button is clicked 
+  className = nextClass()
+  document.querySelector('#showClass').textContent = "Class: " + className
+})
+
+document.querySelector('#classSelectorLeft').addEventListener('click', (event) => { // When class button is clicked 
+  className = previousClass()
+  document.querySelector('#showClass').textContent = "Class: " + className
 })
 
 // ------------------------------

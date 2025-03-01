@@ -52,78 +52,112 @@
           transform: translate(-50%, -50%);
           text-align: center;
         ">
-
+        
+        <!-- Shows the username -->
         <form id="usernameForm">
           <div 
             id="selectedRandomName"
-            type = "text"
+            type="text"
             style="
-              width: 187px;
+              width: 227px;
               padding: 10px;
               box-sizing: border-box;
               border-radius: 5px;
               border: none;
               background: #475569;
               color: #cbd5e1;
-          ">
+              text-align: center;
+            ">
           </div>
-          <div>
+
+          <!-- Class Selector Buttons-->
+          <div style="margin-top: 8px; display: flex; align-items: center; gap: 10px;">
+            
+            <!-- Left Button Class -->
             <button 
-            type = "button"
-            id ="classSelector"
-            style="
-              padding: 8px 20px; 
-              border-radius: 5px;
-              border: none;
-              background-image: linear-gradient(
-                to right,
-                rgb(6, 182, 212),
-                rgb(59, 130, 246)
-              );
-              color: white;
-              cursor: pointer;"
-            > 
+              type="button"
+              id="classSelectorLeft"
+              style="
+                padding: 10px; 
+                border-radius: 5px;
+                border: none;
+                background-image: linear-gradient(to right, #06b6d4, #3b82f6);
+                color: white;
+                cursor: pointer;">
+              ←
             </button>
+
+            <!-- Shows Selected Class -->
+            <button 
+              type="button"
+              id="showClass"
+              style="
+                width: 140px;
+                padding: 10px; 
+                border-radius: 5px;
+                box-sizing: border-box;
+                border: none;
+                background: linear-gradient(to right, #06b6d4, #3b82f6);
+                color: white;
+                font-weight: bold;
+                text-transform: uppercase;
+                cursor: default;">
+            </button>
+
+            <!-- Right Button Class -->
+            <button 
+              type="button"
+              id="classSelectorRight"
+              style="
+                padding: 10px; 
+                border-radius: 5px;
+                border: none;
+                background-image: linear-gradient(to right, #06b6d4, #3b82f6);
+                color: white;
+                cursor: pointer;">
+              →
+            </button>
+            
           </div>
-           <!-- Action buttons -->
-          <div style="margin-top: 8px; display: flex; gap: 5px;">
+
+          <!-- Action Buttons -->
+          <div style="margin-top: 8px; display: flex; gap: 8px;">
+            
+            <!-- Start Button -->
             <button
-              type = "submit"
+              type="submit"
               style="
                 padding: 8px 20px; 
                 border-radius: 5px;
                 border: none;
-                background-image: linear-gradient(
-                  to right,
-                  rgb(6, 182, 212),
-                  rgb(59, 130, 246)
-                );
+                background: linear-gradient(to right, #06b6d4, #3b82f6);
                 color: white;
+                font-weight: bold;
+                text-transform: uppercase;
                 cursor: pointer;">
               Start!
             </button>
+
+            <!-- Random Name Button -->
             <button
               type="button"
-              id = "randomNameBtn"
+              id="randomNameBtn"
               style="
-                padding: 8px 10px;
+                padding: 8px 15px;
                 border-radius: 5px;
                 border: none;
-                background-image: linear-gradient(
-                  to right,
-                  rgb(6, 182, 212),
-                  rgb(59, 130, 246)
-                );
+                background: linear-gradient(to right, #06b6d4, #3b82f6);
                 color: white;
+                font-weight: bold;
+                text-transform: uppercase;
                 cursor: pointer;">
               Random Name
             </button>
           </div>
         </form>
       </div>
-      <!-- username input end -->
+    <!-- username input end -->
     </div>
-    
 
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.2/gsap.min.js"
