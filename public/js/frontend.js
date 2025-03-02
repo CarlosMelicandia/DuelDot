@@ -48,19 +48,15 @@ const playerNames = [
   "Rift", "BOB"
 ]
 
-/**
- * ------------------------------
- * Data Structures for Game Objects
- * ------------------------------
- */
+// ------------------------------
+// Data Structures for Game Objects
+// ------------------------------
 const frontEndPlayers = {}  // Object to keep track of all player objects on the client
 const frontEndProjectiles = {} // Object to keep track of all projectile objects on the client
 
-/**
- * ------------------------------
- * Handling Server Updates for Projectiles
- * ------------------------------
- */
+// ------------------------------
+// Handling Server Updates for Projectiles
+// ------------------------------
 /**
  * Keeps the front end (client-side) projectiles in sync with the back end (server).
  * When the server emits 'updateProjectiles', iterate over each projectile and
@@ -80,7 +76,7 @@ socket.on('updateProjectiles', (backEndProjectiles) => {
         x: backEndProjectile.x,
         y: backEndProjectile.y,
         radius: 5,
-        color: frontEndPlayers[backEndProjectile.playerId]?.color,
+        color: frontEndPlayers[backEndProjectile.playerId]?.color, // Checks if client Player with server projectiles id exists and assigns color if it does
         velocity: backEndProjectile.velocity
       })
     } else {
@@ -118,14 +114,14 @@ socket.on('updatePlayers', (backEndPlayers) => {
      * create a new Player object using the server's data.
      */
     if (!frontEndPlayers[id]) {
-      frontEndPlayers[id] = new Player({
+      frontEndPlayers[id] = new Player ({
         x: backEndPlayer.x,
         y: backEndPlayer.y,
-        radius: backEndPlayer.radius, // The Test branch uses the server-provided radius
+        radius: backEndPlayer.radius,
         color: backEndPlayer.color,
         username: backEndPlayer.username,
-        health: backEndPlayer.health,   // Extra property in Test branch
-        speed: backEndPlayer.speed      // Extra property in Test branch
+        health: backEndPlayer.health,  
+        speed: backEndPlayer.speed      
       })
 
       // Add this player to the leaderboard 
@@ -142,8 +138,8 @@ socket.on('updatePlayers', (backEndPlayers) => {
         `${backEndPlayer.username}: ${backEndPlayer.score}`
 
       document
-        .querySelector(`div[data-id="${id}"]`)
-        .setAttribute('data-score', backEndPlayer.score)
+              .querySelector(`div[data-id="${id}"]`) // Selects a DOM element that matches the player's id
+              .setAttribute('data-score', backEndPlayer.score) // Updates the label in HTML to show the players latest score from the server
 
       // Sort the players displayed in descending order by score
       const parentDiv = document.querySelector('#playerLabels')
@@ -166,9 +162,8 @@ socket.on('updatePlayers', (backEndPlayers) => {
         y: backEndPlayer.y
       }
 
-      // If we're updating our own player, handle local input reconciliation
       if (id === socket.id) {
-        const lastBackendInputIndex = playerInputs.findIndex((input) => {
+        const lastBackendInputIndex = playerInputs.findIndex((input) => { // Gets the last input from the server of that player
           return backEndPlayer.sequenceNumber === input.sequenceNumber
         })
 
@@ -308,6 +303,7 @@ setInterval(() => {
  * This allows for continuous movement while the key is held.
  */
 window.addEventListener('keydown', (event) => {
+  // If the local player's data is not yet available, ignore input events
   if (!frontEndPlayers[socket.id]) return
 
   switch (event.code) {

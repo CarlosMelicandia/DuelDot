@@ -15,13 +15,7 @@ addEventListener('click', (event) => {
     y: frontEndPlayers[socket.id].y
   }
 
-  /**
-   * Calculates the angle between the player's position and the mouse click location.
-   * - event.clientY: Y-coordinate of the click event
-   * - event.clientX: X-coordinate of the click event
-   * - We subtract `top` and `left` to get the click’s position relative to the canvas.
-   * - `Math.atan2()` calculates the angle between the two points.
-   */
+  // Calculates the angle between the player's position and the mouse click location.
   const angle = Math.atan2(
     event.clientY - top - playerPosition.y,
     event.clientX - left - playerPosition.x

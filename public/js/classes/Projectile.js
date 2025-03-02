@@ -1,17 +1,16 @@
 
 /** 
-* Represents a projectile (bullet, energy blast, etc.) that a player shoots.
+* Represents a projectile that a player shoots.
 * Handles both rendering the projectile and updating its position.
 */
 class Projectile {
   /**
    * Constructor for the projectile.
-   * @param {Object} config - The configuration object for the projectile.
-   * @param {number} config.x - The initial x-coordinate of the projectile.
-   * @param {number} config.y - The initial y-coordinate of the projectile.
-   * @param {number} config.radius - The radius of the projectile (size).
-   * @param {string} config.color - The color of the projectile (defaults to white).
-   * @param {Object} config.velocity - The velocity object, containing `x` and `y` components.
+   * @param {number} x - The initial x-coordinate of the projectile.
+   * @param {number} y - The initial y-coordinate of the projectile.
+   * @param {number} radius - The radius of the projectile (size).
+   * @param {string} color - The color of the projectile (defaults to white).
+   * @param {Object} velocity - The velocity object, containing `x` and `y` components.
    */
   constructor({ x, y, radius, color = 'white', velocity }) {
     this.x = x
