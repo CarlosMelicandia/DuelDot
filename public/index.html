@@ -172,5 +172,16 @@
     <script src="./js/classes/Projectile.js"></script>
     <script src="./js/frontend.js"></script>
     <script src="./js/eventListeners.js"></script>
+    <!-- Custom Cursor Script -->
+    <script>
+      // Set a custom cursor for the body and canvas
+      const customCursorImage = "/img/CrosshairCursor.png"; // Update the path if needed
+
+      // Apply the custom cursor to the body
+      document.body.style.cursor = `url(${customCursorImage}), auto`;
+
+      // Apply the custom cursor to the canvas
+      canvas.style.cursor = `url(${customCursorImage}), auto`;
+    </script>
   </body>
 </html>

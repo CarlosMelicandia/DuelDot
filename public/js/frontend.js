@@ -292,7 +292,6 @@ setInterval(() => {
     socket.emit('keydown', { keycode: 'KeyD', sequenceNumber })
   }
 
-  console.log(playerInputs)
 }, 15)
 
 // ------------------------------
