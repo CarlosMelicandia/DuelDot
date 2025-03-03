@@ -9,6 +9,8 @@ const Tank = require('./Tank.js')
 const Mage = require('./Mage.js')
 const Rogue = require('./Rogue.js')
 const Gunner = require('./Gunner.js')
+const { Weapon, Pistol, SubmachineGun, Sniper, Shuriken } = require('./WeaponStuff/Weapons.js')
+const { spawnWeapons, checkCollision } = require('./WeaponStuff/BackWeaponLogic.js')
 
 // ------------------------------
 // Socket.IO Setup
@@ -41,6 +43,7 @@ app.get('/', (req, res) => {
 // ------------------------------
 const backEndPlayers = {} // List of player objects server-side
 const backEndProjectiles = {} // List of projectiles server-side
+const backEndWeapons = [] // List of weapons server-side
 
 // Assigns the canvas height and width to variables
 const GAME_WIDTH = 1024 // Default width
@@ -48,6 +51,7 @@ const GAME_HEIGHT = 576 // Default height
 
 const PROJECTILE_RADIUS = 5 // Radius of projectiles
 let projectileId = 0 // Unique ID counter for each projectile created
+
 
 // ------------------------------
 // Socket.IO Connection and Event Handlers
@@ -63,10 +67,10 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
   socket.on('shoot', ({ x, y, angle }) => { 
     projectileId++ // Increment the projectile ID
 
-    // Calculate the velocity of the projectile based on the angle provided by the client
+    // Calculate the velocity of the projectile based on the angle provided by the client----------------------------------------------------
     const velocity = {
-      x: Math.cos(angle) * 5,
-      y: Math.sin(angle) * 5
+      x: Math.cos(angle) * 5,  //Weapon Velocity 
+      y: Math.sin(angle) * 5   // Weapon Velocity
     }
 
     // Create a new server-side projectile
@@ -161,7 +165,29 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
     if (playerSides.top < 0) backEndPlayers[socket.id].y = backEndPlayer.radius
     if (playerSides.bottom > GAME_HEIGHT) backEndPlayers[socket.id].y = GAME_HEIGHT - backEndPlayer.radius
   })
+
+  // socket.on('updateInventory', (currentWeapon) => {
+  // //------------------------------------------------------------------------------------------------------------------------------------------------
+  //     //Inventory System ----------------------------------------------------------------------------------------------------------------------
+  //     let weapon
+  //     weapons = {
+  //       pistol: Pistol,
+  //       submachineGun: SubmachineGun,
+  //       sniper: Sniper,
+  //       shuriken: Shuriken
+  //     }
+  //     weapon = new weapons[currentWeapon]()
+      
+  //     console.log("Inventory Size", player.inventory.length)
+
+
+      
+
+  //   })
+      //-----------------------------------------------------------------------------------------------------------------------------------------------
 })
+
+spawnWeapons(backEndWeapons)
 
 // ------------------------------
 // Backend Ticker (Game Loop)
@@ -182,7 +208,7 @@ setInterval(() => {
       delete backEndProjectiles[id]
       continue
     }
-
+    
     // Detect projectile collisions with players
     for (const playerId in backEndPlayers) {
       const backEndPlayer = backEndPlayers[playerId]
@@ -197,8 +223,18 @@ setInterval(() => {
       if (DISTANCE < PROJECTILE_RADIUS + backEndPlayer.radius &&
           backEndProjectiles[id].playerId !== playerId) {
 
-        // Reduce the player's health when hit
-        backEndPlayers[playerId].health -= 25
+          // Find the shooter (who fired the projectile)
+           const shooter = backEndPlayers[backEndProjectiles[id].playerId]
+           const equippedWeapon = shooter.inventory.index(0);
+
+    if (shooter && equippedWeapon) {
+      const totalDamage = backEndPlayer[playerId].equippedWeapon.damage * shooter.lightWpnMtp;
+      backEndPlayers[playerId].health -=  totalDamage;
+    } else {
+        console.log(`Error: Shooter or equipped weapon is undefined.`);
+      }
+
+        // console.log(damage);
 
         // If health reaches 0, remove the player and reward the shooter
         if (backEndPlayers[playerId].health <= 0) {
@@ -212,10 +248,14 @@ setInterval(() => {
       }
     }
   }
+  
+  checkCollision(backEndPlayers, backEndWeapons)
 
+  io.emit('updateWeapons', backEndWeapons)
   io.emit('updateProjectiles', backEndProjectiles)
   io.emit('updatePlayers', backEndPlayers)
 }, 15)
+
 
 // ------------------------------
 // Start the Server
@@ -225,3 +265,5 @@ server.listen(port, () => {
 })
 
 console.log('Server did load')
+
+

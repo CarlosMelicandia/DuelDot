@@ -17,6 +17,11 @@ class Gunner extends BasePlayer {
         this.radius = 14
         this.color = 'grey' 
         this.speed = 1 
+        this.lightWpnMtp = 1.0
+        this.heavyWpnMtp = 1.0
+        this.magicWpnMtp = 1.0
+        //this.inventory = [new Pistol()]
+        //this.equippedWeapon = null
     }
 }
 

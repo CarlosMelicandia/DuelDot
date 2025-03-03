@@ -17,6 +17,11 @@ class Rogue extends BasePlayer {
         this.radius = 9 
         this.color = 'blue' 
         this.speed = 1.4 
+        this.lightWpnMtp = 1.0
+        this.heavyWpnMtp = 1.0
+        this.magicWpnMtp = 1.0
+        //this.inventory = [new Pistol()]
+        //this.equippedWeapon = null
     }
 }
 

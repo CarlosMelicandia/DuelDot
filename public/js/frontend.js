@@ -55,6 +55,7 @@ const playerNames = [
  */
 const frontEndPlayers = {}  // Object to keep track of all player objects on the client
 const frontEndProjectiles = {} // Object to keep track of all projectile objects on the client
+const frontEndWeapons = {} // Object to keep track of all weapons objects on the client
 
 /**
  * ------------------------------
@@ -200,6 +201,23 @@ socket.on('updatePlayers', (backEndPlayers) => {
   }
 })
 
+socket.on('updateWeapons', (backEndWeapons) => {
+  for (const weapon in backEndWeapons) {
+    const backEndWeapon = backEndWeapons[weapon]
+    console.log(backEndWeapon)
+    if (!frontEndWeapons[weapon]){
+      frontEndWeapons[weapon] = new WeaponDrawing(
+        backEndWeapon.spawnX,
+        backEndWeapon.spawnY,
+        20,
+        20,
+        "red"
+      )
+    }
+  }
+})
+
+
 // ------------------------------
 // Animation Loop (Game Rendering)
 // ------------------------------
@@ -226,8 +244,12 @@ function animate() {
       frontEndPlayers[id].y +=
         (frontEndPlayers[id].target.y - frontEndPlayers[id].y) * 0.5
     }
-
     frontEndPlayer.draw()
+  }
+
+  for (const weapon in frontEndWeapons){
+    const frontEndWeapon = frontEndWeapons[weapon]
+    frontEndWeapon.draw()
   }
 
   // Draw each projectile
@@ -296,8 +318,6 @@ setInterval(() => {
     playerInputs.push({ sequenceNumber, dx: SPEED, dy: 0 })
     socket.emit('keydown', { keycode: 'KeyD', sequenceNumber })
   }
-
-  console.log(playerInputs)
 }, 15)
 
 // ------------------------------

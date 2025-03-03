@@ -17,6 +17,11 @@ class Tank extends BasePlayer {
         this.radius = 17
         this.color = 'red'
         this.speed = .5
+        this.lightWpnMtp = 1.0
+        this.heavyWpnMtp = 1.0
+        this.magicWpnMtp = 1.0
+        //this.inventory = [new Pistol()]
+        //this.equippedWeapon = null
     }
 }
 

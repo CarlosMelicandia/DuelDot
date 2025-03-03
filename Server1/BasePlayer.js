@@ -17,11 +17,20 @@ class BasePlayer {
       this.sequenceNumber = sequenceNumber // Tracks last processed movement input
       this.score = score // Player's current score
 
-      // Default properties (these will be overridden by subclasses)
+      // Default properties
       this.radius = 0 // Player's hit box radius (set by subclasses)
       this.health = 0 // Current health (set by subclasses)
       this.maxHealth = 0 // Maximum health value (set by subclasses)
       this.speed = 0 // Movement speed (set by subclasses)
+
+      // Weapon multipliers
+      this.lightWpnMtp = 1.0
+      this.heavyWpnMtp = 1.0
+      this.magicWpnMtp = 1.0
+
+      // Inventory and Equipped
+      // this.inventory = []
+      // this.equippedWeapon = null
   }
 }
 
