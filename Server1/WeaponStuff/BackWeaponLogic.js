@@ -1,11 +1,10 @@
 const GAME_WIDTH = 1024 // Default width
 const GAME_HEIGHT = 576 // Default height
-let backEndWeapons = []
 let deletedWeaponIds = []
 
 let weaponId = 0
 
-function spawnWeapons(io) {
+function spawnWeapons(backEndWeapons, io) {
   const maxX = GAME_WIDTH - 50
   const maxY = GAME_HEIGHT - 50
   const min = 50
@@ -39,11 +38,11 @@ function spawnWeapons(io) {
     // Add new weapon and then sort by ID
     backEndWeapons.push(weaponData)
 
-    io.emit("updateWeapons", weaponData)
+    io.emit("updateWeapons", backEndWeapons, weaponData)
   }, 5000) // Sets the time rate at which weapons spawn (Default = 7500)
 }
 
-function checkCollision(io, player) {
+function checkCollision(backEndWeapons, io, player) {
   for (let i = backEndWeapons.length - 1; i >= 0; i--) {
     let weapon = backEndWeapons[i]
     let dist = Math.hypot(player.x - weapon.x, player.y - weapon.y)
@@ -56,7 +55,7 @@ function checkCollision(io, player) {
       deletedWeaponIds.push(weapon.id)
 
       // Send updated weapons + the removed weapon
-      io.emit("updateWeapons", { id: weapon.id, remove: true })
+      io.emit("updateWeapons", backEndWeapons, { id: weapon.id, remove: true })
 
       break;
     }

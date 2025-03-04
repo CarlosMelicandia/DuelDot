@@ -198,7 +198,7 @@ socket.on('updatePlayers', (backEndPlayers) => {
   }
 })
 
-socket.on('updateWeapons', (weaponData) =>{
+socket.on('updateWeapons', (backEndWeapons, weaponData) =>{
   if (weaponData.remove){
     console.log("Before", frontEndWeapons)
     delete frontEndWeapons[weaponData.id]

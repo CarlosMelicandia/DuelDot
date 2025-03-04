@@ -116,7 +116,7 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
 
     console.log(`Class: ${backEndPlayers[socket.id].constructor.name}, Health: ${backEndPlayers[socket.id].health}, Radius: ${backEndPlayers[socket.id].radius}, Speed: ${backEndPlayers[socket.id].speed}`)
     
-    socket.emit('updateWeaponsOnJoin', backEndWeapons); // ___________________________________________________ When another play joins they don't see the previous spawned weapons (I think its because the backEndWeapons in this file isnt being update, move the backEndWeapons from BackWeaponLogic to here maybe)
+    socket.emit('updateWeaponsOnJoin', backEndWeapons);
   })
 
   /**
@@ -189,7 +189,7 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
       //-----------------------------------------------------------------------------------------------------------------------------------------------
 })
 
-spawnWeapons(io) // function to randomly spawn weapons
+spawnWeapons(backEndWeapons, io) // function to randomly spawn weapons
 
 // ------------------------------
 // Backend Ticker (Game Loop)
@@ -197,7 +197,7 @@ spawnWeapons(io) // function to randomly spawn weapons
 setInterval(() => {
   for (const playerId in backEndPlayers){
     const player = backEndPlayers[playerId]
-    checkCollision(io, player)
+    checkCollision(backEndWeapons, io, player)
   }
   // Update projectile positions
   for (const id in backEndProjectiles) {
