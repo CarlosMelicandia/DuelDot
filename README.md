@@ -5,7 +5,7 @@ This is a starter project for the [Chris Courses Online Multiplayer Game Tutoria
 
 To get started, download this repo and double click `index.html` to see the single-player game we'll base our multiplayer off on.
 
-No need to type npm install anymore.
+No need to type npm install when running the server without auto reload.
 There are two ways to start the server:
 1. Run the server without back-end auto-reloading by typing npm start
 2. Run the server with back-end auto reloading by typing npm run dev

@@ -53,7 +53,7 @@ const playerNames = [
 // ------------------------------
 const frontEndPlayers = {}  // Object to keep track of all player objects on the client
 const frontEndProjectiles = {} // Object to keep track of all projectile objects on the client
-const frontEndWeapons = {} // Object to keep track of all weapons objects on the client
+let frontEndWeapons = {} // Object to keep track of all weapons objects on the client
 
 /**
  * ------------------------------
@@ -198,20 +198,24 @@ socket.on('updatePlayers', (backEndPlayers) => {
   }
 })
 
-socket.on('updateWeapons', (backEndWeapons) => {
-  for (const weapon in backEndWeapons) {
-    const backEndWeapon = backEndWeapons[weapon]
-    console.log(backEndWeapon)
-    if (!frontEndWeapons[weapon]){
-      frontEndWeapons[weapon] = new WeaponDrawing(
-        backEndWeapon.spawnX,
-        backEndWeapon.spawnY,
-        20,
-        20,
-        "red"
-      )
+socket.on('updateWeapons', (weaponData) =>{
+  if (weaponData.remove){
+    console.log("Before", frontEndWeapons)
+    delete frontEndWeapons[weaponData.id]
+    console.log("After", frontEndWeapons)
+  }else{
+    if (!frontEndWeapons[weaponData.id]){
+      frontEndWeapons[weaponData.id] = new WeaponDrawing(weaponData)
     }
   }
+})
+
+socket.on('updateWeaponsOnJoin', (backEndWeapons) => {
+  frontEndWeapons = {}
+
+  backEndWeapons.forEach((weapon) => {
+    frontEndWeapons[weapon.id] = new WeaponDrawing(weapon)
+  })
 })
 
 

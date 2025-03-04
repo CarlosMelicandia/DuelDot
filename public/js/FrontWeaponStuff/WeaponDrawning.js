@@ -1,19 +1,17 @@
 class WeaponDrawing {
-    constructor(x, y, width, height, color){
+    constructor({x, y, radius, color, type}){
         this.x = x
         this.y = y
-        this.width = width
-        this.height = height
+        this.radius = radius
         this.color = color
+        this.type = type
     }
 
     draw() {
         c.beginPath()
-        c.fillRect(this.x, this.y, this.height, this.width)
+        c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false)
+        c.fillStyle = this.color
         c.fill()
-    }
-
-    update() {
-        this.draw()
+        c.closePath();
     }
 }

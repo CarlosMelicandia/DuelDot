@@ -4,14 +4,6 @@ class Weapon{
         this.damage = damage;
         this.velocity = velocity;
     }
-
-    isCollided() {
-        const dist = Math.hypot(player.x - this.x, player.y - this.y)
-        if (dist - player.radius - (this.width + this.height) < 1) {
-          return true
-        }
-        return false
-    }
 }
 
 class Pistol extends Weapon{

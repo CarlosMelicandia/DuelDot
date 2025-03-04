@@ -35,9 +35,6 @@ addEventListener('click', (event) => {
     angle
   })
 
-  // (Optional: Debugging - Log projectiles)
-  console.log(frontEndProjectiles)
-
   /**
    * ********************
    * *                  *

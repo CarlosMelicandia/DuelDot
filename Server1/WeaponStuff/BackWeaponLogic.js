@@ -1,28 +1,70 @@
 const GAME_WIDTH = 1024 // Default width
 const GAME_HEIGHT = 576 // Default height
+let backEndWeapons = []
+let deletedWeaponIds = []
 
-let weaponsSpawned = []
-function spawnWeapons(backEndWeapons) {
+let weaponId = 0
+
+function spawnWeapons(io) {
   const maxX = GAME_WIDTH - 50
   const maxY = GAME_HEIGHT - 50
   const min = 50
   
   setInterval(() => {
-    let spawnX = Math.random() * (maxX - min) + min // generates a random number between 50 and width - 50
+    if (backEndWeapons.length > 10 ) return
+    let spawnX = Math.random() * (maxX - min) + min 
     let spawnY = Math.random() * (maxY - min) + min
-    backEndWeapons.push({spawnX, spawnY})
-  }, 5000) // Sets the time rate at which weapons spawn (Default = 5000)
+    let color
+
+    const weaponSpawn = ["pistol", "submachineGun", "sniper", "shuriken"]
+    let weaponToSpawn = weaponSpawn[Math.floor(Math.random() * weaponSpawn.length)]
+    let weaponColors = {
+      "pistol": "red",
+      "submachineGun": "blue",
+      "sniper": "yellow",
+      "shuriken": "orange"
+    }
+
+    let newWeaponId = deletedWeaponIds.length > 0 ? deletedWeaponIds.shift() : weaponId++
+
+    let weaponData = ({
+      id: newWeaponId,
+      x: spawnX, 
+      y: spawnY,
+      radius: 10,
+      color: weaponColors[weaponToSpawn],
+      type: weaponToSpawn
+    })
+
+    // Add new weapon and then sort by ID
+    backEndWeapons.push(weaponData)
+
+    io.emit("updateWeapons", weaponData)
+  }, 5000) // Sets the time rate at which weapons spawn (Default = 7500)
 }
 
-function checkCollision(backEndWeapons, backEndPlayers) {
-weaponsSpawned = weaponsSpawned.filter(weapon => {
-    Weapons.update()
-    const dist = Math.hypot(player.x - this.x, player.y - this.y)
-    if (dist - backEndPlayers[playerId].radius - (backEndWeapons.width + backEndWeapons.height) < 1) {
+function checkCollision(io, player) {
+  for (let i = backEndWeapons.length - 1; i >= 0; i--) {
+    let weapon = backEndWeapons[i]
+    let dist = Math.hypot(player.x - weapon.x, player.y - weapon.y)
+
+    if (dist < player.radius + weapon.radius) {
+      console.log(`Player picked up: ${weapon.type}`)
+      // io.to(player.socketId).emit("assignWeapon", weapon); // Send weapon to player
       
+      backEndWeapons.splice(i, 1) // Remove weapon from array
+      deletedWeaponIds.push(weapon.id)
+
+      // Send updated weapons + the removed weapon
+      io.emit("updateWeapons", { id: weapon.id, remove: true })
+
+      break;
     }
-  })
+  }
 }
+
+
+
 
 module.exports = { 
   spawnWeapons, 
