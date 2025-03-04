@@ -121,6 +121,10 @@ socket.on('updatePlayers', (backEndPlayers) => { // Waits until the server emits
       document.querySelector(`div[data-id="${id}"]`).innerHTML = 
       `${backEndPlayer.username}: ${backEndPlayer.score}`
 
+      // document.getElementById(id).style.color = color // breaks everything :(
+      //Ties player name and score to their color 
+      document.querySelector(`div[data-id="${id}"]`).style.color = backEndPlayer.color
+
       document.querySelector(`div[data-id="${id}"]`) // Selects a DOM element that matches the player's id
               .setAttribute('data-score', backEndPlayer.score) // Updates the label in HTML to show the players latest score from the server
 
@@ -243,7 +247,8 @@ const keys = {
   w: {pressed: false},
   a: {pressed: false},
   s: {pressed: false},
-  d: {pressed: false}
+  d: {pressed: false},
+  tab: {pressed: false}
 }
 
 const SPEED = 5 // How fast the player moves per tick
@@ -293,6 +298,7 @@ window.addEventListener('keydown', (event) => {
   switch (event.code) {
     case 'KeyW':
       keys.w.pressed = true
+      // console.log("W down") //testing
       break
 
     case 'KeyA':
@@ -305,6 +311,11 @@ window.addEventListener('keydown', (event) => {
 
     case 'KeyD':
       keys.d.pressed = true
+      break
+    
+    case 'Tab':
+      keys.tab.pressed = true
+      // console.log("Tab down")
       break
   }
 })
@@ -330,6 +341,10 @@ window.addEventListener('keyup', (event) => {
 
     case 'KeyD':
       keys.d.pressed = false
+      break
+    case 'Tab':
+      keys.tab.pressed = false
+      // console.log("Tab up")
       break
   }
 })

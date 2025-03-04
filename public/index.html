@@ -16,7 +16,7 @@
       canvas {
         width: 1024px;
         height: 576px;
-        background-image: url('/img/background.png');
+        background-image: url("/img/background.png");
         border: 2px solid #ccccd5;
       }
     </style>
@@ -25,19 +25,53 @@
     <div>
       <div
         style="
+          margin-left: 2px;
+          margin-top: 2px;
           position: absolute;
           color: white;
           padding: 8px;
           font-family: sans-serif;
           font-size: 14px;
           user-select: none;
-          background: rgba(0, 0, 0, 0.5);
+          background: rgba(0, 0, 0, 0.8);
+          display: default;
         "
       >
-        <div style="margin-bottom: 8px">Leaderboard</div>
+        <div style="margin-bottom: 8px; text-decoration: underline">
+          Leaderboard
+        </div>
         <div id="playerLabels"></div>
       </div>
       <canvas></canvas>
+
+      <!-- Big Leader Board -->
+      <div
+        style="
+          display: none;
+          /* align-items: center; */
+          justify-content: center;
+          position: absolute;
+          color: white;
+          padding: 8px;
+          background: rgba(0, 0, 0, 0.5);
+          top: 0;
+          right: 0;
+          bottom: 0;
+          left: 0;
+        "
+      >
+      <div
+      style="
+        background: rgba(100, 100, 100, 0.8);
+        padding: 10%;
+        border-radius: 2%;
+      "
+      >
+        <h1>Leaderboard</h1>
+        <div id="leaderBoard"></div>
+      </div>
+        <!-- Big Leader Board End -->
+      </div>
 
       <!-- username input -->
       <div
