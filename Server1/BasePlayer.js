@@ -18,6 +18,8 @@ class BasePlayer {
       this.score = score // Player's current score
 
       // Default properties
+      this.health = 0
+      this.maxHealth = 0
       this.radius = 0 // Player's hit box radius (set by subclasses)
       this.health = 0 // Current health (set by subclasses)
       this.maxHealth = 0 // Maximum health value (set by subclasses)
@@ -29,8 +31,8 @@ class BasePlayer {
       this.magicWpnMtp = 1.0
 
       // Inventory and Equipped
-      // this.inventory = []
-      // this.equippedWeapon = null
+      this.inventory = []
+      this.equippedWeapon = null
   }
 }
 

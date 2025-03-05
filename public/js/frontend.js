@@ -99,11 +99,9 @@ socket.on('updateProjectiles', (backEndProjectiles) => {
   }
 })
 
-/**
- * ------------------------------
- * Handling Server Updates for Players
- * ------------------------------
- */
+//------------------------------
+// Handling Server Updates for Players
+// ------------------------------
 /**
  * Keeps the front end (client side) players in sync with the back end (server).
  * When the server emits 'updatePlayers', update or create player objects as needed.
@@ -198,18 +196,18 @@ socket.on('updatePlayers', (backEndPlayers) => {
   }
 })
 
+// Waits for an updateWeapons from the back end to sync and spawn weapons
 socket.on('updateWeapons', (backEndWeapons, weaponData) =>{
-  if (weaponData.remove){
-    console.log("Before", frontEndWeapons)
-    delete frontEndWeapons[weaponData.id]
-    console.log("After", frontEndWeapons)
+  if (weaponData.remove){ // if the weapon has been removed due to collision
+    delete frontEndWeapons[weaponData.id] // deletes weapon
   }else{
-    if (!frontEndWeapons[weaponData.id]){
-      frontEndWeapons[weaponData.id] = new WeaponDrawing(weaponData)
+    if (!frontEndWeapons[weaponData.id]){ // Creates the weapon in the frontEnd if it doesn't exist
+      frontEndWeapons[weaponData.id] = new WeaponDrawing(weaponData) // Contains only x, y, type, radius, and color
     }
   }
 })
 
+// When a players joins it shows them the weapons that had spawned previously
 socket.on('updateWeaponsOnJoin', (backEndWeapons) => {
   frontEndWeapons = {}
 
@@ -218,6 +216,18 @@ socket.on('updateWeaponsOnJoin', (backEndWeapons) => {
   })
 })
 
+// Waits for a weapon equip call from the server
+socket.on('equipWeapon', (weaponEquipped, player) => {
+  if (player.inventory[0] && !player.inventory[1]){ // if the first inventory is open 
+    document.querySelector('#inventorySlot1Text').textContent = weaponEquipped.name // Show weapon in inventory
+    console.log('Inventory Slot 1 Text Updated:', document.querySelector('#inventorySlot1Text'));
+  }else {
+    if(player.inventory[1]){ // if the second inventory is open
+    document.querySelector('#inventorySlot2Text').textContent = weaponEquipped.name // Shows the weapon in the second slot
+    console.log('Inventory Slot 2 Text Updated:', document.querySelector('#inventorySlot2Text'));
+  }
+}
+})
 
 // ------------------------------
 // Animation Loop (Game Rendering)
@@ -273,7 +283,9 @@ const keys = {
   w: { pressed: false },
   a: { pressed: false },
   s: { pressed: false },
-  d: { pressed: false }
+  d: { pressed: false },
+  num1: { pressed: false },
+  num2: { pressed: false }
 }
 
 /**
@@ -295,6 +307,10 @@ setInterval(() => {
 
   // Dynamically get the player's speed
   const SPEED = 5 * player.speed 
+
+  /**
+   * Player movement
+   */
 
   if (keys.w.pressed) {
     sequenceNumber++
@@ -319,7 +335,32 @@ setInterval(() => {
     playerInputs.push({ sequenceNumber, dx: SPEED, dy: 0 })
     socket.emit('keydown', { keycode: 'KeyD', sequenceNumber })
   }
-}, 15)
+
+  /**
+   * Inventory 
+   */
+  if (keys.num1.pressed) {
+    sequenceNumber++ 
+    playerInputs.push({ sequenceNumber, dx: 0, dy: 0 })
+    document.querySelector('#inventorySlot1').style.borderColor = "blue" // Highlights the first Inventory Slot
+    socket.emit('weaponSelected', { keycode: 'Digit1', sequenceNumber} ) // Emits the information back to the server
+  } else{
+    if (!keys.num1.pressed && keys.num2.pressed){
+      document.querySelector('#inventorySlot1').style.borderColor = "white" // Turns the inventory back to original color
+    }
+  }
+
+  if (keys.num2.pressed) {
+    sequenceNumber++
+    playerInputs.push({ sequenceNumber, dx: 0, dy: 0 })
+    document.querySelector('#inventorySlot2').style.borderColor = "blue" // Highlights the second Inventory Slot
+    socket.emit('weaponSelected', { keycode: 'Digit2', sequenceNumber} ) // Emits the information back to the server 
+  } else{
+    if (keys.num1.pressed && !keys.num2.pressed){
+      document.querySelector('#inventorySlot2').style.borderColor = "white" // Turns the inventory back to original color
+    }
+  }
+}, 15) // (default: 15)
 
 // ------------------------------
 // Event Listeners for Key Presses
@@ -331,6 +372,9 @@ setInterval(() => {
 window.addEventListener('keydown', (event) => {
   // If the local player's data is not yet available, ignore input events
   if (!frontEndPlayers[socket.id]) return
+
+  
+  if ((event.code === 'Digit1' || event.code === 'Digit2') && event.repeat) return
 
   switch (event.code) {
     case 'KeyW':
@@ -344,6 +388,12 @@ window.addEventListener('keydown', (event) => {
       break
     case 'KeyD':
       keys.d.pressed = true
+      break
+    case 'Digit1':
+      keys.num1.pressed = true
+      break
+    case 'Digit2':
+      keys.num2.pressed = true
       break
   }
 })
@@ -366,6 +416,12 @@ window.addEventListener('keyup', (event) => {
       break
     case 'KeyD':
       keys.d.pressed = false
+      break
+    case 'Digit1':
+      keys.num1.pressed = false
+      break
+    case 'Digit2':
+      keys.num2.pressed = false
       break
   }
 })

@@ -1,5 +1,6 @@
 class Weapon{
-    constructor(type, damage, velocity){
+    constructor(name, type, damage, velocity){
+        this.name = name
         this.type = type;
         this.damage = damage;
         this.velocity = velocity;
@@ -8,25 +9,25 @@ class Weapon{
 
 class Pistol extends Weapon{
     constructor(){
-        super("light",20,5);
+        super("Pistol", "light", 20, 5);
     }
     
 }
 class SubmachineGun extends Weapon{
     constructor(){
-        super("light",10,5);
+        super("Submachine Gun","light",10,5);
     }
     
 }
 class Sniper extends Weapon{
     constructor(){
-        super("heavy",50,10);
+        super("Sniper","heavy",50,10);
     }
     
 }
 class Shuriken extends Weapon{
     constructor(){
-        super("light",25,5);
+        super("Shuriken", "light",25,5);
     }
     
 }

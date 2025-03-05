@@ -12,16 +12,18 @@ class Tank extends BasePlayer {
     constructor(props) {
         super(props) // Calls BasePlayer constructor
         this.class = "Tank"
+        
+        // Class Stats
         this.health = 150
         this.maxHealth = 150
         this.radius = 17
         this.color = 'red'
         this.speed = .5
+
+        // Weapon multipliers
         this.lightWpnMtp = 1.0
         this.heavyWpnMtp = 1.0
         this.magicWpnMtp = 1.0
-        //this.inventory = [new Pistol()]
-        //this.equippedWeapon = null
     }
 }
 

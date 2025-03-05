@@ -11,17 +11,19 @@ class Gunner extends BasePlayer {
      */
     constructor(props) {
         super(props) // Calls BasePlayer constructor
-        this.class = "Gunner" 
+        this.class = "Gunner"
+        
+        // Class Stats
         this.health = 100
-        this.maxHealth = 100 
+        this.maxHealth = 100
         this.radius = 14
         this.color = 'grey' 
         this.speed = 1 
+
+        // Weapon multipliers
         this.lightWpnMtp = 1.0
         this.heavyWpnMtp = 1.0
         this.magicWpnMtp = 1.0
-        //this.inventory = [new Pistol()]
-        //this.equippedWeapon = null
     }
 }
 

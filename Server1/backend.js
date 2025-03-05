@@ -41,9 +41,9 @@ app.get('/', (req, res) => {
 // ------------------------------
 // Server-side Data Structures
 // ------------------------------
-const backEndPlayers = {} // List of player objects server-side
-const backEndProjectiles = {} // List of projectiles server-side
-const backEndWeapons = [] // List of weapons server-side
+const backEndPlayers = {} // List of player object objects server-side
+const backEndProjectiles = {} // List of projectile objects server-side
+const backEndWeapons = [] // List of weapon references server-side
 
 // Assigns the canvas height and width to variables
 const GAME_WIDTH = 1024 // Default width
@@ -107,6 +107,7 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
     })
     
     backEndPlayers[socket.id] = newPlayer
+    newPlayer.socketId = socket.id // ADs the player ID to their player profile
 
     // Store the canvas settings for the player
     backEndPlayers[socket.id].canvas = {
@@ -128,6 +129,27 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
     io.emit('updatePlayers', backEndPlayers) // Send an updated player list to all clients
   })
 
+
+  /**
+   * Handles weapon selection
+   */
+  socket.on('weaponSelected', ({keycode, sequenceNumber}) => {
+    const backEndPlayer = backEndPlayers[socket.id]
+
+    if (!backEndPlayer) return // Checks if the player exists in the server
+
+    backEndPlayer.sequenceNumber = sequenceNumber // Updates their sequenceNumber
+
+    switch (keycode){
+      case "Digit1":
+        backEndPlayer.equippedWeapon = backEndPlayer.inventory[0] // adds the weapon to their first slot in inventory
+        break
+      case "Digit2":
+        backEndPlayer.equippedWeapon = backEndPlayer.inventory[1] // adds the weapon to their second slot in inventory
+        break
+    }
+  })
+
   /**
    * Handles player movement via key presses.
    */
@@ -136,7 +158,7 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
 
     if (!backEndPlayer) return // Ensure player exists before proceeding
 
-    backEndPlayers[socket.id].sequenceNumber = sequenceNumber // Sync the sequence number from the client
+    backEndPlayer.sequenceNumber = sequenceNumber // Sync the sequence number from the client
     
     // Move the player based on the key pressed
     switch (keycode) {
@@ -167,26 +189,6 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
     if (playerSides.top < 0) backEndPlayers[socket.id].y = backEndPlayer.radius
     if (playerSides.bottom > GAME_HEIGHT) backEndPlayers[socket.id].y = GAME_HEIGHT - backEndPlayer.radius
   })
-
-  // socket.on('updateInventory', (currentWeapon) => {
-  // //------------------------------------------------------------------------------------------------------------------------------------------------
-  //     //Inventory System ----------------------------------------------------------------------------------------------------------------------
-  //     let weapon
-  //     weapons = {
-  //       pistol: Pistol,
-  //       submachineGun: SubmachineGun,
-  //       sniper: Sniper,
-  //       shuriken: Shuriken
-  //     }
-  //     weapon = new weapons[currentWeapon]()
-      
-  //     console.log("Inventory Size", player.inventory.length)
-
-
-      
-
-  //   })
-      //-----------------------------------------------------------------------------------------------------------------------------------------------
 })
 
 spawnWeapons(backEndWeapons, io) // function to randomly spawn weapons
