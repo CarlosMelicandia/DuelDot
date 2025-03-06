@@ -5,9 +5,20 @@ class PowerUp {
     this.id = id;
     this.type = type;
     this.radius = 8;
-    this.color = type === 'speed' ? 'yellow' : 'green';
+    this.color = this.getColorByType(type);
   }
 
+  getColorByType(type) {
+    switch (type) {
+      case 'speed':
+        return 'yellow';
+      case 'multiShot':
+        return 'green';
+      default:
+        return 'white'; // Default color for unknown types
+    }
+  }
+  
   draw() {
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);

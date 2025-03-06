@@ -5,6 +5,7 @@ class Player {
     this.radius = radius
     this.color = color
     this.username = username 
+    this.activePowerUps = {}
   }
 
   draw() {
@@ -19,5 +20,12 @@ class Player {
     ctx.fillStyle = this.color // Colors the inside of the player to match player color
     ctx.fill() // Draws the actual circle of the player
     ctx.restore()
+  }
+
+  activatePowerUp(name, duration) {
+    this.activePowerUps[name] = true;
+    setTimeout(() => {
+      this.activePowerUps[name] = false;
+    }, duration);
   }
 }

@@ -53,7 +53,8 @@ let powerUpId = 0 // Unique id counter for each power up
 function spawnPowerUp() {
   const x = Math.random() * GAME_WIDTH;
   const y = Math.random() * GAME_HEIGHT;
-  const type = 'speed'; // Example power-up type
+  const types = ['speed', 'multiShot']; // Add 'multiShot' as a possible type
+  const type = types[Math.floor(Math.random() * types.length)]; // Randomly select a type
   const id = powerUpId++;
 
   const powerUpData = { x, y, type, id }; // Create the power-up object
@@ -76,21 +77,30 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
   /**
    * When the client emits a shoot event it creates a new projectile
    */
-  socket.on('shoot', ({ x, y, angle }) => { 
-    projectileId++ // Adds an ID to the projectile
-
-    // Calculates the velocity of the projectile based on the angle given by the client
-    const velocity = {
-      x: Math.cos(angle) * 5,
-      y: Math.sin(angle) * 5
+  socket.on('shoot', ({ x, y, angle }) => {
+    const player = backEndPlayers[socket.id];
+    if (!player) return;
+  
+    function createProjectile(angleOffset) {
+      projectileId++;
+      const velocity = {
+        x: Math.cos(angle + angleOffset) * 5,
+        y: Math.sin(angle + angleOffset) * 5
+      };
+      backEndProjectiles[projectileId] = {
+        x,
+        y,
+        velocity,
+        playerId: socket.id
+      };
     }
-
-    // Creates a new server projectile with the given position, velocity, and the player's socket id
-    backEndProjectiles[projectileId] = {
-      x,
-      y,
-      velocity,
-      playerId: socket.id
+  
+    if (player.hasMultiShot) {
+      createProjectile(-0.2); // Left angle
+      createProjectile(0);    // Center
+      createProjectile(0.2);  // Right angle
+    } else {
+      createProjectile(0); // Normal single shot
     }
   })
 
@@ -142,6 +152,15 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
             backEndPlayers[playerId].speed = backEndPlayers[playerId].originalSpeed || SPEED
           }
         }, 5000); // 5 seconds duration  
+      } else if (powerUp.type === 'multiShot') {
+        backEndPlayers[playerId].hasMultiShot = true; // Enable multi-shot for the player
+        
+        // Set a timeout to remove the power-up after 5 seconds
+        setTimeout(() => {
+          if (backEndPlayers[playerId]) {
+            backEndPlayers[playerId].hasMultiShot = false;
+          }
+        }, 5000);
       }
       
       // Remove the power-up from the server

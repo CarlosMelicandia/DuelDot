@@ -18,16 +18,32 @@ addEventListener('click', (event) => {
     event.clientX - left - playerPosition.x
   )
 
-/**
- * .emit sends information to the server from the client o vice versa
- * Here it sends the players x and y position alongside the angle of the shot
- */
-  socket.emit('shoot', {
-    x: playerPosition.x,
-    y: playerPosition.y,
-    angle
-  })
-   
+  // Check if multi-shot power-up is active
+  if (frontEndPlayers[socket.id].activePowerUps && 
+    frontEndPlayers[socket.id].activePowerUps['multiShot']) {
+      // For multi-shot, fire bullets in a radius
+      const numProjectiles = 8; // Number of bullets in the radius
+      
+      for (let i = 0; i < numProjectiles; i++) {
+        // Calculate angles in a circle around the player
+        const spreadAngle = Math.PI / 6; // Adjust spread width
+        const projectileAngle = angle + spreadAngle * ((i / (numProjectiles - 1)) - 0.5);
+
+        // Send each projectile to the server
+        socket.emit('shoot', {
+          x: playerPosition.x,
+          y: playerPosition.y,
+          angle: projectileAngle
+        });
+      }
+    } else {
+      // Regular single-shot logic
+      socket.emit('shoot', {
+        x: playerPosition.x,
+        y: playerPosition.y,
+        angle
+      })
+    }
 
   /**
    * ********************
