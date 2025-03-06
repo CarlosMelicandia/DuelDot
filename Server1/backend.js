@@ -196,11 +196,12 @@ spawnWeapons(backEndWeapons, io) // function to randomly spawn weapons
 // ------------------------------
 // Backend Ticker (Game Loop)
 // ------------------------------
-setInterval(() => {
+setInterval(() => { 
   for (const playerId in backEndPlayers){
     const player = backEndPlayers[playerId]
     checkCollision(backEndWeapons, io, player)
   }
+  
   // Update projectile positions
   for (const id in backEndProjectiles) {
     backEndProjectiles[id].x += backEndProjectiles[id].velocity.x
@@ -232,13 +233,13 @@ setInterval(() => {
 
       // Find the shooter (who fired the projectile)
         const shooter = backEndPlayers[backEndProjectiles[id].playerId]
-        const equippedWeapon = shooter.inventory.index(0);
+        const equippedWeapon = shooter.inventory.index(0)
 
       if (shooter && equippedWeapon) {
-        const totalDamage = backEndPlayer[playerId].equippedWeapon.damage * shooter.lightWpnMtp;
-        backEndPlayers[playerId].health -=  totalDamage;
+        const totalDamage = backEndPlayer[playerId].equippedWeapon.damage * shooter.lightWpnMtp
+        backEndPlayers[playerId].health -=  totalDamage
       } else {
-          console.log(`Error: Shooter or equipped weapon is undefined.`);
+          console.log(`Error: Shooter or equipped weapon is undefined.`)
         }
 
         // If health reaches 0, remove the player and reward the shooter

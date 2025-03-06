@@ -29,7 +29,6 @@ class Shuriken extends Weapon{
     constructor(){
         super("Shuriken", "light",25,5);
     }
-    
 }
 
 module.exports = {

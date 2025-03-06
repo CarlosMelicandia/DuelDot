@@ -1,5 +1,4 @@
 const { Pistol, SubmachineGun, Sniper, Shuriken } = require("./Weapons")
-const BasePlayer = require("../BasePlayer.js")
 
 const GAME_WIDTH = 1024 // Default width
 const GAME_HEIGHT = 576 // Default height
@@ -52,7 +51,6 @@ function checkCollision(backEndWeapons, io, player) {
     if (dist < player.radius + weapon.radius) {
       if (player.inventory.length >= 2) return
       console.log(`Player picked up: ${weapon.type}`)
-      // io.to(player.socketId).emit("assignWeapon", weapon); // Send weapon to player
       
       const weapons = {
         pistol: Pistol,

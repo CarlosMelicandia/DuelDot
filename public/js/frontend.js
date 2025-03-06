@@ -220,11 +220,9 @@ socket.on('updateWeaponsOnJoin', (backEndWeapons) => {
 socket.on('equipWeapon', (weaponEquipped, player) => {
   if (player.inventory[0] && !player.inventory[1]){ // if the first inventory is open 
     document.querySelector('#inventorySlot1Text').textContent = weaponEquipped.name // Show weapon in inventory
-    console.log('Inventory Slot 1 Text Updated:', document.querySelector('#inventorySlot1Text'));
   }else {
     if(player.inventory[1]){ // if the second inventory is open
     document.querySelector('#inventorySlot2Text').textContent = weaponEquipped.name // Shows the weapon in the second slot
-    console.log('Inventory Slot 2 Text Updated:', document.querySelector('#inventorySlot2Text'));
   }
 }
 })
