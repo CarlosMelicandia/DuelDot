@@ -370,3 +370,20 @@ document.querySelector('#usernameForm').addEventListener('submit', (event) => {
     username: document.querySelector('#usernameInput').value
   })
 })
+
+// ------------------------------
+// Leader Board Show Handler
+// ------------------------------
+document.addEventListener("keydown", function(event) {
+  if (event.key === "Tab") {
+      event.preventDefault(); // Prevent default tab behavior
+      document.querySelector(".leaderboard").style.display = "block";
+  }
+});
+
+document.addEventListener("keyup", function(event) {
+  if (event.key === "Tab") {
+      document.querySelector(".leaderboard").style.display = "none";
+  }
+});
+
