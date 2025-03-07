@@ -122,9 +122,11 @@ socket.on('updatePlayers', (backEndPlayers) => {
         color: backEndPlayer.color,
         username: backEndPlayer.username,
         health: backEndPlayer.health,  
-        speed: backEndPlayer.speed      
+        fireRate: backEndPlayer.fireRate      
       })
 
+      console.log(frontEndPlayers[id])
+      
       // Add this player to the leaderboard 
       document.querySelector('#playerLabels').innerHTML += 
         `<div data-id="${id}" data-score="${backEndPlayer.score}">
@@ -503,7 +505,7 @@ document.querySelector('#randomNameBtn').addEventListener('click', () => {
 document.querySelector('#usernameForm').addEventListener('submit', (event) => {
   event.preventDefault() // Prevents the form from refreshing
   document.querySelector('#usernameForm').style.display = 'none' // Hides the username form
-
+  document.querySelector('#inventoryArea').style.display = 'flex'
   // Send data to the server to initialize the player
   socket.emit('initGame', {
     width: canvas.width,

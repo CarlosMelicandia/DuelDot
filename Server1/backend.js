@@ -9,7 +9,7 @@ const Tank = require('./Tank.js')
 const Mage = require('./Mage.js')
 const Rogue = require('./Rogue.js')
 const Gunner = require('./Gunner.js')
-const { Weapon, Pistol, SubmachineGun, Sniper, Shuriken } = require('./WeaponStuff/Weapons.js')
+const { Weapon, Pistol, SubmachineGun, Sniper, Shuriken, Fist } = require('./WeaponStuff/Weapons.js')
 const { spawnWeapons, checkCollision } = require('./WeaponStuff/BackWeaponLogic.js')
 
 // ------------------------------
@@ -67,19 +67,30 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
   socket.on('shoot', ({ x, y, angle }) => { 
     projectileId++ // Increment the projectile ID
 
+    console.log('shoot')
     // Calculate the velocity of the projectile based on the angle provided by the client----------------------------------------------------
-    const velocity = {
-      x: Math.cos(angle) * 5,  //Weapon Velocity 
-      y: Math.sin(angle) * 5   // Weapon Velocity
+    if (!backEndPlayers[socket.id].canShoot){
+      console.log("Can't Shoot")
+      const fireRate = backEndPlayers[socket.id].equippedWeapon.fireRate * 1000
+      setTimeout(() => {
+          backEndPlayers.canShoot = true
+      }, 1000)
+      return
     }
 
-    // Create a new server-side projectile
-    backEndProjectiles[projectileId] = {
-      x,
-      y,
-      velocity,
-      playerId: socket.id
-    }
+      const velocity = {
+      x: Math.cos(angle) * 5,  //Weapon Velocity 
+      y: Math.sin(angle) * 5   // Weapon Velocity
+      }
+
+      // Create a new server-side projectile
+      backEndProjectiles[projectileId] = {
+        x,
+        y,
+        velocity,
+        playerId: socket.id
+      }
+      backEndPlayers[socket.id].canShoot = false
   })
 
   /**
@@ -115,7 +126,7 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
       height
     }
 
-    console.log(`Class: ${backEndPlayers[socket.id].constructor.name}, Health: ${backEndPlayers[socket.id].health}, Radius: ${backEndPlayers[socket.id].radius}, Speed: ${backEndPlayers[socket.id].speed}`)
+    console.log(`Class: ${backEndPlayers[socket.id].constructor.name}, Health: ${backEndPlayers[socket.id].health}, Radius: ${backEndPlayers[socket.id].radius}, Speed: ${backEndPlayers[socket.id].speed}, Weapon: ${backEndPlayers[socket.id].equippedWeapon}, Damage: ${backEndPlayers[socket.id].fireRate}`)
     
     socket.emit('updateWeaponsOnJoin', backEndWeapons);
   })
@@ -233,12 +244,20 @@ setInterval(() => {
 
       // Find the shooter (who fired the projectile)
         const shooter = backEndPlayers[backEndProjectiles[id].playerId]
-        const equippedWeapon = shooter.inventory.index(0)
+        const equippedWeapon = shooter.equippedWeapon
 
       if (shooter && equippedWeapon) {
-        const totalDamage = backEndPlayer[playerId].equippedWeapon.damage * shooter.lightWpnMtp
+        const damageMplrType = {
+          light: shooter.lightWpnMtp,
+          heavy: shooter.heavyWpnMtp,
+          magic: shooter.magicWpnMtp
+        }
+        const damageMplr = damageMplrType[equippedWeapon.type]
+
+        const totalDamage = equippedWeapon.damage * damageMplr
         backEndPlayers[playerId].health -=  totalDamage
-      } else {
+      }  
+      else {
           console.log(`Error: Shooter or equipped weapon is undefined.`)
         }
 

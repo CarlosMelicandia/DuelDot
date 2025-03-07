@@ -1,6 +1,7 @@
 // ------------------------------
 // BasePlayer Class (Abstract)
 // ------------------------------
+const { Fist } = require('./WeaponStuff/Weapons')
 class BasePlayer {
   /**
    * Constructor for the BasePlayer class.
@@ -25,14 +26,18 @@ class BasePlayer {
       this.maxHealth = 0 // Maximum health value (set by subclasses)
       this.speed = 0 // Movement speed (set by subclasses)
 
-      // Weapon multipliers
+      // Default Weapon multipliers
       this.lightWpnMtp = 1.0
       this.heavyWpnMtp = 1.0
       this.magicWpnMtp = 1.0
 
       // Inventory and Equipped
       this.inventory = []
-      this.equippedWeapon = null
+      this.equippedWeapon = Fist.name
+
+      // Checks whether the player can shoot
+      this.canShoot = true
+      this.fireRate = .25
   }
 }
 
