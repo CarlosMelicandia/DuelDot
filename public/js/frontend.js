@@ -122,7 +122,7 @@ socket.on('updatePlayers', (backEndPlayers) => {
         color: backEndPlayer.color,
         username: backEndPlayer.username,
         health: backEndPlayer.health,  
-        fireRate: backEndPlayer.fireRate      
+        fireRate: backEndPlayer.weaponEquipped.fireRate   //-----------------------------------------------------------------  
       })
 
       console.log(frontEndPlayers[id])
