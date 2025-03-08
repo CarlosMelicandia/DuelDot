@@ -2,42 +2,76 @@
 // Canvas and Context Setup
 // ------------------------------
 const canvas = document.querySelector("canvas"); // Finds the canvas element from the HTML file
-const ctx = canvas.getContext("2d"); // Context in which the canvas is being made
+const c = canvas.getContext("2d"); // Context in which the canvas is being made
 
 // ------------------------------
 // Socket.IO and DOM Element Setup
 // ------------------------------
-const socket = io(); // This is what allows for communication to happen between the client and the server and vice versa
-
-const scoreEl = document.querySelector("#scoreEl"); // Finds the element with id "scoreEL" from html file
+const socket = io(); // Allows for communication between the client and the server
+const scoreEl = document.querySelector("#scoreEl"); // Finds the element with ID "scoreEl" from the HTML file
 
 // ------------------------------
 // Device Pixel Ratio and Canvas Dimensions
 // ------------------------------
 const devicePixelRatio = window.devicePixelRatio || 1; // Gets the device's pixel ratio (for high-DPI displays), defaulting to 1 if unavailable
 
-// Assigns the canvas height and width to variables
-const GAME_WIDTH = 1024; // (default 1024)
-const GAME_HEIGHT = 576; // (default 576)
+canvas.width = 1024 * devicePixelRatio; // Sets the canvas’s internal width
+canvas.height = 576 * devicePixelRatio; // Sets the canvas’s internal height
 
-// Sets the canvas’s internal width and height
-// Adjusts te canvas width and height to ensure proper resolution on multiple devices
-canvas.width = GAME_WIDTH * devicePixelRatio;
-canvas.height = GAME_HEIGHT * devicePixelRatio;
-
-ctx.scale(devicePixelRatio, devicePixelRatio); // Scales the drawing context so that drawing commands correspond to CSS pixels (ensuring a 1:1 ratio)
+c.scale(devicePixelRatio, devicePixelRatio); // Scales the drawing context so that drawing commands correspond to CSS pixels
 
 // Center of the canvas
 const x = canvas.width / 2;
 const y = canvas.height / 2;
 
-/**
- * ------------------------------
- * Data Structures for Game Objects
- * ------------------------------
- */
+// ------------------------------
+// Possible Random Player Names
+// ------------------------------
+const playerNames = [
+  "Shadow",
+  "Raven",
+  "Phoenix",
+  "Blaze",
+  "Viper",
+  "Maverick",
+  "Rogue",
+  "Hunter",
+  "Nova",
+  "Zephyr",
+  "Falcon",
+  "Titan",
+  "Specter",
+  "Cyclone",
+  "Inferno",
+  "Reaper",
+  "Stalker",
+  "Venom",
+  "Glitch",
+  "Banshee",
+  "Shadowstrike",
+  "Onyx",
+  "Rebel",
+  "Fury",
+  "Apex",
+  "Crimson",
+  "Nightfall",
+  "Saber",
+  "Tempest",
+  "Lightning",
+  "Bullet",
+  "Vortex",
+  "Echo",
+  "Blitz",
+  "Rift",
+  "BOB",
+];
+
+// ------------------------------
+// Data Structures for Game Objects
+// ------------------------------
 const frontEndPlayers = {}; // Object to keep track of all player objects on the client
 const frontEndProjectiles = {}; // Object to keep track of all projectile objects on the client
+let frontEndWeapons = {}; // Object to keep track of all weapons objects on the client
 
 /**
  * ------------------------------
@@ -46,12 +80,12 @@ const frontEndProjectiles = {}; // Object to keep track of all projectile object
  */
 /**
  * Keeps the front end (client-side) projectiles in sync with the back end (server).
- * When the server emits 'updateProjectiles', iterate over each projectile.
+ * When the server emits 'updateProjectiles', iterate over each projectile and
+ * create or update them locally.
  */
 socket.on("updateProjectiles", (backEndProjectiles) => {
-  // Waits until the server emits an "updateProjectiles" event
+  // Loop over each projectile from the server (each has a unique id)
   for (const id in backEndProjectiles) {
-    // Loop over each projectile from the server (each has a unique id)
     const backEndProjectile = backEndProjectiles[id];
 
     /**
@@ -67,7 +101,7 @@ socket.on("updateProjectiles", (backEndProjectiles) => {
         velocity: backEndProjectile.velocity,
       });
     } else {
-      // Updates the client projectiles position based on the velocity of the server's projectile
+      // Update the client projectile’s position based on the server’s velocity
       frontEndProjectiles[id].x += backEndProjectiles[id].velocity.x;
       frontEndProjectiles[id].y += backEndProjectiles[id].velocity.y;
     }
@@ -83,7 +117,7 @@ socket.on("updateProjectiles", (backEndProjectiles) => {
   }
 });
 
-// ------------------------------
+//------------------------------
 // Handling Server Updates for Players
 // ------------------------------
 /**
@@ -91,10 +125,8 @@ socket.on("updateProjectiles", (backEndProjectiles) => {
  * When the server emits 'updatePlayers', update or create player objects as needed.
  */
 socket.on("updatePlayers", (backEndPlayers) => {
-  // Waits until the server emits an "updatePlayers" event
   for (const id in backEndPlayers) {
-    // Loop over each player received from the server
-    const backEndPlayer = backEndPlayers[id]; // Assigns backEndPlayer to each player's ID
+    const backEndPlayer = backEndPlayers[id];
 
     /**
      * If a player with this id does not exist on the client,
@@ -104,22 +136,24 @@ socket.on("updatePlayers", (backEndPlayers) => {
       frontEndPlayers[id] = new Player({
         x: backEndPlayer.x,
         y: backEndPlayer.y,
-        radius: 10,
+        radius: backEndPlayer.radius,
         color: backEndPlayer.color,
         username: backEndPlayer.username,
+        health: backEndPlayer.health,
+        speed: backEndPlayer.speed,
       });
 
-      // Adds that player with their attributes to the leaderboard
+      // Add this player to the leaderboard
       document.querySelector(
         "#playerLabels"
-      ).innerHTML += `<div data-id="${id}" data-score="${backEndPlayer.score}">${backEndPlayer.username}: ${backEndPlayer.score}</div>`;
+      ).innerHTML += `<div data-id="${id}" data-score="${backEndPlayer.score}">
+          ${backEndPlayer.username}: ${backEndPlayer.score}
+         </div>`;
     } else {
-    /**
-     * If the player exists in both client and server side it will
-     * display and reorder the list so that the players are shown in
-     * descending order
-     */
-      // Updates the username of the player in the leaderboard to display their new score
+      // Update player health in the frontend
+      frontEndPlayers[id].health = backEndPlayer.health;
+
+      // Update the player’s score in the leaderboard
       document.querySelector(
         `div[data-id="${id}"]`
       ).innerHTML = `${backEndPlayer.username}: ${backEndPlayer.score}`;
@@ -133,46 +167,38 @@ socket.on("updatePlayers", (backEndPlayers) => {
         .querySelector(`div[data-id="${id}"]`) // Selects a DOM element that matches the player's id
         .setAttribute("data-score", backEndPlayer.score); // Updates the label in HTML to show the players latest score from the server
 
-      // Sort the leaderboard entries so that players with higher scores appear first
-      const parentDiv = document.querySelector("#playerLabels"); // Assigns parentDiv to an html element with ID playerLabels
-      const childDivs = Array.from(parentDiv.querySelectorAll("div")); // Assigns a copy of an Array of all players with their username and score so we can sort them
-
-      // compares two elements a and b, which are the players scores and puts the higher one first
+      // Sort the players displayed in descending order by score
+      const parentDiv = document.querySelector("#playerLabels");
+      const childDivs = Array.from(parentDiv.querySelectorAll("div"));
       childDivs.sort((a, b) => {
         const scoreA = Number(a.getAttribute("data-score"));
         const scoreB = Number(b.getAttribute("data-score"));
-
-        return scoreB - scoreA; // Descending order: higher scores first
+        return scoreB - scoreA;
       });
-
-      // Remove the old leaderboard entries
       childDivs.forEach((div) => {
         parentDiv.removeChild(div);
       });
-
-      // Re-adds them in sorted order
       childDivs.forEach((div) => {
         parentDiv.appendChild(div);
       });
 
-      // Used for interpolation (get new values from existing ones) to match client's player position to server side
+      // Used for interpolation (moving the player closer to its new position)
       frontEndPlayers[id].target = {
         x: backEndPlayer.x,
         y: backEndPlayer.y,
       };
 
-      // Checks if the player id matches clients id to run code specifically for that player
       if (id === socket.id) {
         const lastBackendInputIndex = playerInputs.findIndex((input) => {
           // Gets the last input from the server of that player
           return backEndPlayer.sequenceNumber === input.sequenceNumber;
         });
 
-        // Removes all inputs from playerInputs up to and including that index
-        if (lastBackendInputIndex > -1)
+        if (lastBackendInputIndex > -1) {
           playerInputs.splice(0, lastBackendInputIndex + 1);
+        }
 
-        // This ensures that the player's position on both the the client and the server stay in sync
+        // Reapply remaining inputs
         playerInputs.forEach((input) => {
           frontEndPlayers[id].target.x += input.dx;
           frontEndPlayers[id].target.y += input.dy;
@@ -181,7 +207,7 @@ socket.on("updatePlayers", (backEndPlayers) => {
     }
   }
 
-  // Removes any client side players that no longer exists in backEndPLayers (server side)
+  // Remove any client-side players that no longer exist on the server
   for (const id in frontEndPlayers) {
     if (!backEndPlayers[id]) {
       const divToDelete = document.querySelector(`div[data-id="${id}"]`);
@@ -191,8 +217,52 @@ socket.on("updatePlayers", (backEndPlayers) => {
       if (id === socket.id) {
         document.querySelector("#usernameForm").style.display = "block";
       }
-
       delete frontEndPlayers[id];
+    }
+  }
+});
+
+// Waits for an updateWeapons from the back end to sync and spawn weapons
+socket.on("updateWeapons", (backEndWeapons, weaponData) => {
+  if (weaponData.remove) {
+    // if the weapon has been removed due to collision
+    delete frontEndWeapons[weaponData.id]; // deletes weapon
+  } else {
+    if (!frontEndWeapons[weaponData.id]) {
+      // Creates the weapon in the frontEnd if it doesn't exist
+      frontEndWeapons[weaponData.id] = new WeaponDrawing(weaponData); // Contains only x, y, type, radius, and color
+    }
+  }
+});
+
+// When a players joins it shows them the weapons that had spawned previously
+socket.on("updateWeaponsOnJoin", (backEndWeapons) => {
+  frontEndWeapons = {};
+
+  backEndWeapons.forEach((weapon) => {
+    frontEndWeapons[weapon.id] = new WeaponDrawing(weapon);
+  });
+});
+
+// Waits for a weapon equip call from the server
+socket.on("equipWeapon", (weaponEquipped, player) => {
+  if (player.inventory[0] && !player.inventory[1]) {
+    // if the first inventory is open
+    document.querySelector("#inventorySlot1Text").textContent =
+      weaponEquipped.name; // Show weapon in inventory
+    console.log(
+      "Inventory Slot 1 Text Updated:",
+      document.querySelector("#inventorySlot1Text")
+    );
+  } else {
+    if (player.inventory[1]) {
+      // if the second inventory is open
+      document.querySelector("#inventorySlot2Text").textContent =
+        weaponEquipped.name; // Shows the weapon in the second slot
+      console.log(
+        "Inventory Slot 2 Text Updated:",
+        document.querySelector("#inventorySlot2Text")
+      );
     }
   }
 });
@@ -202,47 +272,43 @@ socket.on("updatePlayers", (backEndPlayers) => {
 // ------------------------------
 /**
  * Continuously updates the game state:
- * - Clears the canvas
- * - Moves players toward their target positions via interpolation
- * - Draws all players and projectiles
+ * 1) Clears the canvas
+ * 2) Moves players toward their target positions via interpolation
+ * 3) Draws all players and projectiles
  */
 let animationId;
 function animate() {
-  animationId = requestAnimationFrame(animate); // Tells the browser you want to do an animation
-  // ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'
-  ctx.clearRect(0, 0, canvas.width, canvas.height); // Clears the canvas
+  animationId = requestAnimationFrame(animate); // Tells the browser we want to perform an animation
+  // c.fillStyle = 'rgba(0, 0, 0, 0.1)' // Optional "ghosting" effect if needed
+  c.clearRect(0, 0, canvas.width, canvas.height); // Clears the entire canvas
 
+  // Interpolate and draw each player
   for (const id in frontEndPlayers) {
-    // For ever player in the frontEndPLayers array
-    const frontEndPlayer = frontEndPlayers[id]; // Assigns a specific player to frontEndPlayer
+    const frontEndPlayer = frontEndPlayers[id];
 
-    // linear interpolation (moving the player closer to the target)
-    // First checks to see if the client player has x and y and then proceeds to move the player halfway every frame
+    // linear interpolation (move the player closer to its target)
     if (frontEndPlayer.target) {
-      // .target is an object containing the x and y coordinates of a player (client side)
       frontEndPlayers[id].x +=
         (frontEndPlayers[id].target.x - frontEndPlayers[id].x) * 0.5;
       frontEndPlayers[id].y +=
         (frontEndPlayers[id].target.y - frontEndPlayers[id].y) * 0.5;
     }
-
     frontEndPlayer.draw();
   }
 
-  // Loops through each client side projectile in frontEndProjectiles and calls the draw method
+  for (const weapon in frontEndWeapons) {
+    const frontEndWeapon = frontEndWeapons[weapon];
+    frontEndWeapon.draw();
+  }
+
+  // Draw each projectile
   for (const id in frontEndProjectiles) {
     const frontEndProjectile = frontEndProjectiles[id];
     frontEndProjectile.draw();
   }
-
-  // (Optional commented-out code for updating projectiles if needed)
-  // for (let i = frontEndProjectiles.length - 1; i >= 0; i--) {
-  //   const frontEndProjectile = frontEndProjectiles[i]
-  //   frontEndProjectile.update()
-  // }
 }
 
-animate(); // Calls the animate function
+animate();
 
 // ------------------------------
 // Player Input Handling (Movement)
@@ -257,20 +323,38 @@ const keys = {
   s: { pressed: false },
   d: { pressed: false },
   tab: { pressed: false },
+  num1: { pressed: false },
+  num2: { pressed: false },
 };
 
-const SPEED = 5; // How fast the player moves per tick
-const playerInputs = []; // Stores the local inputs of a player
-let sequenceNumber = 0; // Counts the number of movement inputs sent to the server
+/**
+ * We keep a local buffer (playerInputs) of all unacknowledged inputs.
+ * The server eventually sends back a sequenceNumber acknowledging the last
+ * processed input, and we remove old inputs from this list.
+ */
+const playerInputs = [];
+let sequenceNumber = 0;
+
 /**
  * Every 15 milliseconds, check which keys are pressed.
  * If a key is pressed, record the input and send it to the server.
  */
 setInterval(() => {
+  // Ensure the local player exists before trying to move
+  const player = frontEndPlayers[socket.id];
+  if (!player) return;
+
+  // Dynamically get the player's speed
+  const SPEED = 5 * player.speed;
+
+  /**
+   * Player movement
+   */
+
   if (keys.w.pressed) {
     sequenceNumber++;
-    playerInputs.push({ sequenceNumber, dx: 0, dy: -SPEED }); // Adds the playersInput info to the playerInputs Array
-    socket.emit("keydown", { keycode: "KeyW", sequenceNumber }); // Sends the information to the server
+    playerInputs.push({ sequenceNumber, dx: 0, dy: -SPEED });
+    socket.emit("keydown", { keycode: "KeyW", sequenceNumber });
   }
 
   if (keys.a.pressed) {
@@ -290,40 +374,69 @@ setInterval(() => {
     playerInputs.push({ sequenceNumber, dx: SPEED, dy: 0 });
     socket.emit("keydown", { keycode: "KeyD", sequenceNumber });
   }
-}, 15); // (Default: 15)
+
+  /**
+   * Inventory
+   */
+  if (keys.num1.pressed) {
+    sequenceNumber++;
+    playerInputs.push({ sequenceNumber, dx: 0, dy: 0 });
+    document.querySelector("#inventorySlot1").style.borderColor = "blue"; // Highlights the first Inventory Slot
+    socket.emit("weaponSelected", { keycode: "Digit1", sequenceNumber }); // Emits the information back to the server
+  } else {
+    if (!keys.num1.pressed && keys.num2.pressed) {
+      document.querySelector("#inventorySlot1").style.borderColor = "white"; // Turns the inventory back to original color
+    }
+  }
+
+  if (keys.num2.pressed) {
+    sequenceNumber++;
+    playerInputs.push({ sequenceNumber, dx: 0, dy: 0 });
+    document.querySelector("#inventorySlot2").style.borderColor = "blue"; // Highlights the second Inventory Slot
+    socket.emit("weaponSelected", { keycode: "Digit2", sequenceNumber }); // Emits the information back to the server
+  } else {
+    if (keys.num1.pressed && !keys.num2.pressed) {
+      document.querySelector("#inventorySlot2").style.borderColor = "white"; // Turns the inventory back to original color
+    }
+  }
+}, 15); // (default: 15)
 
 // ------------------------------
 // Event Listeners for Key Presses
 // ------------------------------
 /**
  * Listen for keydown events and mark the corresponding key as pressed.
- * This helps in tracking continuous movement.
+ * This allows for continuous movement while the key is held.
  */
 window.addEventListener("keydown", (event) => {
   // If the local player's data is not yet available, ignore input events
   if (!frontEndPlayers[socket.id]) return;
 
+  if ((event.code === "Digit1" || event.code === "Digit2") && event.repeat)
+    return;
+
   switch (event.code) {
     case "KeyW":
       keys.w.pressed = true;
-      // console.log("W down") //testing
       break;
-
     case "KeyA":
       keys.a.pressed = true;
       break;
-
     case "KeyS":
       keys.s.pressed = true;
       break;
-
     case "KeyD":
       keys.d.pressed = true;
       break;
-
     case "Tab":
       keys.tab.pressed = true;
       // console.log("Tab down")
+      break;
+    case "Digit1":
+      keys.num1.pressed = true;
+      break;
+    case "Digit2":
+      keys.num2.pressed = true;
       break;
   }
 });
@@ -338,15 +451,12 @@ window.addEventListener("keyup", (event) => {
     case "KeyW":
       keys.w.pressed = false;
       break;
-
     case "KeyA":
       keys.a.pressed = false;
       break;
-
     case "KeyS":
       keys.s.pressed = false;
       break;
-
     case "KeyD":
       keys.d.pressed = false;
       break;
@@ -354,28 +464,103 @@ window.addEventListener("keyup", (event) => {
       keys.tab.pressed = false;
       // console.log("Tab up")
       break;
+    case "Digit1":
+      keys.num1.pressed = false;
+      break;
+    case "Digit2":
+      keys.num2.pressed = false;
+      break;
   }
+});
+
+// ------------------------------
+// Class Selection Handling
+// ------------------------------
+const classSelectors = ["Tank", "Rogue", "Mage", "Gunner"]; // Possible classes
+let classSelection = 0; // Starts in Tank
+let className = classSelectors[classSelection]; // Selects the class
+
+/**
+ * Cycles forward in the array
+ * @returns the selected class
+ */
+function nextClass() {
+  classSelection = (classSelection + 1) % classSelectors.length;
+  return classSelectors[classSelection];
+}
+
+/**
+ * Cycles Backwards in the array
+ * @returns the selected class
+ */
+function previousClass() {
+  classSelection =
+    (classSelection - 1 + classSelectors.length) % classSelectors.length;
+  return classSelectors[classSelection];
+}
+
+document.querySelector("#showClass").textContent = "Class: " + className; // Displays the first class
+
+// When the user clicks the -> arrow it goes to the next class
+document.querySelector("#classSelectorRight").addEventListener("click", () => {
+  className = nextClass();
+  document.querySelector("#showClass").textContent = "Class: " + className;
+});
+
+// When the user clicks the <- arrow it goes to the previous class
+document.querySelector("#classSelectorLeft").addEventListener("click", () => {
+  className = previousClass();
+  document.querySelector("#showClass").textContent = "Class: " + className;
+});
+
+// ------------------------------
+// Random Username Handling
+// ------------------------------
+/**
+ * Generate a random name that isn't already in use by another player on the client.
+ * If the generated name is taken, recurse until a unique name is found.
+ */
+function selectName() {
+  let playerNameNumber = Math.floor(Math.random() * playerNames.length);
+  let name = playerNames[playerNameNumber];
+  for (const id in frontEndPlayers) {
+    if (frontEndPlayers[id].username === name) {
+      // If name is already taken by a current player, try again
+      return selectName();
+    }
+  }
+  return name;
+}
+
+let playerName = selectName();
+document.querySelector("#selectedRandomName").textContent = playerName;
+
+document.querySelector("#randomNameBtn").addEventListener("click", () => {
+  // Generate a new random name when clicked
+  playerName = selectName();
+  document.querySelector("#selectedRandomName").textContent = playerName;
 });
 
 // ------------------------------
 // Username Form Handling
 // ------------------------------
 /**
- * When the player submits their username:
- * - Prevent the default form submission (which would reload the page)
+ * When the player submits their username (or chosen random name):
+ * - Prevent default form submission
  * - Hide the username form
- * - Emit an "initGame" event to the server with canvas settings and the username,
- *   so the server can initialize and track the new player.
+ * - Emit an 'initGame' event to the server with our chosen data
  */
 document.querySelector("#usernameForm").addEventListener("submit", (event) => {
-  event.preventDefault(); // Prevents the form from refreshing the page on submission
+  event.preventDefault(); // Prevents the form from refreshing
   document.querySelector("#usernameForm").style.display = "none"; // Hides the username form
-  // Sends initGame which tells the server to track this player with their settings
+
+  // Send data to the server to initialize the player
   socket.emit("initGame", {
     width: canvas.width,
     height: canvas.height,
     devicePixelRatio,
-    username: document.querySelector("#usernameInput").value,
+    username: playerName,
+    className,
   });
 });
 
