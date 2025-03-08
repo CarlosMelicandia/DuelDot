@@ -29,8 +29,7 @@ addEventListener('click', (event) => {
    * - `x, y`: Player’s current position.
    * - `angle`: The angle at which the projectile should be fired.
    */
-
-  console.log("check 2", frontEndPlayers[socket.id].canShoot)
+  
   if (frontEndPlayers[socket.id].canShoot){
     socket.emit('shoot', {
     x: playerPosition.x,

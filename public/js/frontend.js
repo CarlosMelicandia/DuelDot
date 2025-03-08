@@ -135,7 +135,6 @@ socket.on('updatePlayers', (backEndPlayers) => {
       // Update player health in the frontend
       frontEndPlayers[id].health = backEndPlayer.health
       frontEndPlayers[id].canShoot = backEndPlayer.canShoot
-      console.log("Check 1", frontEndPlayers[id].canShoot)
 
       // Update the player’s score in the leaderboard
       document.querySelector(`div[data-id="${id}"]`).innerHTML = 

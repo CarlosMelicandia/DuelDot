@@ -66,7 +66,6 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
    */
   socket.on('shoot', ({ x, y, angle }) => { 
     if (backEndPlayers[socket.id].canShoot) { 
-      console.log("BackEnd Check 1: ", backEndPlayers[socket.id].canShoot)
       projectileId++ // Increment the projectile ID
 
       // Calculate the velocity of the projectile based on the angle provided by the client----------------------------------------------------
@@ -88,9 +87,7 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
       setInterval(() => {
         backEndPlayers[socket.id].canShoot = true
       }, 5000)
-      console.log("BackEnd Check 2: ", backEndPlayers[socket.id].canShoot)
     }
-    console.log("Projectile List: ", backEndProjectiles)
   })
 
   /**
@@ -242,14 +239,21 @@ setInterval(() => {
       if (DISTANCE < PROJECTILE_RADIUS + backEndPlayer.radius &&
           backEndProjectiles[id].playerId !== playerId) {
 
-      // Find the shooter (who fired the projectile)
+        // Find the shooter (who fired the projectile)
         const shooter = backEndPlayers[backEndProjectiles[id].playerId]
         const equippedWeapon = shooter.equippedWeapon
 
-      if (shooter && equippedWeapon) {
-        const totalDamage = backEndPlayer[playerId].equippedWeapon.damage * shooter.lightWpnMtp
-        backEndPlayers[playerId].health -=  totalDamage
-      } else {
+        const weaponMtps = { // List of all possible weapon multipliers
+          light: shooter.lightWpnMtp,
+          heavy: shooter.heavyWpnMtp,
+          magic: shooter.MagicWpnMtp
+        }
+        const weaponMtp = weaponMtps[equippedWeapon.type] // Obtains the specific weapon multiplier based on th weapons type
+
+        if (shooter && equippedWeapon) {
+          const totalDamage = equippedWeapon.damage * weaponMtp // Calculates the total damage based on multiplier
+          backEndPlayers[playerId].health -=  totalDamage
+        } else {
           console.log(`Error: Shooter or equipped weapon is undefined.`)
         }
 

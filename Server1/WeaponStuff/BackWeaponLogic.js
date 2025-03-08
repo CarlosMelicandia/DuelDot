@@ -50,7 +50,6 @@ function checkCollision(backEndWeapons, io, player) {
 
     if (dist < player.radius + weapon.radius) {
       if (player.inventory.length >= 2) return
-      console.log(`Player picked up: ${weapon.type}`)
       
       const weapons = {
         pistol: Pistol,
