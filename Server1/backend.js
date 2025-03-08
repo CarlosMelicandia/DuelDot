@@ -66,6 +66,8 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
    */
   socket.on('shoot', ({ x, y, angle }) => { 
     if (backEndPlayers[socket.id].canShoot) { 
+      const fireRate = backEndPlayers[socket.id].equippedWeapon.fireRate * 1000
+      console.log(fireRate)
       projectileId++ // Increment the projectile ID
 
       // Calculate the velocity of the projectile based on the angle provided by the client----------------------------------------------------
@@ -84,9 +86,9 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
 
       // Delay Calculation 
       backEndPlayers[socket.id].canShoot = false
-      setInterval(() => {
+      setTimeout(() => {
         backEndPlayers[socket.id].canShoot = true
-      }, 5000)
+      }, fireRate)
     }
   })
 
