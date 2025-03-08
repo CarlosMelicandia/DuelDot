@@ -141,9 +141,18 @@ socket.on("updatePlayers", (backEndPlayers) => {
         username: backEndPlayer.username,
         health: backEndPlayer.health,
         speed: backEndPlayer.speed,
+        // weapon: backEndPlayer.equippedWeapon,
       });
 
       // Add this player to the leaderboard
+      document.querySelector("#playerLabelsLead").innerHTML += `
+          <tr>
+            <td>${className}</td>
+            <td>${backEndPlayer.username}</td>
+            <td data-id="${id}score">${backEndPlayer.score}</td>
+            <td data-id="${id}weapon">Nothing</td>
+            <td>55%</td>
+          </tr>`;
       document.querySelector(
         "#playerLabels"
       ).innerHTML += `<div data-id="${id}" data-score="${backEndPlayer.score}">
@@ -157,6 +166,18 @@ socket.on("updatePlayers", (backEndPlayers) => {
       document.querySelector(
         `div[data-id="${id}"]`
       ).innerHTML = `${backEndPlayer.username}: ${backEndPlayer.score}`;
+
+      /*
+      YO DUMBASSES WORK ON THIS :D
+      */
+      // Updates Player Waapon
+      // document.querySelector(
+      //   `tr[data-id="${id}weapon"]`
+      // ).innerHTML = `${backEndPlayer.equippedWeapon}`;
+      // Update Player Score to tabLeaderBoard
+      // document.querySelector(
+      //   `tr[data-id="${id}score"]`
+      // ).innerHTML = `${backEndPlayer.score}`;
 
       // document.getElementById(id).style.color = color // breaks everything :(
       //Ties player name and score to their color
