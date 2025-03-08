@@ -28,42 +28,11 @@ const y = canvas.height / 2;
 // Possible Random Player Names
 // ------------------------------
 const playerNames = [
-  "Shadow",
-  "Raven",
-  "Phoenix",
-  "Blaze",
-  "Viper",
-  "Maverick",
-  "Rogue",
-  "Hunter",
-  "Nova",
-  "Zephyr",
-  "Falcon",
-  "Titan",
-  "Specter",
-  "Cyclone",
-  "Inferno",
-  "Reaper",
-  "Stalker",
-  "Venom",
-  "Glitch",
-  "Banshee",
-  "Shadowstrike",
-  "Onyx",
-  "Rebel",
-  "Fury",
-  "Apex",
-  "Crimson",
-  "Nightfall",
-  "Saber",
-  "Tempest",
-  "Lightning",
-  "Bullet",
-  "Vortex",
-  "Echo",
-  "Blitz",
-  "Rift",
-  "BOB",
+  "Shadow", "Raven", "Phoenix", "Blaze", "Viper", "Maverick", "Rogue",
+  "Hunter", "Nova", "Zephyr", "Falcon", "Titan", "Specter", "Cyclone",
+  "Inferno", "Reaper", "Stalker", "Venom", "Glitch", "Banshee", "Shadowstrike",
+  "Onyx", "Rebel", "Fury", "Apex", "Crimson", "Nightfall", "Saber", "Tempest",
+  "Lightning", "Bullet", "Vortex", "Echo", "Blitz", "Rift", "BOB"
 ];
 
 // ------------------------------
@@ -124,6 +93,57 @@ socket.on("updateProjectiles", (backEndProjectiles) => {
  * Keeps the front end (client side) players in sync with the back end (server).
  * When the server emits 'updatePlayers', update or create player objects as needed.
  */
+function updateLeaderboardDisplay() {
+  // Convert frontEndPlayers into an array with relevant properties.
+  let playersArray = Object.entries(frontEndPlayers).map(([id, player]) => ({
+    id,
+    username: player.username,
+    score: player.score,
+    color: player.color
+  }));
+
+  // Sort players descending by score.
+  playersArray.sort((a, b) => b.score - a.score);
+
+  // Get the top 10 players.
+  let topPlayers = playersArray.slice(0, 10);
+
+  // Determine the local player's ID.
+  const localPlayerId = socket.id;
+
+  // Check if the local player's entry is already in the top 10.
+  const localPlayerInTop = topPlayers.find(p => p.id === localPlayerId);
+
+  // If not, add the local player's data (flagged as not ranked).
+  if (!localPlayerInTop) {
+    const localPlayerData = playersArray.find(p => p.id === localPlayerId);
+    if (localPlayerData) {
+      localPlayerData.notRanked = true;
+      topPlayers.push(localPlayerData);
+    }
+  }
+
+  // Clear the leaderboard container.
+  const parentDiv = document.querySelector("#playerLabels");
+  parentDiv.innerHTML = "";
+
+  // Render each leaderboard entry.
+  topPlayers.forEach((entry, index) => {
+    // If the entry is flagged as not ranked, show "X"
+    let rankDisplay = entry.notRanked ? "X" : index + 1;
+    const div = document.createElement("div");
+    div.setAttribute("data-id", entry.id);
+    div.setAttribute("data-score", entry.score);
+    div.setAttribute("data-username", entry.username);
+    div.style.display = "flex";
+    div.style.justifyContent = "space-between";
+    div.style.width = "100%";
+    div.style.color = entry.color;
+    div.innerHTML = `<span><strong>${rankDisplay}.</strong> ${entry.username}</span><span>${entry.score}</span>`;
+    parentDiv.appendChild(div);
+  });
+}  
+
 socket.on("updatePlayers", (backEndPlayers) => {
   for (const id in backEndPlayers) {
     const backEndPlayer = backEndPlayers[id];
@@ -144,7 +164,7 @@ socket.on("updatePlayers", (backEndPlayers) => {
         // weapon: backEndPlayer.equippedWeapon,
       });
 
-      // Add this player to the leaderboard
+      // Add this player to the big leaderboard
       document.querySelector("#playerLabelsLead").innerHTML += `
           <tr>
             <td>${className}</td>
@@ -153,6 +173,7 @@ socket.on("updatePlayers", (backEndPlayers) => {
             <td data-id="${id}weapon">Nothing</td>
             <td>55%</td>
           </tr>`;
+      // Add this player to the small leaderboard
       document.querySelector(
         "#playerLabels"
       ).innerHTML += `<div data-id="${id}" data-score="${backEndPlayer.score}">
@@ -160,12 +181,34 @@ socket.on("updatePlayers", (backEndPlayers) => {
          </div>`;
     } else {
       // Update player health in the frontend
+      // Update player properties.
       frontEndPlayers[id].health = backEndPlayer.health;
-
-      // Update the player’s score in the leaderboard
-      document.querySelector(
-        `div[data-id="${id}"]`
-      ).innerHTML = `${backEndPlayer.username}: ${backEndPlayer.score}`;
+      frontEndPlayers[id].target = { x: backEndPlayer.x, y: backEndPlayer.y };
+      frontEndPlayers[id].score = backEndPlayer.score;
+      frontEndPlayers[id].color = backEndPlayer.color;
+      frontEndPlayers[id].username = backEndPlayer.username;
+      frontEndPlayers[id].health = backEndPlayer.health;
+      frontEndPlayers[id].speed = backEndPlayer.speed;
+      if (id === socket.id) {
+        const lastBackendInputIndex = playerInputs.findIndex((input) => {
+          return backEndPlayer.sequenceNumber === input.sequenceNumber;
+        });
+        if (lastBackendInputIndex > -1) {
+          playerInputs.splice(0, lastBackendInputIndex + 1);
+        }
+        playerInputs.forEach((input) => {
+          frontEndPlayers[id].target.x += input.dx;
+          frontEndPlayers[id].target.y += input.dy;
+        });
+      }
+      // Update the small leaderboard entry.
+      let elem = document.querySelector(`div[data-id="${id}"]`);
+      if (elem) {
+        elem.innerHTML = `${backEndPlayer.username}: ${backEndPlayer.score}`;
+        elem.style.color = backEndPlayer.color;
+        elem.setAttribute("data-score", backEndPlayer.score);
+      }
+    }
 
       /*
       YO DUMBASSES WORK ON THIS :D
@@ -180,52 +223,6 @@ socket.on("updatePlayers", (backEndPlayers) => {
       // ).innerHTML = `${backEndPlayer.score}`;
 
       // document.getElementById(id).style.color = color // breaks everything :(
-      //Ties player name and score to their color
-      document.querySelector(`div[data-id="${id}"]`).style.color =
-        backEndPlayer.color;
-
-      document
-        .querySelector(`div[data-id="${id}"]`) // Selects a DOM element that matches the player's id
-        .setAttribute("data-score", backEndPlayer.score); // Updates the label in HTML to show the players latest score from the server
-
-      // Sort the players displayed in descending order by score
-      const parentDiv = document.querySelector("#playerLabels");
-      const childDivs = Array.from(parentDiv.querySelectorAll("div"));
-      childDivs.sort((a, b) => {
-        const scoreA = Number(a.getAttribute("data-score"));
-        const scoreB = Number(b.getAttribute("data-score"));
-        return scoreB - scoreA;
-      });
-      childDivs.forEach((div) => {
-        parentDiv.removeChild(div);
-      });
-      childDivs.forEach((div) => {
-        parentDiv.appendChild(div);
-      });
-
-      // Used for interpolation (moving the player closer to its new position)
-      frontEndPlayers[id].target = {
-        x: backEndPlayer.x,
-        y: backEndPlayer.y,
-      };
-
-      if (id === socket.id) {
-        const lastBackendInputIndex = playerInputs.findIndex((input) => {
-          // Gets the last input from the server of that player
-          return backEndPlayer.sequenceNumber === input.sequenceNumber;
-        });
-
-        if (lastBackendInputIndex > -1) {
-          playerInputs.splice(0, lastBackendInputIndex + 1);
-        }
-
-        // Reapply remaining inputs
-        playerInputs.forEach((input) => {
-          frontEndPlayers[id].target.x += input.dx;
-          frontEndPlayers[id].target.y += input.dy;
-        });
-      }
-    }
   }
 
   // Remove any client-side players that no longer exist on the server
@@ -241,6 +238,8 @@ socket.on("updatePlayers", (backEndPlayers) => {
       delete frontEndPlayers[id];
     }
   }
+
+  updateLeaderboardDisplay();
 });
 
 // Waits for an updateWeapons from the back end to sync and spawn weapons
@@ -451,7 +450,6 @@ window.addEventListener("keydown", (event) => {
       break;
     case "Tab":
       keys.tab.pressed = true;
-      // console.log("Tab down")
       break;
     case "Digit1":
       keys.num1.pressed = true;

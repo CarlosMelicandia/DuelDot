@@ -1,5 +1,6 @@
 <html>
   <head>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <style>
       body {
         -webkit-font-smoothing: antialiased;
@@ -56,28 +57,37 @@
       }
     </style>
   </head>
-  <body style="display: flex; align-items: center; justify-content: center">
-    <div>
-      <div
-        style="
-          margin-left: 2px;
-          margin-top: 2px;
-          position: absolute;
-          color: white;
-          padding: 8px;
-          font-family: sans-serif;
-          font-size: 14px;
-          user-select: none;
-          background: rgba(0, 0, 0, 0.8);
-          display: default;
-        "
-      >
-        <div style="margin-bottom: 8px; text-decoration: underline">
-          Leaderboard
+  <body style="margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; background: black; font-family: 'VT323', monospace;">
+    <!-- Game Container -->
+    <div style="position: relative; width: 1024px; height: 576px;">
+
+    <!-- The Game Canvas -->
+    <canvas></canvas>
+
+
+      <!-- Small Leaderboard-->
+      <div id="small_leaderboard">d
+        <div
+          style="
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: white;
+            padding: 8px;
+            font-size: 18px;
+            font-weight: 200;
+            user-select: none;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 5px;"
+        >
+          <div style="margin-bottom: 8px; font-size: 30px; font-weight: 400;">
+            LeaderBoard
+          </div>
+
+
+          <div id="playerLabels"></div>
         </div>
-        <div id="playerLabels"></div>
       </div>
-      <canvas></canvas>
       <!-- Big Leader Board -->
       <style>
         /* Leaderboard Container */
@@ -90,8 +100,8 @@
           right: 0;
           /* bottom: 0; */
           left: 0;
-          width: 30%;
-          /*max-width: 900px; */
+          width: 80%;
+          max-width: 900px;
           margin: 40px auto;
           background: rgba(206, 206, 206, 0.7);
           border-radius: 12px;
@@ -102,7 +112,7 @@
           z-index: 1;
         }
         /* Title */
-        .leaderboard h1 {
+        .leaderboard h2 {
           text-align: center;
           font-size: 2rem;
           margin-bottom: 10px;
@@ -145,14 +155,20 @@
             <th>Gun</th>
             <th>Accuracy</th>
           </thead>
-          <!-- Tester Stuff
           <tr>
             <td>Gunner</td>
             <td>Gabe</td>
             <td>555</td>
             <td>Glock</td>
             <td>55%</td>
-          </tr> -->
+          </tr>
+          <tr>
+            <td>Gunner</td>
+            <td>Gabe</td>
+            <td>555</td>
+            <td>Glock</td>
+            <td>55%</td>
+          </tr>
         </table>
         <!-- Big Leader Board End -->
       </div>
@@ -161,16 +177,18 @@
       <div
         id="inventoryArea"
         style="
+          position: absolute;
+          bottom: 0;
+          right: 0;
+          margin: 0;
+          padding: 0;
           display: flex;
-          position: relative;
           flex-direction: column;
           align-items: center;
           justify-content: space-evenly;
           width: 230px;
           height: 156px;
-          bottom: 80px;
-          left: 910px;
-          transform: translate(-50%, -50%);
+          
         "
       >
         <div class="itemBorder" id="inventorySlot1">
@@ -331,8 +349,6 @@
     <script src="./js/FrontWeaponStuff/WeaponDrawning.js"></script>
     <script src="./js/frontend.js"></script>
     <script src="./js/eventListeners.js"></script>
-    <script src="./js/frontend.js"></script>
-
     <!-- Custom Cursor Script -->
     <script>
       // Set a custom cursor for the body and canvas
