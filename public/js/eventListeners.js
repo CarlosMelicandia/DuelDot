@@ -1,12 +1,13 @@
 /**
  * Checks for when the user clicks
  */
-addEventListener('click', (event) => { 
-  const { top, left } = canvas.getBoundingClientRect() // Gets the top and left position from the canvas
-  const playerPosition = { // playerPosition holds both x and y
+addEventListener("click", (event) => {
+  const { top, left } = canvas.getBoundingClientRect(); // Gets the top and left position from the canvas
+  const playerPosition = {
+    // playerPosition holds both x and y
     x: frontEndPlayers[socket.id].x, // This gets a specific player's x and y position
-    y: frontEndPlayers[socket.id].y
-  }
+    y: frontEndPlayers[socket.id].y,
+  };
 
   /**
    * Calculates the angle between the click and players position
@@ -16,18 +17,17 @@ addEventListener('click', (event) => {
   const angle = Math.atan2(
     event.clientY - top - playerPosition.y,
     event.clientX - left - playerPosition.x
-  )
+  );
 
-/**
- * .emit sends information to the server from the client o vice versa
- * Here it sends the players x and y position alongside the angle of the shot
- */
-  socket.emit('shoot', {
+  /**
+   * .emit sends information to the server from the client o vice versa
+   * Here it sends the players x and y position alongside the angle of the shot
+   */
+  socket.emit("shoot", {
     x: playerPosition.x,
     y: playerPosition.y,
-    angle
-  })
-   
+    angle,
+  });
 
   /**
    * ********************
@@ -51,4 +51,4 @@ addEventListener('click', (event) => {
   //     velocity
   //   })
   // )
-})
+});

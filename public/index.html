@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html>
   <head>
     <style>
@@ -20,283 +19,142 @@
         background-image: url("/img/background.png");
         border: 2px solid #ccccd5;
       }
-
-      /* === Inventory & Text from Main === */
-      .itemBorder {
-        display: flex;
-        box-sizing: border-box;
-        width: 220px;
-        height: 70px;
-        border: 1px solid white;
-        background: rgba(69, 67, 67, 0.5);
-        align-items: center;
-        justify-content: center;
-        flex-direction: row;
-        font-family: taken;
-        font-size: 20px;
-        position: relative;
-      }
-
-      .numbers {
-        position: absolute;
-        top: 5px;
-        left: 5px;
-        margin: 0;
-        padding: 0;
-        color: white;
-        font-size: 12px;
-        font-weight: bold;
-      }
-
-      .weaponText {
-        color: white;
-        font-size: 25px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 100%;
-      }
-
-      /* === Big Leaderboard from Backend === */
-      .leaderboard {
-        display: none; /* Hidden by default; you can toggle display in JS */
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-
-        /* Example look; tweak as needed */
-        width: 80%;
-        max-width: 900px;
-        margin: 40px auto;
-        background: #2a2a2a;
-        border-radius: 12px;
-        padding: 20px;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
-        color: white;
-        font-family: Arial, sans-serif;
-      }
-
-      .leaderboard h2 {
-        text-align: center;
-        font-size: 2rem;
-        margin-bottom: 10px;
-        text-decoration: underline;
-      }
-
-      .leaderboard-table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-
-      .leaderboard-table th,
-      .leaderboard-table td {
-        padding: 12px;
-        text-align: left;
-        border-bottom: 1px solid #444;
-      }
     </style>
   </head>
-
   <body style="display: flex; align-items: center; justify-content: center">
     <div>
-      <!-- Small / HUD-Style Leaderboard (from Main) -->
       <div
         style="
+          margin-left: 2px;
+          margin-top: 2px;
           position: absolute;
           color: white;
           padding: 8px;
           font-family: sans-serif;
           font-size: 14px;
           user-select: none;
-          background: rgba(0, 0, 0, 0.5);
+          background: rgba(0, 0, 0, 0.8);
+          display: default;
         "
       >
-        <div style="margin-bottom: 8px">Leaderboard</div>
+        <div style="margin-bottom: 8px; text-decoration: underline">
+          Leaderboard
+        </div>
         <div id="playerLabels"></div>
       </div>
-
-      <!-- The game canvas -->
       <canvas></canvas>
 
-      <!-- Big (Full-Screen) Leaderboard (from Backend) -->
-      <div class="leaderboard" id="bigLeaderboard">
-        <h2>Leaderboard</h2>
-        <table class="leaderboard-table">
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>Name</th>
-              <th>Score</th>
-            </tr>
-          </thead>
-          <tbody id="bigLeaderboardBody">
-            <!-- Dynamically populated by JS -->
-          </tbody>
-        </table>
+      <!-- Big Leader Board -->
+      <style>
+        /* Leaderboard Container */
+        .leaderboard {
+          display: none;
+          /* align-items: center; */
+          justify-content: center;
+          position: absolute;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          left: 0;
+          width: 80%;
+          max-width: 900px;
+          margin: 40px auto;
+          background: #2a2a2a;
+          border-radius: 12px;
+          padding: 20px;
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
+          color: white;
+          font-family: "Arial", sans-serif;
+        }
+        /* Title */
+        .leaderboard h2 {
+          text-align: center;
+          font-size: 2rem;
+          margin-bottom: 10px;
+        }
+
+        /* Table Styles */
+        .leaderboard-table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+
+        .leaderboard-table thead {
+          background: #28283d;
+        }
+
+        .leaderboard-table th,
+        .leaderboard-table td {
+          padding: 12px;
+          text-align: left;
+          border-bottom: 1px solid #444;
+        }
+      </style>
+      <div class="leaderBoard">
+        <div
+          style="
+            background: rgba(100, 100, 100, 0.8);
+            padding: 10%;
+            border-radius: 2%;
+          "
+        >
+          <h1>Leaderboard</h1>
+          <div class="leaderboard-table"></div>
+        </div>
+        <!-- Big Leader Board End -->
       </div>
 
-      <!-- Inventory Slots (from Main) -->
+      <!-- username input -->
       <div
-        id="inventoryArea"
         style="
           display: flex;
-          position: relative;
-          flex-direction: column;
-          align-items: center;
-          justify-content: space-evenly;
-          width: 230px;
-          height: 156px;
-          bottom: 80px;
-          left: 910px;
-          transform: translate(-50%, -50%);
-        "
-      >
-        <div class="itemBorder" id="inventorySlot1">
-          <div class="numbers">1</div>
-          <div class="weaponText" id="inventorySlot1Text"></div>
-        </div>
-        <div class="itemBorder" id="inventorySlot2">
-          <div class="numbers">2</div>
-          <div class="weaponText" id="inventorySlot2Text"></div>
-        </div>
-      </div>
-
-      <!-- Username & Class Selection Menu (from Main) -->
-      <div
-        id="menu"
-        style="
-          display: flex;
-          flex-direction: column;
           align-items: center;
           justify-content: center;
           position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          text-align: center;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          left: 0;
         "
       >
         <form id="usernameForm">
-          <!-- Div showing selected Random Name -->
-          <div
-            id="selectedRandomName"
-            type="text"
-            style="
-              width: 227px;
-              padding: 10px;
-              box-sizing: border-box;
-              border-radius: 5px;
-              border: none;
-              background: #475569;
-              color: #cbd5e1;
-              text-align: center;
-            "
-          >
-            <!-- Filled by JS -->
+          <div>
+            <input
+              id="usernameInput"
+              type="text"
+              placeholder="Username"
+              style="
+                padding: 12px;
+                border-radius: 5px;
+                border: none;
+                background: #475569;
+                color: #cbd5e1;
+              "
+            />
           </div>
-
-          <!-- Class Selector Buttons -->
-          <div
-            style="
-              margin-top: 8px;
-              display: flex;
-              align-items: center;
-              gap: 10px;
-            "
-          >
+          <div style="text-align: center; margin-top: 8px">
             <button
-              type="button"
-              id="classSelectorLeft"
-              style="
-                padding: 10px;
-                border-radius: 5px;
-                border: none;
-                background-image: linear-gradient(to right, #06b6d4, #3b82f6);
-                color: white;
-                cursor: pointer;
-              "
-            >
-              ←
-            </button>
-
-            <button
-              type="button"
-              id="showClass"
-              style="
-                width: 140px;
-                padding: 10px;
-                border-radius: 5px;
-                box-sizing: border-box;
-                border: none;
-                background: linear-gradient(to right, #06b6d4, #3b82f6);
-                color: white;
-                font-weight: bold;
-                text-transform: uppercase;
-                cursor: default;
-              "
-            >
-              <!-- Class Name Shown Here by JS -->
-            </button>
-
-            <button
-              type="button"
-              id="classSelectorRight"
-              style="
-                padding: 10px;
-                border-radius: 5px;
-                border: none;
-                background-image: linear-gradient(to right, #06b6d4, #3b82f6);
-                color: white;
-                cursor: pointer;
-              "
-            >
-              →
-            </button>
-          </div>
-
-          <!-- Action Buttons -->
-          <div style="margin-top: 8px; display: flex; gap: 8px">
-            <button
-              type="submit"
               style="
                 padding: 8px 20px;
                 border-radius: 5px;
                 border: none;
-                background: linear-gradient(to right, #06b6d4, #3b82f6);
+                background-image: linear-gradient(
+                  to right,
+                  rgb(6, 182, 212),
+                  rgb(59, 130, 246)
+                );
                 color: white;
-                font-weight: bold;
-                text-transform: uppercase;
                 cursor: pointer;
               "
             >
               Start!
             </button>
-
-            <button
-              type="button"
-              id="randomNameBtn"
-              style="
-                padding: 8px 15px;
-                border-radius: 5px;
-                border: none;
-                background: linear-gradient(to right, #06b6d4, #3b82f6);
-                color: white;
-                font-weight: bold;
-                text-transform: uppercase;
-                cursor: pointer;
-              "
-            >
-              Random Name
-            </button>
           </div>
         </form>
       </div>
-      <!-- end of #menu -->
+      <!-- username input end -->
     </div>
 
-    <!-- Scripts -->
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.2/gsap.min.js"
       integrity="sha512-kVlGhj2qFy+KBCFuvjBJTGUMxbdqJKs4yK2jh0e0VPhWUPiPC87bzm4THmaaIee3Oj7j6sDpTTgm2EPPiESqBg=="
@@ -304,29 +162,11 @@
       referrerpolicy="no-referrer"
     ></script>
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
-
-    <!-- Classes (shared) -->
     <script src="./js/classes/Enemy.js"></script>
     <script src="./js/classes/Player.js"></script>
     <script src="./js/classes/Particle.js"></script>
     <script src="./js/classes/Projectile.js"></script>
-
-    <!-- Extra front-end script from Main (missing in Backend) -->
-    <script src="./js/FrontWeaponStuff/WeaponDrawning.js"></script>
-
-    <!-- Common front-end scripts -->
     <script src="./js/frontend.js"></script>
     <script src="./js/eventListeners.js"></script>
-
-    <!-- Custom Cursor (from Main) -->
-    <script>
-      const customCursorImage = "/img/CrosshairCursor.png"; // Adjust path if needed
-
-      document.body.style.cursor = `url(${customCursorImage}), auto`;
-      const gameCanvas = document.querySelector("canvas");
-      if (gameCanvas) {
-        gameCanvas.style.cursor = `url(${customCursorImage}), auto`;
-      }
-    </script>
   </body>
 </html>
