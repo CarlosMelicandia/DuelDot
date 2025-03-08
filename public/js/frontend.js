@@ -122,9 +122,10 @@ socket.on('updatePlayers', (backEndPlayers) => {
         color: backEndPlayer.color,
         username: backEndPlayer.username,
         health: backEndPlayer.health,  
-        speed: backEndPlayer.speed      
+        speed: backEndPlayer.speed,
+        canShoot: backEndPlayer.canShoot     
       })
-
+      
       // Add this player to the leaderboard 
       document.querySelector('#playerLabels').innerHTML += 
         `<div data-id="${id}" data-score="${backEndPlayer.score}">
@@ -133,6 +134,8 @@ socket.on('updatePlayers', (backEndPlayers) => {
     } else {
       // Update player health in the frontend
       frontEndPlayers[id].health = backEndPlayer.health
+      frontEndPlayers[id].canShoot = backEndPlayer.canShoot
+      console.log("Check 1", frontEndPlayers[id].canShoot)
 
       // Update the player’s score in the leaderboard
       document.querySelector(`div[data-id="${id}"]`).innerHTML = 

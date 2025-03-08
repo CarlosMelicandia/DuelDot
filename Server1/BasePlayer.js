@@ -33,6 +33,8 @@ class BasePlayer {
       // Inventory and Equipped
       this.inventory = []
       this.equippedWeapon = null
+
+      this.canShoot = true
   }
 }
 

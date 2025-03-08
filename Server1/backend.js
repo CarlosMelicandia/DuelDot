@@ -65,21 +65,32 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
    * When the client emits a 'shoot' event, a new projectile is created.
    */
   socket.on('shoot', ({ x, y, angle }) => { 
-    projectileId++ // Increment the projectile ID
+    if (backEndPlayers[socket.id].canShoot) { 
+      console.log("BackEnd Check 1: ", backEndPlayers[socket.id].canShoot)
+      projectileId++ // Increment the projectile ID
 
-    // Calculate the velocity of the projectile based on the angle provided by the client----------------------------------------------------
-    const velocity = {
-      x: Math.cos(angle) * 5,  //Weapon Velocity 
-      y: Math.sin(angle) * 5   // Weapon Velocity
-    }
+      // Calculate the velocity of the projectile based on the angle provided by the client----------------------------------------------------
+      const velocity = {
+        x: Math.cos(angle) * 5,  //Weapon Velocity 
+        y: Math.sin(angle) * 5   // Weapon Velocity
+      }
 
-    // Create a new server-side projectile
-    backEndProjectiles[projectileId] = {
-      x,
-      y,
-      velocity,
-      playerId: socket.id
+      // Create a new server-side projectile
+      backEndProjectiles[projectileId] = {
+        x,
+        y,
+        velocity,
+        playerId: socket.id
+      }
+
+      // Delay Calculation 
+      backEndPlayers[socket.id].canShoot = false
+      setInterval(() => {
+        backEndPlayers[socket.id].canShoot = true
+      }, 5000)
+      console.log("BackEnd Check 2: ", backEndPlayers[socket.id].canShoot)
     }
+    console.log("Projectile List: ", backEndProjectiles)
   })
 
   /**
@@ -114,7 +125,7 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
       width,
       height
     }
-
+    
     console.log(`Class: ${backEndPlayers[socket.id].constructor.name}, Health: ${backEndPlayers[socket.id].health}, Radius: ${backEndPlayers[socket.id].radius}, Speed: ${backEndPlayers[socket.id].speed}`)
     
     socket.emit('updateWeaponsOnJoin', backEndWeapons);
@@ -233,7 +244,7 @@ setInterval(() => {
 
       // Find the shooter (who fired the projectile)
         const shooter = backEndPlayers[backEndProjectiles[id].playerId]
-        const equippedWeapon = shooter.inventory.index(0)
+        const equippedWeapon = shooter.equippedWeapon
 
       if (shooter && equippedWeapon) {
         const totalDamage = backEndPlayer[playerId].equippedWeapon.damage * shooter.lightWpnMtp
