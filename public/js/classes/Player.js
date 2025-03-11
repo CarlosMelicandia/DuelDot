@@ -17,7 +17,7 @@ class Player {
    * @param {number} health - The player's initial health (Test branch addition).
    * @param {number} speed - The player's movement speed (Test branch addition).
    */
-  constructor({ x, y, radius, color, username, health, speed, canShoot }) {
+  constructor({ x, y, radius, color, username, health, speed, canShoot, equippedWeapon }) {
     this.x = x
     this.y = y
     this.radius = radius
@@ -27,6 +27,7 @@ class Player {
     this.maxHealth = health // Store max health for calculations 
     this.speed = speed // Movement speed 
     this.canShoot = canShoot
+    this.equippedWeapon = equippedWeapon
   }
 
   /**

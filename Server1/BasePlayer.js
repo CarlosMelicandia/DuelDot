@@ -10,7 +10,7 @@ class BasePlayer {
    * @param {number} [sequenceNumber=0] - The last processed input sequence number.
    * @param {number} [score=0] - The player's current score.
    */
-  constructor({ username, x, y, sequenceNumber = 0, score = 0 }) {
+  constructor({ username, x, y, sequenceNumber = 0, score = 0, equippedWeapon }) {
       this.username = username // Player's display name
       this.x = x // X position on the map
       this.y = y // Y position on the map
@@ -32,7 +32,7 @@ class BasePlayer {
 
       // Inventory and Equipped
       this.inventory = []
-      this.equippedWeapon = null
+      this.equippedWeapon = equippedWeapon
 
       this.canShoot = true
   }

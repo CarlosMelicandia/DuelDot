@@ -10,6 +10,8 @@ addEventListener('click', (event) => {
   // Ensure the local player exists before proceeding
   if (!frontEndPlayers[socket.id]) return 
 
+  if (!frontEndPlayers[socket.id].canShoot || frontEndPlayers[socket.id].equippedWeapon.type == "melee") return // Checks to see if the frontEnd should even do the calculations
+  
   const playerPosition = { // Stores the local player’s current position
     x: frontEndPlayers[socket.id].x,
     y: frontEndPlayers[socket.id].y
@@ -29,14 +31,11 @@ addEventListener('click', (event) => {
    * - `x, y`: Player’s current position.
    * - `angle`: The angle at which the projectile should be fired.
    */
-  
-  if (frontEndPlayers[socket.id].canShoot){
-    socket.emit('shoot', {
-    x: playerPosition.x,
-    y: playerPosition.y,
-    angle
-    })
-  }
+  socket.emit('shoot', {
+  x: playerPosition.x,
+  y: playerPosition.y,
+  angle
+  })
 
   /**
    * ********************

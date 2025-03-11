@@ -10,7 +10,7 @@ class Weapon{
 
 class Pistol extends Weapon{
     constructor(){
-        super("Pistol", "light", 20, 1.5, 5);
+        super("Pistol", "light", 20, 1, 5);
     }
     
 }
@@ -32,10 +32,17 @@ class Shuriken extends Weapon{
     }
 }
 
+class Fist extends Weapon{
+    constructor(){
+        super("Fist", "melee", 40, 0.3, 5);
+    }
+}
+
 module.exports = {
     Weapon,
     Pistol,
     SubmachineGun,
     Sniper,
-    Shuriken
+    Shuriken,
+    Fist
 }

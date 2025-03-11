@@ -9,7 +9,7 @@ const Tank = require('./Tank.js')
 const Mage = require('./Mage.js')
 const Rogue = require('./Rogue.js')
 const Gunner = require('./Gunner.js')
-const { Weapon, Pistol, SubmachineGun, Sniper, Shuriken } = require('./WeaponStuff/Weapons.js')
+const { Weapon, Pistol, SubmachineGun, Sniper, Shuriken, Fist } = require('./WeaponStuff/Weapons.js')
 const { spawnWeapons, checkCollision } = require('./WeaponStuff/BackWeaponLogic.js')
 
 // ------------------------------
@@ -52,6 +52,7 @@ const GAME_HEIGHT = 576 // Default height
 const PROJECTILE_RADIUS = 5 // Radius of projectiles
 let projectileId = 0 // Unique ID counter for each projectile created
 
+const FIST = new Fist() // initiates the fist
 
 // ------------------------------
 // Socket.IO Connection and Event Handlers
@@ -65,12 +66,14 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
    * When the client emits a 'shoot' event, a new projectile is created.
    */
   socket.on('shoot', ({ x, y, angle }) => { 
-    if (backEndPlayers[socket.id].canShoot) { 
+    const player = backEndPlayers[socket.id]
+    if (!player || player.equippedWeapon.type == "melee")return // checks that the player is alive and doesn't have a melee
+    
+    if (player.canShoot) { 
       const fireRate = backEndPlayers[socket.id].equippedWeapon.fireRate * 1000
-      console.log(fireRate)
       projectileId++ // Increment the projectile ID
 
-      // Calculate the velocity of the projectile based on the angle provided by the client----------------------------------------------------
+      // Calculate the velocity of the projectile based on the angle provided by the client
       const velocity = {
         x: Math.cos(angle) * 5,  //Weapon Velocity 
         y: Math.sin(angle) * 5   // Weapon Velocity
@@ -112,12 +115,13 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
       username: username, 
       x: x, 
       y: y,
+      equippedWeapon: FIST,
       score: 0,
       sequenceNumber: 0
     })
     
     backEndPlayers[socket.id] = newPlayer
-    newPlayer.socketId = socket.id // ADs the player ID to their player profile
+    newPlayer.socketId = socket.id // Adds the player ID to their player profile
 
     // Store the canvas settings for the player
     backEndPlayers[socket.id].canvas = {
@@ -125,7 +129,7 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
       height
     }
     
-    console.log(`Class: ${backEndPlayers[socket.id].constructor.name}, Health: ${backEndPlayers[socket.id].health}, Radius: ${backEndPlayers[socket.id].radius}, Speed: ${backEndPlayers[socket.id].speed}`)
+    console.log(`Class: ${backEndPlayers[socket.id].constructor.name}, Health: ${backEndPlayers[socket.id].health}, Radius: ${backEndPlayers[socket.id].radius}, Speed: ${backEndPlayers[socket.id].speed}, Weapon: ${backEndPlayers[socket.id].equippedWeapon.name}`)
     
     socket.emit('updateWeaponsOnJoin', backEndWeapons);
   })
@@ -152,10 +156,18 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
 
     switch (keycode){
       case "Digit1":
-        backEndPlayer.equippedWeapon = backEndPlayer.inventory[0] // adds the weapon to their first slot in inventory
+        if (backEndPlayer.inventory[0]){
+          backEndPlayer.equippedWeapon = backEndPlayer.inventory[0] // adds the weapon to their first slot in inventory
+        } else if (backEndPlayer.equippedWeapon != "Fist"){ // Goes back to fist if inventory slot is empty
+          backEndPlayer.equippedWeapon = FIST
+        }
         break
-      case "Digit2":
-        backEndPlayer.equippedWeapon = backEndPlayer.inventory[1] // adds the weapon to their second slot in inventory
+      case "Digit2":       
+       if (backEndPlayer.inventory[1]){
+          backEndPlayer.equippedWeapon = backEndPlayer.inventory[1] // adds the weapon to their second slot in inventory
+        } else if (backEndPlayer.equippedWeapon.name != "Fist"){ // Goes back to fist if inventory slot is empty
+          backEndPlayer.equippedWeapon = FIST
+        }
         break
     }
   })

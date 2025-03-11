@@ -107,7 +107,7 @@ socket.on('updateProjectiles', (backEndProjectiles) => {
  * When the server emits 'updatePlayers', update or create player objects as needed.
  */
 socket.on('updatePlayers', (backEndPlayers) => {
-  for (const id in backEndPlayers) {
+  for (const id in backEndPlayers) { // displays the same info as if using socket.id, might want to remove the for loop
     const backEndPlayer = backEndPlayers[id]
 
     /**
@@ -123,7 +123,6 @@ socket.on('updatePlayers', (backEndPlayers) => {
         username: backEndPlayer.username,
         health: backEndPlayer.health,  
         speed: backEndPlayer.speed,
-        canShoot: backEndPlayer.canShoot     
       })
       
       // Add this player to the leaderboard 
@@ -132,6 +131,11 @@ socket.on('updatePlayers', (backEndPlayers) => {
           ${backEndPlayer.username}: ${backEndPlayer.score}
          </div>`
     } else {
+      // Updates the player equipped weapon in the front end
+      frontEndPlayers[id].equippedWeapon = backEndPlayer.equippedWeapon
+      // Updates whether the player can shoot in the front end
+      frontEndPlayers[id].canShoot = backEndPlayer.canShoot
+
       // Update player health in the frontend
       frontEndPlayers[id].health = backEndPlayer.health
       frontEndPlayers[id].canShoot = backEndPlayer.canShoot
@@ -354,6 +358,7 @@ setInterval(() => {
     sequenceNumber++
     playerInputs.push({ sequenceNumber, dx: 0, dy: 0 })
     document.querySelector('#inventorySlot2').style.borderColor = "blue" // Highlights the second Inventory Slot
+    console.log(player.equippedWeapon) // ----------------------------- Test
     socket.emit('weaponSelected', { keycode: 'Digit2', sequenceNumber} ) // Emits the information back to the server 
   } else{
     if (keys.num1.pressed && !keys.num2.pressed){
