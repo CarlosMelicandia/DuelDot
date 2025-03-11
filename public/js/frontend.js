@@ -358,7 +358,6 @@ setInterval(() => {
     sequenceNumber++
     playerInputs.push({ sequenceNumber, dx: 0, dy: 0 })
     document.querySelector('#inventorySlot2').style.borderColor = "blue" // Highlights the second Inventory Slot
-    console.log(player.equippedWeapon) // ----------------------------- Test
     socket.emit('weaponSelected', { keycode: 'Digit2', sequenceNumber} ) // Emits the information back to the server 
   } else{
     if (keys.num1.pressed && !keys.num2.pressed){
