@@ -89,4 +89,36 @@ class Player {
     c.fill() // Fills the shape with the chosen color
     c.restore() // Restores the canvas state to avoid affecting other elements
   }
+
+  drawHands(angle){
+    // ------------------------------
+    // Draw Player's Hand
+    // ------------------------------
+    c.save()
+    c.translate(this.x, this.y)
+    c.rotate(angle)
+    c.beginPath()
+    c.arc(25, 10, 5, 0, Math.PI * 2) // Draws right hand
+    c.moveTo(25,-10) 
+    c.arc(25, -10, 5, 0, Math.PI * 2) // Draws left hand
+    c.fillStyle = this.color
+    c.fill()
+    c.restore()
+
+
+    /**
+     * Might need to be separate for when we do punching
+     */
+    // ------------------------------
+    // Draw Player's Left Hand
+    // ------------------------------
+    // c.save()
+    // c.translate(this.x, this.y)
+    // c.rotate(angle)
+    // c.beginPath()
+    // c.arc(25, -10, 5, 0, Math.PI * 2)
+    // c.fillStyle = this.color
+    // c.fill()
+    // c.restore()
+  }
 }

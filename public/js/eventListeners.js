@@ -23,6 +23,9 @@ addEventListener('click', (event) => {
     event.clientX - left - playerPosition.x
   )
 
+  frontEndPlayers[socket.id].drawHands()
+  console.log("Shoot")
+
   /**
    * Sends a "shoot" event to the server.
    * This informs the server that the player has fired a shot.
@@ -63,4 +66,17 @@ addEventListener('click', (event) => {
   //     velocity
   //   })
   // )
+})
+
+addEventListener('mousemove', (event) => {
+  const player = frontEndPlayers[socket.id]
+  if (!player) return
+  const { top, left } = canvas.getBoundingClientRect()
+
+  const mouseAngle = Math.atan2(
+    event.clientY - top - player.y,
+    event.clientX - left - player.x
+  )
+
+  player.aimAngle = mouseAngle
 })
