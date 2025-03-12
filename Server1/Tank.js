@@ -21,9 +21,9 @@ class Tank extends BasePlayer {
         this.speed = .5
 
         // Weapon multipliers
-        this.lightWpnMtp = 1.0
-        this.heavyWpnMtp = 1.0
-        this.magicWpnMtp = 1.0
+        this.lightWpnMtp = 1.3
+        this.heavyWpnMtp = 1.6
+        this.magicWpnMtp = .2
     }
 }
 

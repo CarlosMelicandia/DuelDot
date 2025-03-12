@@ -107,7 +107,7 @@ socket.on('updateProjectiles', (backEndProjectiles) => {
  * When the server emits 'updatePlayers', update or create player objects as needed.
  */
 socket.on('updatePlayers', (backEndPlayers) => {
-  for (const id in backEndPlayers) {
+  for (const id in backEndPlayers) { // displays the same info as if using socket.id, might want to remove the for loop
     const backEndPlayer = backEndPlayers[id]
 
     /**
@@ -122,17 +122,23 @@ socket.on('updatePlayers', (backEndPlayers) => {
         color: backEndPlayer.color,
         username: backEndPlayer.username,
         health: backEndPlayer.health,  
-        speed: backEndPlayer.speed      
+        speed: backEndPlayer.speed,
       })
-
+      
       // Add this player to the leaderboard 
       document.querySelector('#playerLabels').innerHTML += 
         `<div data-id="${id}" data-score="${backEndPlayer.score}">
           ${backEndPlayer.username}: ${backEndPlayer.score}
          </div>`
     } else {
+      // Updates the player equipped weapon in the front end
+      frontEndPlayers[id].equippedWeapon = backEndPlayer.equippedWeapon
+      // Updates whether the player can shoot in the front end
+      frontEndPlayers[id].canShoot = backEndPlayer.canShoot
+
       // Update player health in the frontend
       frontEndPlayers[id].health = backEndPlayer.health
+      frontEndPlayers[id].canShoot = backEndPlayer.canShoot
 
       // Update the player’s score in the leaderboard
       document.querySelector(`div[data-id="${id}"]`).innerHTML = 
@@ -254,6 +260,7 @@ function animate() {
         (frontEndPlayers[id].target.y - frontEndPlayers[id].y) * 0.5
     }
     frontEndPlayer.draw()
+    frontEndPlayer.drawHands({ xPosition: frontEndPlayer.handXMove, angle: frontEndPlayer.aimAngle })
   }
 
   for (const weapon in frontEndWeapons){

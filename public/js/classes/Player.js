@@ -17,7 +17,7 @@ class Player {
    * @param {number} health - The player's initial health (Test branch addition).
    * @param {number} speed - The player's movement speed (Test branch addition).
    */
-  constructor({ x, y, radius, color, username, health, speed }) {
+  constructor({ x, y, radius, color, username, health, speed, canShoot, equippedWeapon }) {
     this.x = x
     this.y = y
     this.radius = radius
@@ -26,6 +26,8 @@ class Player {
     this.health = health // Initialize health 
     this.maxHealth = health // Store max health for calculations 
     this.speed = speed // Movement speed 
+    this.canShoot = canShoot
+    this.equippedWeapon = equippedWeapon
   }
 
   /**
@@ -86,5 +88,37 @@ class Player {
     c.fillStyle = this.color // Colors the circle to match the player's assigned color
     c.fill() // Fills the shape with the chosen color
     c.restore() // Restores the canvas state to avoid affecting other elements
+  }
+
+  drawHands({ xPosition = 25, yPosition = 10, angle }){
+    // ------------------------------
+    // Draw Player's Hand
+    // ------------------------------
+    c.save()
+    c.translate(this.x, this.y)
+    c.rotate(angle)
+    c.beginPath()
+    c.arc(xPosition, yPosition, 5, 0, Math.PI * 2) // Draws right hand
+    c.moveTo(25,-10) 
+    c.arc(xPosition, -yPosition, 5, 0, Math.PI * 2) // Draws left hand
+    c.fillStyle = this.color
+    c.fill()
+    c.restore()
+
+
+    /**
+     * Might need to be separate for when we do punching
+     */
+    // ------------------------------
+    // Draw Player's Left Hand
+    // ------------------------------
+    // c.save()
+    // c.translate(this.x, this.y)
+    // c.rotate(angle)
+    // c.beginPath()
+    // c.arc(25, -10, 5, 0, Math.PI * 2)
+    // c.fillStyle = this.color
+    // c.fill()
+    // c.restore()
   }
 }
