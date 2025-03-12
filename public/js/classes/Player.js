@@ -90,7 +90,7 @@ class Player {
     c.restore() // Restores the canvas state to avoid affecting other elements
   }
 
-  drawHands(angle){
+  drawHands({ xPosition = 25, yPosition = 10, angle }){
     // ------------------------------
     // Draw Player's Hand
     // ------------------------------
@@ -98,9 +98,9 @@ class Player {
     c.translate(this.x, this.y)
     c.rotate(angle)
     c.beginPath()
-    c.arc(25, 10, 5, 0, Math.PI * 2) // Draws right hand
+    c.arc(xPosition, yPosition, 5, 0, Math.PI * 2) // Draws right hand
     c.moveTo(25,-10) 
-    c.arc(25, -10, 5, 0, Math.PI * 2) // Draws left hand
+    c.arc(xPosition, -yPosition, 5, 0, Math.PI * 2) // Draws left hand
     c.fillStyle = this.color
     c.fill()
     c.restore()

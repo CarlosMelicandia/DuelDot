@@ -63,6 +63,17 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
   io.emit('updatePlayers', backEndPlayers) // Send the current list of players to all connected clients
 
   /**
+   * When client emits a punch event, a punch is made
+   */
+  socket.on('punch', ({ }) => { // ------------------------------------- Test
+    const player = backEndPlayers[socket.id]
+
+    if (!player) return
+
+    // console.log("Test")
+  })
+  
+  /**
    * When the client emits a 'shoot' event, a new projectile is created.
    */
   socket.on('shoot', ({ x, y, angle }) => { 

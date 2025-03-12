@@ -260,7 +260,7 @@ function animate() {
         (frontEndPlayers[id].target.y - frontEndPlayers[id].y) * 0.5
     }
     frontEndPlayer.draw()
-    frontEndPlayer.drawHands(frontEndPlayer.aimAngle)
+    frontEndPlayer.drawHands({ xPosition: frontEndPlayer.handXMove, angle: frontEndPlayer.aimAngle })
   }
 
   for (const weapon in frontEndWeapons){

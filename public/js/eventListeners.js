@@ -6,15 +6,26 @@
 addEventListener('click', (event) => {
   const canvas = document.querySelector('canvas') // Select the canvas element
   const { top, left } = canvas.getBoundingClientRect() // Gets the top and left position of the canvas relative to the viewport
+  const player = frontEndPlayers[socket.id]
 
   // Ensure the local player exists before proceeding
-  if (!frontEndPlayers[socket.id]) return 
+  if (!player) return 
 
-  if (!frontEndPlayers[socket.id].canShoot || frontEndPlayers[socket.id].equippedWeapon.type == "melee") return // Checks to see if the frontEnd should even do the calculations
+  if (player.equippedWeapon.type == "melee") {
+    setTimeout (() => {
+      player.handXMove = 25
+    }, 1000)
+    player.handXMove = 30
+    // socket.emit('punch', {
+
+    // })// Test------------------------------------
+  }
+
+  if (!player.canShoot) return // Checks to see if the frontEnd should even do the calculations
   
   const playerPosition = { // Stores the local player’s current position
-    x: frontEndPlayers[socket.id].x,
-    y: frontEndPlayers[socket.id].y
+    x: player.x,
+    y: player.y
   }
 
   // Calculates the angle between the player's position and the mouse click location.
@@ -34,6 +45,7 @@ addEventListener('click', (event) => {
    * - `x, y`: Player’s current position.
    * - `angle`: The angle at which the projectile should be fired.
    */
+
   socket.emit('shoot', {
   x: playerPosition.x,
   y: playerPosition.y,
