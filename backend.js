@@ -63,8 +63,7 @@ function spawnPowerUp() {
   io.emit('spawnPowerUp', powerUpData); // Send to all clients
 }
 
-setInterval(spawnPowerUp, 10000) // How often power ups spawn.
-
+setInterval(spawnPowerUp, 2000) // How often power ups spawn.
 
 // ------------------------------
 // Socket.IO Connection and Event Handlers
@@ -97,8 +96,10 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
   
     if (player.hasMultiShot) {
       createProjectile(-0.2); // Left angle
+      createProjectile(-0.4); // Left angle
       createProjectile(0);    // Center
       createProjectile(0.2);  // Right angle
+      createProjectile(0.4);  // Right angle
     } else {
       createProjectile(0); // Normal single shot
     }

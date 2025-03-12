@@ -21,11 +21,4 @@ class Player {
     ctx.fill() // Draws the actual circle of the player
     ctx.restore()
   }
-
-  activatePowerUp(name, duration) {
-    this.activePowerUps[name] = true;
-    setTimeout(() => {
-      this.activePowerUps[name] = false;
-    }, duration);
-  }
 }

@@ -13,7 +13,7 @@ class PowerUp {
       case 'speed':
         return 'yellow';
       case 'multiShot':
-        return 'green';
+        return 'red';
       default:
         return 'white'; // Default color for unknown types
     }
