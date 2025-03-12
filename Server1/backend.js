@@ -11,6 +11,7 @@ const Rogue = require('./Rogue.js')
 const Gunner = require('./Gunner.js')
 const { Weapon, Pistol, SubmachineGun, Sniper, Shuriken, Fist } = require('./WeaponStuff/Weapons.js')
 const { spawnWeapons, checkCollision } = require('./WeaponStuff/BackWeaponLogic.js')
+const { spawnPowerUps, checkPowerUpCollision } = require('./PowerUps/BackEndPowerUps.js')
 
 // ------------------------------
 // Socket.IO Setup
@@ -44,6 +45,7 @@ app.get('/', (req, res) => {
 const backEndPlayers = {} // List of player object objects server-side
 const backEndProjectiles = {} // List of projectile objects server-side
 const backEndWeapons = [] // List of weapon references server-side
+const backEndPowerUps = [] // List of power-ups references server-side
 
 // Assigns the canvas height and width to variables
 const GAME_WIDTH = 1024 // Default width
@@ -224,7 +226,9 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
   })
 })
 
-spawnWeapons(backEndWeapons, io) // function to randomly spawn weapons
+spawnWeapons(backEndWeapons, io); // Function to spawn weapons
+spawnPowerUps(backEndPowerUps, io); // Function to spawn power-ups
+
 
 // ------------------------------
 // Backend Ticker (Game Loop)
@@ -232,8 +236,10 @@ spawnWeapons(backEndWeapons, io) // function to randomly spawn weapons
 setInterval(() => { 
   for (const playerId in backEndPlayers){
     const player = backEndPlayers[playerId]
-    checkCollision(backEndWeapons, io, player)
+    checkCollision(backEndWeapons, io, player) // Weapon collision
+    checkPowerUpCollision(backEndPowerUps, io, player) // Power-up collision
   }
+
   
   // Update projectile positions
   for (const id in backEndProjectiles) {
@@ -296,6 +302,7 @@ setInterval(() => {
   }
   
   io.emit('updateProjectiles', backEndProjectiles)
+  io.emit('updatePowerUps', backEndPowerUps)
   io.emit('updatePlayers', backEndPlayers)
 }, 15)
 

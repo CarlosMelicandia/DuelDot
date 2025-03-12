@@ -1,3 +1,4 @@
+
 // ------------------------------
 // Canvas and Context Setup
 // ------------------------------
@@ -54,6 +55,8 @@ const playerNames = [
 const frontEndPlayers = {}  // Object to keep track of all player objects on the client
 const frontEndProjectiles = {} // Object to keep track of all projectile objects on the client
 let frontEndWeapons = {} // Object to keep track of all weapons objects on the client
+let frontEndPowerUps = {}; // Object to track power-ups on the client
+
 
 /**
  * ------------------------------
@@ -213,6 +216,44 @@ socket.on('updateWeapons', (backEndWeapons, weaponData) =>{
   }
 })
 
+class PowerUpDrawing {
+  constructor({ id, x, y, radius, type }) {
+    this.id = id;
+    this.x = x;
+    this.y = y;
+    this.radius = radius;
+    this.type = type;
+    this.image = new Image(); // Create an image object
+
+    // Assign different PNGs based on power-up type
+    const powerUpImages = {
+      "speed": "../assets/speed.png", 
+      "multiShot": "../assets/shield.png",
+      
+    };
+
+    this.image.src = powerUpImages[this.type] || "../assets/speed.png";
+
+  }
+
+  draw() {
+    c.drawImage(this.image, this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
+  }
+}
+
+
+
+socket.on('updatePowerUps', (backEndPowerUps, powerUpData) => {
+  if (powerUpData.remove) { // If the power-up was collected, remove it
+    delete frontEndPowerUps[powerUpData.id];
+  } else {
+    if (!frontEndPowerUps[powerUpData.id]) { // Create the power-up if it doesn't exist
+      frontEndPowerUps[powerUpData.id] = new PowerUpDrawing(powerUpData); // Stores the power-up data
+    }
+  }
+});
+
+
 // When a players joins it shows them the weapons that had spawned previously
 socket.on('updateWeaponsOnJoin', (backEndWeapons) => {
   frontEndWeapons = {}
@@ -221,6 +262,14 @@ socket.on('updateWeaponsOnJoin', (backEndWeapons) => {
     frontEndWeapons[weapon.id] = new WeaponDrawing(weapon)
   })
 })
+
+socket.on('updatePowerUpsOnJoin', (backEndPowerUps) => {
+  frontEndPowerUps = {};
+  backEndPowerUps.forEach((powerUp) => {
+    frontEndPowerUps[powerUp.id] = new PowerUpDrawing(powerUp);
+  });
+});
+
 
 // Waits for a weapon equip call from the server
 socket.on('equipWeapon', (weaponEquipped, player) => {
@@ -267,6 +316,13 @@ function animate() {
     const frontEndWeapon = frontEndWeapons[weapon]
     frontEndWeapon.draw()
   }
+
+  //Draw the PowerUps
+  for (const powerUp in frontEndPowerUps) {
+    const frontEndPowerUp = frontEndPowerUps[powerUp];
+    frontEndPowerUp.draw();
+  }
+  
 
   // Draw each projectile
   for (const id in frontEndProjectiles) {

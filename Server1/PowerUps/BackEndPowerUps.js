@@ -1,61 +1,88 @@
 // ------------------------------
 // Power-up Spawner Logic
 // ------------------------------
-function spawnPowerUp() {
-    const x = Math.random() * GAME_WIDTH;
-    const y = Math.random() * GAME_HEIGHT;
-    const types = ['speed', 'multiShot', 'health', 'shield', 'DMG']; 
-    const type = types[Math.floor(Math.random() * types.length)]; // Randomly select a type
-    const id = powerUpId++;
-  
-    const powerUpData = { x, y, type, id }; // Create the power-up object
-  
-    powerUps[id] = powerUpData; // Store it on the server
-    io.emit('spawnPowerUp', powerUpData); // Send to all clients
-  }
-  
-  setInterval(spawnPowerUp, 10000) // How often power ups spawn.
 
-  /**
-   * Listens for player collision with power ups-- need to implement collision detection for this to happen
-   */
-  socket.on('collectPowerUp', ({playerId, powerUpId}) => {
-    if (powerUps[powerUpId] && backEndPlayers[playerId]) {
-      const powerUp = powerUps[powerUpId];
+const GAME_WIDTH = 1024 // Default width
+const GAME_HEIGHT = 576 // Default height
+let powerUpId = 0; // Unique ID counter for power-ups
+
+
+function spawnPowerUps(backEndPowerUps, io) {
+  const maxX = GAME_WIDTH - 50;
+  const maxY = GAME_HEIGHT - 50;
+  const min = 50;
+
+  setInterval(() => {
+    if (backEndPowerUps.length > 10) return; // Limit number of power-ups
+
+    let spawnX = Math.random() * (maxX - min) + min;
+    let spawnY = Math.random() * (maxY - min) + min;
+
+    const powerUpTypes = ["speed", "multiShot"];
+    let powerUpType = powerUpTypes[Math.floor(Math.random() * powerUpTypes.length)];
+
+    let powerUpColors = {
+      "speed": "pink",
+      "multiShot": "pink",
+    };
+
+    let newPowerUpId = powerUpId++; // Unique ID for power-ups
+
+    let powerUpData = {
+      id: newPowerUpId,
+      x: spawnX,
+      y: spawnY,
+      radius: 10,
+      color: powerUpColors[powerUpType],
+      type: powerUpType
+    };
+
+    // Add new power-up
+    backEndPowerUps.push(powerUpData);
+
+    // Notify all clients about the new power-up
+    io.emit("updatePowerUps", backEndPowerUps, powerUpData);
+  }, 5000); // Power-ups spawn every 5 seconds (same as weapons)
+}
+
+// ------------------------------
+// Power-up Collision Logic
+// ------------------------------
+function checkPowerUpCollision(backEndPowerUps, io, player) {
+  for (let i = backEndPowerUps.length - 1; i >= 0; i--) {
+    let powerUp = backEndPowerUps[i];
+    let dist = Math.hypot(player.x - powerUp.x, player.y - powerUp.y);
+
+    if (dist < player.radius + powerUp.radius) { // Collision detected
+      switch (powerUp.type) {
+        case 'speed':
+          if (!player.originalSpeed) player.originalSpeed = player.speed;
+          player.speed = player.originalSpeed * 1.8; // Increase speed
+          setTimeout(() => {
+            if (player) player.speed = player.originalSpeed || player.speed;
+          }, 5000);
+          break;
+
+        case 'multiShot':
+          player.hasMultiShot = true;
+          setTimeout(() => {
+            if (player) player.hasMultiShot = false;
+          }, 5000);
+          break;
+
       
-      if (powerUp.type === 'speed') {
-        // Store the player's original speed if not already stored
-        if (!backEndPlayers[playerId].originalSpeed) {
-          backEndPlayers[playerId].originalSpeed = SPEED;
-        }
-        
-        // Apply speed boost
-        backEndPlayers[playerId].speed = SPEED * 1.8; // 80% speed boost
-        
-        // When applying a power-up on the server
-        backEndPlayers[playerId].hasPowerUp = true; // doesnt do anything yet
-
-        // Set a timeout to reset the speed
-        setTimeout(() => {
-          if (backEndPlayers[playerId]) {  // Check if player still exists
-            backEndPlayers[playerId].speed = backEndPlayers[playerId].originalSpeed || SPEED
-          }
-        }, 5000); // 5 seconds duration  
-      } else if (powerUp.type === 'multiShot') {
-        backEndPlayers[playerId].hasMultiShot = true; // Enable multi-shot for the player
-        
-        // Set a timeout to remove the power-up after 5 seconds
-        setTimeout(() => {
-          if (backEndPlayers[playerId]) {
-            backEndPlayers[playerId].hasMultiShot = false;
-          }
-        }, 5000);
       }
-      
-      // Remove the power-up from the server
-      delete powerUps[powerUpId];
-      
-      // Notify all clients to remove this power-up
-      io.emit('removePowerUp', powerUpId);
+
+      // Remove power-up from the server and notify clients
+      backEndPowerUps.splice(i, 1);
+      io.emit("updatePowerUps", backEndPowerUps, { id: powerUp.id, remove: true });
+
+      break;
     }
-  })
+  }
+}
+
+module.exports = { 
+  spawnPowerUps, 
+  checkPowerUpCollision  
+};
