@@ -19,39 +19,41 @@ addEventListener('click', (event) => {
     // socket.emit('punch', {
 
     // })// Test------------------------------------
+  } else{
+
+    console.log(player.canShoot)
+    if (!player.canShoot) return // Checks to see if the frontEnd should even do the calculations
+    
+    const playerPosition = { // Stores the local player’s current position
+      x: player.x,
+      y: player.y
+    }
+
+    // Calculates the angle between the player's position and the mouse click location.
+    const angle = Math.atan2(
+      event.clientY - top - playerPosition.y,
+      event.clientX - left - playerPosition.x
+    )
+
+    // frontEndPlayers[socket.id].drawHands() 
+    console.log("Shoot")
+
+    /**
+     * Sends a "shoot" event to the server.
+     * This informs the server that the player has fired a shot.
+     * 
+     * Data sent:
+     * - `x, y`: Player’s current position.
+     * - `angle`: The angle at which the projectile should be fired.
+     */
+
+    console.log("shoot")
+    socket.emit('shoot', {
+    x: playerPosition.x,
+    y: playerPosition.y,
+    angle
+    })
   }
-
-  if (!player.canShoot) return // Checks to see if the frontEnd should even do the calculations
-  
-  const playerPosition = { // Stores the local player’s current position
-    x: player.x,
-    y: player.y
-  }
-
-  // Calculates the angle between the player's position and the mouse click location.
-  const angle = Math.atan2(
-    event.clientY - top - playerPosition.y,
-    event.clientX - left - playerPosition.x
-  )
-
-  frontEndPlayers[socket.id].drawHands()
-  console.log("Shoot")
-
-  /**
-   * Sends a "shoot" event to the server.
-   * This informs the server that the player has fired a shot.
-   * 
-   * Data sent:
-   * - `x, y`: Player’s current position.
-   * - `angle`: The angle at which the projectile should be fired.
-   */
-
-  socket.emit('shoot', {
-  x: playerPosition.x,
-  y: playerPosition.y,
-  angle
-  })
-
   /**
    * ********************
    * *                  *
