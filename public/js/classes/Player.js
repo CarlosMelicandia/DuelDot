@@ -15,8 +15,10 @@ class Player {
    * @param {string} username - The player's displayed username.
    * @param {number} health - The player's initial health (Test branch addition).
    * @param {number} speed - The player's movement speed (Test branch addition).
+   * @param {boolean} notRanked - Whether the player is not ranked (Test branch addition).
+   * @param {number} score - The player's score.
    */
-  constructor({ x, y, radius, color, username, health, speed, socketId }) {
+  constructor({ x, y, radius, color, username, health, speed, score}) {
     this.x = x;
     this.y = y;
     this.radius = radius;
@@ -25,8 +27,8 @@ class Player {
     this.health = health; // Initialize health
     this.maxHealth = health; // Store max health for calculations
     this.speed = speed; // Movement speed
-    this.socketId = socketId;
     this.notRanked = false;
+    this.score = 0;
   }
 
   /**

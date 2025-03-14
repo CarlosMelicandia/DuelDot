@@ -101,6 +101,7 @@ socket.on("updatePlayers", (backEndPlayers) => {
      * If a player with this id does not exist on the client,
      * create a new Player object using the server's data.
      */
+    
     if (!frontEndPlayers[id]) {
       frontEndPlayers[id] = new Player({
         x: backEndPlayer.x,
@@ -110,7 +111,7 @@ socket.on("updatePlayers", (backEndPlayers) => {
         username: backEndPlayer.username,
         health: backEndPlayer.health,
         speed: backEndPlayer.speed,
-        socketId: backEndPlayer.socketId
+        score: backEndPlayer.score,
         // weapon: backEndPlayer.equippedWeapon,
       });
     } else {
@@ -163,20 +164,30 @@ socket.on("updatePlayers", (backEndPlayers) => {
   }
 });
 
-// Update LeaderBoard 
+// Update LeaderBoard when ever new player joins, player dies, or player leaves
 socket.on("updateRanking", (topPlayers, backEndPlayers) => {
-  if (!frontEndPlayers[socket.id]) return
-  const localPlayerInTop = topPlayers.find(p => p.id === socket.id);
-   
-  if (!localPlayerInTop && !frontEndPlayers[socket.id].notRanked) {
+  // Check if the local player exist in the frontEndPlayers
+  // If not, log a warning and return
+  if(!frontEndPlayers[socket.id]) {
+    console.warn(`Player ${socket.id} not exist in frontEndPlayers`);
+    return;
+  }
+
+  // Check if the local player is in the top 10 players in terms of score 
+  const localPlayerInTop = topPlayers.some(p => p.id === socket.id);
+
+  // If the local player is not in the top 10, mark them not rank and add them into the topPlayers array
+  if (!localPlayerInTop) {
     frontEndPlayers[socket.id].notRanked = true;
     topPlayers.push(frontEndPlayers[socket.id]);
-    console.log("Work")
-   }
+  }
 
+  // Find and clear the small leaderboard
   const parentDiv = document.querySelector("#update-sleaderboard");
   parentDiv.innerHTML = "";
 
+  // Loop through the topPlayers array and display them on the small leaderboard
+  // If a player mark unranked, display "X" as their rank
   topPlayers.forEach((entry, index) => {
     let rankDisplay = entry.notRanked ? "X" : index + 1;
     const div = document.createElement("div");
@@ -195,6 +206,7 @@ socket.on("updateRanking", (topPlayers, backEndPlayers) => {
   const bigLeaderBoard = document.querySelector("#playerLabelsLead");
   bigLeaderBoard.innerHTML = "";
 
+  // Loop through backEndPlayers and display them on the big leaderboard
   for (const id in backEndPlayers) {
     const backendPlayer = backEndPlayers[id];
     document.querySelector("#playerLabelsLead").innerHTML += `

@@ -114,7 +114,6 @@ io.on("connection", (socket) => {
       y: y,
       score: 0,
       sequenceNumber: 0,
-      socketId: socket.id
     });
 
     backEndPlayers[socket.id] = newPlayer;
@@ -133,9 +132,9 @@ io.on("connection", (socket) => {
         backEndPlayers[socket.id].speed
       }`
     );
-    io.emit('updatePlayers', backEndPlayers)
-    updateLeaderBoard(backEndPlayers, io)
-    socket.emit("updateWeaponsOnJoin", backEndWeapons)
+    io.emit("updatePlayers", backEndPlayers); // Send an updated player list to all clients
+    updateLeaderBoard(backEndPlayers, io); // Update the leaderboard when a new player join
+    socket.emit("updateWeaponsOnJoin", backEndWeapons); // Send the current list of weapons to the new player
   });
 
   /**
@@ -145,6 +144,7 @@ io.on("connection", (socket) => {
     console.log(reason); // Logs why the player disconnected
     delete backEndPlayers[socket.id]; // Remove the player from the server's list
     io.emit("updatePlayers", backEndPlayers); // Send an updated player list to all clients
+    updateLeaderBoard(backEndPlayers, io); // Update the leaderboard when a player disconnects
   });
 
   /**
@@ -267,7 +267,7 @@ setInterval(() => {
         if (backEndPlayers[playerId].health <= 0) {
           backEndPlayers[backEndProjectiles[id].playerId].score++;
           delete backEndPlayers[playerId];
-          updateLeaderBoard(backEndPlayers, io);
+          updateLeaderBoard(backEndPlayers, io); // Update the leaderboard when a player is eliminated
         }
 
         // Remove the projectile
@@ -276,8 +276,8 @@ setInterval(() => {
       }
     }
   }
-  io.emit("updateProjectiles", backEndProjectiles);
-  io.emit("updatePlayers", backEndPlayers);
+  io.emit("updateProjectiles", backEndProjectiles); // Send an updated list of projectiles to all clients
+  io.emit("updatePlayers", backEndPlayers); // Send an updated list of players to all clients
 }, 15);
 
 // ------------------------------
