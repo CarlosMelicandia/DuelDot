@@ -54,6 +54,17 @@ const GAME_HEIGHT = 576 // Default height
 const PROJECTILE_RADIUS = 5 // Radius of projectiles
 let projectileId = 0 // Unique ID counter for each projectile created
 
+// Initialize player properties related to powerups
+function initializePlayerPowerupProperties(player) {
+  player.hasMultiShot = false;
+  player.damageMultiplier = 1;
+  player.shieldAmount = 0; 
+  player.hasPowerUp = false;
+  player.activePowerup = null;
+  if(!player.originalSpeed) player.originalSpeed = player.speed;
+  return player;
+}
+
 const FIST = new Fist() // initiates the fist
 
 // ------------------------------
@@ -84,6 +95,7 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
     
     if (player.canShoot) { 
       const fireRate = backEndPlayers[socket.id].equippedWeapon.fireRate * 1000
+      const createProjectile = (projectileAngle) => {
       projectileId++ // Increment the projectile ID
 
       // Calculate the velocity of the projectile based on the angle provided by the client
@@ -99,6 +111,16 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
         velocity,
         playerId: socket.id
       }
+    }
+
+    createProjectile(angle)
+
+    // If multi-shot is active, create additional projectiles
+    if (player.hasMultiShot) {
+      const spreadAngle = 15 * (Math.PI / 180) // 15 degrees in radians
+      createProjectile(angle - spreadAngle) // Left shot
+      createProjectile(angle + spreadAngle) // Right shot
+    }
 
       // Delay Calculation 
       backEndPlayers[socket.id].canShoot = false
@@ -132,6 +154,9 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
       score: 0,
       sequenceNumber: 0
     })
+
+    // Initialize powerup-related properties
+    initializePlayerPowerupProperties(newPlayer);
     
     backEndPlayers[socket.id] = newPlayer
     newPlayer.socketId = socket.id // Adds the player ID to their player profile
@@ -275,6 +300,7 @@ setInterval(() => {
 
         // Find the shooter (who fired the projectile)
         const shooter = backEndPlayers[backEndProjectiles[id].playerId]
+        if(shooter){
         const equippedWeapon = shooter.equippedWeapon
 
         const weaponMtps = { // List of all possible weapon multipliers
@@ -283,6 +309,22 @@ setInterval(() => {
           magic: shooter.MagicWpnMtp
         }
         const weaponMtp = weaponMtps[equippedWeapon.type] // Obtains the specific weapon multiplier based on th weapons type
+        const damageMultiplier = shooter.damageMultiplier 
+
+        let totalDamage = equippedWeapon.damage * weaponMtp * damageMultiplier
+
+        // Check if the target has a shield
+        if (backEndPlayer.shieldAmount > 0) {
+          if (totalDamage <= backEndPlayer.shieldAmount) {
+            // Shield absorbs all damage
+            backEndPlayer.shieldAmount -= totalDamage
+            totalDamage = 0
+          } else {
+            // Shield absorbs part of the damage
+            totalDamage -= backEndPlayer.shieldAmount
+            backEndPlayer.shieldAmount = 0
+          }
+        }
 
         if (shooter && equippedWeapon) {
           const totalDamage = equippedWeapon.damage * weaponMtp // Calculates the total damage based on multiplier
@@ -291,11 +333,19 @@ setInterval(() => {
           console.log(`Error: Shooter or equipped weapon is undefined.`)
         }
 
-        // If health reaches 0, remove the player and reward the shooter
-        if (backEndPlayers[playerId].health <= 0) {
-          backEndPlayers[backEndProjectiles[id].playerId].score++
-          delete backEndPlayers[playerId]
+        // Apply remaining damage to health
+        if (totalDamage > 0) {
+          backEndPlayer.health -= totalDamage
         }
+      }
+
+        // If health reaches 0, remove the player and reward the shooter
+        if(backEndPlayer.health <= 0){
+          if (backEndPlayers[playerId].health <= 0) {
+          backEndPlayers[backEndProjectiles[id].playerId].score++
+        }
+        delete backEndPlayers[playerId]
+      }
 
         // Remove the projectile
         delete backEndProjectiles[id]

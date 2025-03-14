@@ -14,6 +14,12 @@ class PowerUps {
         return 'public/assets/FastPU.png';
       case 'multiShot':
         return 'public/assets/MultishotPU.png';
+      case 'health': 
+        return 'public/assets/HealthPU.png';  
+      case 'damage': 
+        return 'public/assets/DamagePU.png';
+      case 'shield': 
+        return 'public/assets/ShieldPU.png';    
       default:
         return 'white'; // Default color for unknown types
     }
