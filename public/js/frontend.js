@@ -167,7 +167,7 @@ socket.on("updatePlayers", (backEndPlayers) => {
 });
 
 // Update LeaderBoard 
-socket.on("updateRanking", (topPlayers) => {
+socket.on("updateRanking", (topPlayers, backEndPlayers) => {
   const localPlayerInTop = topPlayers.find(p => p.id === socket.id);
   
   if (!localPlayerInTop) {
@@ -190,17 +190,20 @@ socket.on("updateRanking", (topPlayers) => {
     div.style.color = entry.color;
     div.innerHTML = `<span><strong>${rankDisplay}.</strong> ${entry.username}</span><span>${entry.score}</span>`;
     parentDiv.appendChild(div);
+  });
 
-    /*document.querySelector("#playerLabelsLead").innerHTML += `
+  for (const id in backEndPlayers) {
+    const backendPlayer = backEndPlayers[id];
+    console.log(backendPlayer);
+    document.querySelector("#playerLabelsLead").innerHTML += `
           <tr>
-            <td>${className}</td>
-            <td>${backEndPlayer.username}</td>
-            <td data-id="${id}score">${backEndPlayer.score}</td>
+            <td>${backendPlayer.class}</td>
+            <td>${backendPlayer.username}</td>
+            <td data-id="${id}score">${backendPlayer.score}</td>
             <td data-id="${id}weapon">Nothing</td>
             <td>55%</td>
           </tr>`;
-          */
-  });
+  }
 });
 
 // Waits for an updateWeapons from the back end to sync and spawn weapons

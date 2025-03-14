@@ -1,7 +1,6 @@
-
-
-function updateLeaderBoard(backendPlayers, io) {
-  let playersArray = Object.entries(backendPlayers).map(([id, player]) => ({
+function updateLeaderBoard(backEndPlayers, io) {
+  
+  let playersArray = Object.entries(backEndPlayers).map(([id, player]) => ({
     id,
     username: player.username,
     score: player.score,
@@ -12,7 +11,7 @@ function updateLeaderBoard(backendPlayers, io) {
 
   let topPlayers = playersArray.slice(0, 10);
 
-  io.emit("updateRanking", topPlayers);
+  io.emit("updateRanking", topPlayers, backEndPlayers);
 }
 
 module.exports = { updateLeaderBoard };

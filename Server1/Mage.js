@@ -11,13 +11,13 @@ class Rogue extends BasePlayer {
      */
     constructor(props) {
         super(props) // Calls BasePlayer constructor
-        this.class = "Rogue" 
+        this.class = "Mage" 
 
         // Class Stats
         this.health = 80 
         this.maxHealth = 80 
-        this.radius = 9 
-        this.color = 'blue' 
+        this.radius = 12 
+        this.color = 'purple' 
         this.speed = 1.4 
 
         // Weapon multipliers
