@@ -21,6 +21,19 @@
         border: 2px solid #ccccd5;
       }
 
+      .small-leaderboard {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        color: white;
+        padding: 8px;
+        font-size: 18px;
+        font-weight: 200;
+        user-select: none;
+        background: rgba(0, 0, 0, 0.8);
+        border-radius: 5px;
+      }
+
       .itemBorder {
         display: flex;
         box-sizing: border-box;
@@ -66,26 +79,12 @@
 
 
       <!-- Small Leaderboard-->
-      <div id="small_leaderboard">d
-        <div
-          style="
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            color: white;
-            padding: 8px;
-            font-size: 18px;
-            font-weight: 200;
-            user-select: none;
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 5px;"
-        >
+      <div class="small-leaderboard">
+        <div>
           <div style="margin-bottom: 8px; font-size: 30px; font-weight: 400;">
             LeaderBoard
           </div>
-
-
-          <div id="playerLabels"></div>
+          <div id="update-sleaderboard"></div>
         </div>
       </div>
       <!-- Big Leader Board -->

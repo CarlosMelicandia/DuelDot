@@ -20,6 +20,7 @@ const {
   spawnWeapons,
   checkCollision,
 } = require("./WeaponStuff/BackWeaponLogic.js");
+const { updateLeaderBoard } = require("./backendLeaderBoard.js");
 
 // ------------------------------
 // Socket.IO Setup
@@ -131,7 +132,7 @@ io.on("connection", (socket) => {
         backEndPlayers[socket.id].speed
       }`
     );
-
+    updateLeaderBoard(backEndPlayers, io);
     socket.emit("updateWeaponsOnJoin", backEndWeapons);
   });
 
@@ -264,6 +265,7 @@ setInterval(() => {
         if (backEndPlayers[playerId].health <= 0) {
           backEndPlayers[backEndProjectiles[id].playerId].score++;
           delete backEndPlayers[playerId];
+          updateLeaderBoard(backEndPlayers, io);
         }
 
         // Remove the projectile
@@ -272,7 +274,6 @@ setInterval(() => {
       }
     }
   }
-
   io.emit("updateProjectiles", backEndProjectiles);
   io.emit("updatePlayers", backEndPlayers);
 }, 15);
