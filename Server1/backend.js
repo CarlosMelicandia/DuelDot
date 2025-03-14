@@ -114,6 +114,7 @@ io.on("connection", (socket) => {
       y: y,
       score: 0,
       sequenceNumber: 0,
+      socketId: socket.id
     });
 
     backEndPlayers[socket.id] = newPlayer;
@@ -132,8 +133,9 @@ io.on("connection", (socket) => {
         backEndPlayers[socket.id].speed
       }`
     );
-    updateLeaderBoard(backEndPlayers, io);
-    socket.emit("updateWeaponsOnJoin", backEndWeapons);
+    io.emit('updatePlayers', backEndPlayers)
+    updateLeaderBoard(backEndPlayers, io)
+    socket.emit("updateWeaponsOnJoin", backEndWeapons)
   });
 
   /**

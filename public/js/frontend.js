@@ -110,18 +110,15 @@ socket.on("updatePlayers", (backEndPlayers) => {
         username: backEndPlayer.username,
         health: backEndPlayer.health,
         speed: backEndPlayer.speed,
+        socketId: backEndPlayer.socketId
         // weapon: backEndPlayer.equippedWeapon,
       });
     } else {
       // Update player health in the frontend
       // Update player properties.
-      frontEndPlayers[id].health = backEndPlayer.health;
       frontEndPlayers[id].target = { x: backEndPlayer.x, y: backEndPlayer.y };
       frontEndPlayers[id].score = backEndPlayer.score;
-      frontEndPlayers[id].color = backEndPlayer.color;
-      frontEndPlayers[id].username = backEndPlayer.username;
       frontEndPlayers[id].health = backEndPlayer.health;
-      frontEndPlayers[id].speed = backEndPlayer.speed;
       if (id === socket.id) {
         const lastBackendInputIndex = playerInputs.findIndex((input) => {
           return backEndPlayer.sequenceNumber === input.sequenceNumber;
@@ -168,12 +165,14 @@ socket.on("updatePlayers", (backEndPlayers) => {
 
 // Update LeaderBoard 
 socket.on("updateRanking", (topPlayers, backEndPlayers) => {
+  if (!frontEndPlayers[socket.id]) return
   const localPlayerInTop = topPlayers.find(p => p.id === socket.id);
-  
-  if (!localPlayerInTop) {
+   
+  if (!localPlayerInTop && !frontEndPlayers[socket.id].notRanked) {
     frontEndPlayers[socket.id].notRanked = true;
     topPlayers.push(frontEndPlayers[socket.id]);
-  }
+    console.log("Work")
+   }
 
   const parentDiv = document.querySelector("#update-sleaderboard");
   parentDiv.innerHTML = "";
@@ -190,11 +189,14 @@ socket.on("updateRanking", (topPlayers, backEndPlayers) => {
     div.style.color = entry.color;
     div.innerHTML = `<span><strong>${rankDisplay}.</strong> ${entry.username}</span><span>${entry.score}</span>`;
     parentDiv.appendChild(div);
-  });
+   });
+
+  // If lag being cause, make this more efficient instead of clearing the big leaderboard everytime
+  const bigLeaderBoard = document.querySelector("#playerLabelsLead");
+  bigLeaderBoard.innerHTML = "";
 
   for (const id in backEndPlayers) {
     const backendPlayer = backEndPlayers[id];
-    console.log(backendPlayer);
     document.querySelector("#playerLabelsLead").innerHTML += `
           <tr>
             <td>${backendPlayer.class}</td>
