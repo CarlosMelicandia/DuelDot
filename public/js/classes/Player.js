@@ -28,7 +28,7 @@ class Player {
     this.maxHealth = health; // Store max health for calculations
     this.speed = speed; // Movement speed
     this.notRanked = false;
-    this.score = 0;
+    this.score = score;
   }
 
   /**
