@@ -74,17 +74,7 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
   console.log('A user connected') // Logs that a player has connected
 
   io.emit('updatePlayers', backEndPlayers) // Send the current list of players to all connected clients
-
-  /**
-   * When client emits a punch event, a punch is made
-   */
-  socket.on('punch', ({ }) => { // ------------------------------------- Test
-    const player = backEndPlayers[socket.id]
-
-    if (!player) return
-
-    // console.log("Test")
-  })
+  
   
   /**
    * When the client emits a 'shoot' event, a new projectile is created.
@@ -213,14 +203,32 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
     }
   })
 
+  /**
+   * When client emits a punch event, a punch is made
+   */
+  socket.on('punch', () => {
+    // This may require a separate io.emit that just focuses on this punch and remove  -----------------
+    // This is due to some delay may happen since its every 15ms update, would not need to change .handX 
+    // or anything and this would be done in the frontEnd with a socket.on "punch" or something
+    const backEndPlayer = backEndPlayers[socket.id]
 
-  socket.on('updateHands', ({mouseX, mouseY}) => {
+    if (!backEndPlayer || !backEndPlayer.canPunch) return
+
+    backEndPlayer.canPunch = false
+
+    backEndPlayer.handX += .2
+    setTimeout (() => {
+      backEndPlayer.handX = 1.5
+      backEndPlayer.canPunch = true
+    }, 1000)
+  })
+
+  socket.on('updateHands', (angle) => {
     const backEndPlayer = backEndPlayers[socket.id]
 
     if (!backEndPlayer) return
 
-    backEndPlayer.handX = mouseX
-    backEndPlayer.handY = mouseY
+    backEndPlayer.aimAngle = angle
   })  
 
   /**

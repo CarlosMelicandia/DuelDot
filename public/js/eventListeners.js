@@ -7,26 +7,13 @@ addEventListener('click', (event) => {
   const canvas = document.querySelector('canvas') // Select the canvas element
   const { top, left } = canvas.getBoundingClientRect() // Gets the top and left position of the canvas relative to the viewport
   const player = frontEndPlayers[socket.id]
-  let canPunch = true
 
   // Ensure the local player exists before proceeding
   if (!player) return 
 
-  if (player.equippedWeapon.type == "melee" && canPunch) {
-    canPunch = false
-    player.handXMove = 1.7
-    setTimeout (() => {
-      player.handXMove = 1.5
-    }, 1000)
-    canPunch = true
-    
-   
-    // socket.emit('punch', {
-
-    // })// Test------------------------------------
+  if (player.equippedWeapon.type == "melee" && player.canPunch) {
+    socket.emit('punch')// Test------------------------------------
   } else{
-
-    console.log(player.canShoot)
     if (!player.canShoot) return // Checks to see if the frontEnd should even do the calculations
     
     const playerPosition = { // Stores the local player’s current position
@@ -40,9 +27,6 @@ addEventListener('click', (event) => {
       event.clientX - left - playerPosition.x
     )
 
-    // frontEndPlayers[socket.id].drawHands() 
-    console.log("Shoot")
-
     /**
      * Sends a "shoot" event to the server.
      * This informs the server that the player has fired a shot.
@@ -52,7 +36,7 @@ addEventListener('click', (event) => {
      * - `angle`: The angle at which the projectile should be fired.
      */
 
-    console.log("shoot")
+    
     socket.emit('shoot', {
     x: playerPosition.x,
     y: playerPosition.y,
@@ -72,8 +56,8 @@ addEventListener('mousemove', (event) => {
     event.clientX - left - player.x
   )
 
-  player.aimAngle = mouseAngle
+  // player.aimAngle = mouseAngle
 
-  socket.emit('updateHands', (event.clientX, event.clientY))
+  socket.emit('updateHands', mouseAngle)
 
 })

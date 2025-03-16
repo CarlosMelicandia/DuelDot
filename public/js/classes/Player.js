@@ -30,6 +30,7 @@ class Player {
     this.equippedWeapon = equippedWeapon
 
     this.aimAngle = 0
+    this.handXMove = 0
   }
 
   /**
@@ -65,7 +66,7 @@ class Player {
     // 
     c.save()
     c.translate(this.x, this.y)
-    c.rotate(angle)
+    c.rotate(this.aimAngle)
   
     // Body
     c.shadowColor = this.color

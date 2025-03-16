@@ -134,19 +134,20 @@ socket.on('updatePlayers', (backEndPlayers) => {
           ${backEndPlayer.username}: ${backEndPlayer.score}
          </div>`
     } else {
+      frontEndPlayer = frontEndPlayers[id]
       // Updates the player equipped weapon in the front end
-      frontEndPlayers[id].equippedWeapon = backEndPlayer.equippedWeapon
+      frontEndPlayer.equippedWeapon = backEndPlayer.equippedWeapon
+
       // Updates whether the player can shoot in the front end
-      frontEndPlayers[id].canShoot = backEndPlayer.canShoot
-      // // Updates where the player is looking at
-      // frontEndPlayers[id].angle = Math.atan2(
-      //   backEndPlayer.mouseX - top - backEndPlayer.x,
-      //   backEndPlayer.mouseY - left - backEndPlayer.y
-      // )
+      frontEndPlayer.canShoot = backEndPlayer.canShoot
+
+      // Updates about the punching
+      frontEndPlayer.aimAngle = backEndPlayer.aimAngle
+      frontEndPlayer.handXMove = backEndPlayer.handX // TEST
+      frontEndPlayer.canPunch = backEndPlayer.canPunch
 
       // Update player health in the frontend
-      frontEndPlayers[id].health = backEndPlayer.health
-      frontEndPlayers[id].canShoot = backEndPlayer.canShoot
+      frontEndPlayer.health = backEndPlayer.health
 
       // Update the player’s score in the leaderboard
       document.querySelector(`div[data-id="${id}"]`).innerHTML = 
@@ -172,7 +173,7 @@ socket.on('updatePlayers', (backEndPlayers) => {
       })
 
       // Used for interpolation (moving the player closer to its new position)
-      frontEndPlayers[id].target = {
+      frontEndPlayer.target = {
         x: backEndPlayer.x,
         y: backEndPlayer.y
       }
@@ -188,8 +189,8 @@ socket.on('updatePlayers', (backEndPlayers) => {
 
         // Reapply remaining inputs
         playerInputs.forEach((input) => {
-          frontEndPlayers[id].target.x += input.dx
-          frontEndPlayers[id].target.y += input.dy
+          frontEndPlayer.target.x += input.dx
+          frontEndPlayer.target.y += input.dy
         })
       }
     }

@@ -18,8 +18,10 @@ class BasePlayer {
       this.score = score // Player's current score
 
       // Hand Properties
-      this.handX = 25 // TEST 
-      this.handY = 10 // TEST
+      this.handX = 1.5 
+      this.handY = 10
+      this.aimAngle = 0
+      this.canPunch = true
 
       // Default properties
       this.health = 0
