@@ -17,6 +17,10 @@ class BasePlayer {
       this.sequenceNumber = sequenceNumber // Tracks last processed movement input
       this.score = score // Player's current score
 
+      // Hand Properties
+      this.handX = 25 // TEST 
+      this.handY = 10 // TEST
+
       // Default properties
       this.health = 0
       this.maxHealth = 0

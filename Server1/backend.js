@@ -213,6 +213,16 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
     }
   })
 
+
+  socket.on('updateHands', ({mouseX, mouseY}) => {
+    const backEndPlayer = backEndPlayers[socket.id]
+
+    if (!backEndPlayer) return
+
+    backEndPlayer.handX = mouseX
+    backEndPlayer.handY = mouseY
+  })  
+
   /**
    * Handles player movement via key presses.
    */
@@ -238,6 +248,8 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
         backEndPlayers[socket.id].x += 5 * backEndPlayer.speed
         break
     }
+
+    
 
     // Prevent the player from moving out of bounds
     const playerSides = {

@@ -138,6 +138,11 @@ socket.on('updatePlayers', (backEndPlayers) => {
       frontEndPlayers[id].equippedWeapon = backEndPlayer.equippedWeapon
       // Updates whether the player can shoot in the front end
       frontEndPlayers[id].canShoot = backEndPlayer.canShoot
+      // // Updates where the player is looking at
+      // frontEndPlayers[id].angle = Math.atan2(
+      //   backEndPlayer.mouseX - top - backEndPlayer.x,
+      //   backEndPlayer.mouseY - left - backEndPlayer.y
+      // )
 
       // Update player health in the frontend
       frontEndPlayers[id].health = backEndPlayer.health
@@ -275,8 +280,6 @@ class PowerUpDrawing {
   }
 }
 
-
-
 socket.on('updatePowerUps', (backEndPowerUps, powerUpData) => {
   if (powerUpData.remove) { // If the power-up was collected, remove it
     delete frontEndPowerUps[powerUpData.id];
@@ -350,8 +353,7 @@ function animate() {
       frontEndPlayers[id].y +=
         (frontEndPlayers[id].target.y - frontEndPlayers[id].y) * 0.5
     }
-    frontEndPlayer.draw()
-    frontEndPlayer.drawHands({ xPosition: frontEndPlayer.handXMove, angle: frontEndPlayer.aimAngle })
+    frontEndPlayer.draw({ xPosition: frontEndPlayer.handXMove, angle: frontEndPlayer.aimAngle })
   }
 
   for (const weapon in frontEndWeapons){

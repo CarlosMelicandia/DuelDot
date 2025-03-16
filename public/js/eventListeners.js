@@ -7,15 +7,20 @@ addEventListener('click', (event) => {
   const canvas = document.querySelector('canvas') // Select the canvas element
   const { top, left } = canvas.getBoundingClientRect() // Gets the top and left position of the canvas relative to the viewport
   const player = frontEndPlayers[socket.id]
+  let canPunch = true
 
   // Ensure the local player exists before proceeding
   if (!player) return 
 
-  if (player.equippedWeapon.type == "melee") {
+  if (player.equippedWeapon.type == "melee" && canPunch) {
+    canPunch = false
+    player.handXMove = 1.7
     setTimeout (() => {
-      player.handXMove = 25
+      player.handXMove = 1.5
     }, 1000)
-    player.handXMove = 30
+    canPunch = true
+    
+   
     // socket.emit('punch', {
 
     // })// Test------------------------------------
@@ -54,38 +59,13 @@ addEventListener('click', (event) => {
     angle
     })
   }
-  /**
-   * ********************
-   * *                  *
-   * *      IGNORE      *
-   * *                  *
-   * ********************
-   *
-   * The following code would create a local projectile immediately.
-   * However, the game currently relies on the server to send projectile updates.
-   * Uncommenting this would cause projectiles to be spawned client-side instead.
-   */
-  
-  // const velocity = {
-  //   x: Math.cos(angle) * 5,
-  //   y: Math.sin(angle) * 5
-  // }
-
-  // frontEndProjectiles.push(
-  //   new Projectile({
-  //     x: playerPosition.x,
-  //     y: playerPosition.y,
-  //     radius: 5,
-  //     color: 'white',
-  //     velocity
-  //   })
-  // )
 })
 
 addEventListener('mousemove', (event) => {
+  const { top, left } = canvas.getBoundingClientRect()
+
   const player = frontEndPlayers[socket.id]
   if (!player) return
-  const { top, left } = canvas.getBoundingClientRect()
 
   const mouseAngle = Math.atan2(
     event.clientY - top - player.y,
@@ -93,4 +73,7 @@ addEventListener('mousemove', (event) => {
   )
 
   player.aimAngle = mouseAngle
+
+  socket.emit('updateHands', (event.clientX, event.clientY))
+
 })
