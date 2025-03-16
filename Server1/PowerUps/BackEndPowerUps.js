@@ -23,13 +23,13 @@ function spawnPowerUps(backEndPowerUps, io) {
     const powerUpTypes = ["speed", "multiShot", "health", "damage", "shield"];
     let powerUpType = powerUpTypes[Math.floor(Math.random() * powerUpTypes.length)];
 
-    let powerUpColors = {
-      "speed": "yellow",
-      "multiShot": "red",
-      "health": "green",
-      "damage": "orange",
-      "shield": "blue"
-    };
+    // let powerUpColors = { // temporary; using pngs afterwards-- obsolete
+    //   "speed": "yellow",
+    //   "multiShot": "red",
+    //   "health": "green",
+    //   "damage": "orange",
+    //   "shield": "blue"
+    // };
 
     let newPowerUpId = powerUpId++; // Unique ID for power-ups
 
@@ -38,7 +38,7 @@ function spawnPowerUps(backEndPowerUps, io) {
       x: spawnX,
       y: spawnY,
       radius: 22,
-      color: powerUpColors[powerUpType],
+      // color: powerUpColors[powerUpType], (temporary stuff)
       type: powerUpType
     };
 
@@ -146,14 +146,14 @@ function checkPowerUpCollision(backEndPowerUps, io, player) {
             }
           }, POWERUP_DURATION);
           
-          
-          // Only remove the shield effect aura after duration
-          // (The shield points will remain until depleted)
-          setTimeout(() => {
-            if (player && player.activePowerups && player.activePowerups.shield) {
-              player.activePowerups.shield.active = false;
-            }
-          }, POWERUP_DURATION * 2);
+          case 'shield':
+            // Only remove the shield effect aura after duration
+            // (The shield points will remain until depleted)
+            setTimeout(() => {
+              if (player && player.activePowerups && player.activePowerups.shield) {
+                player.activePowerups.shield.active = false;
+              }
+            }, POWERUP_DURATION * 2);
           break;
       }
 

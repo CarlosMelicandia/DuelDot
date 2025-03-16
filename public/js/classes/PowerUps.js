@@ -32,12 +32,4 @@ class PowerUps {
     ctx.fill();
     ctx.closePath();
   }
-
-  checkCollision(player) {
-    const dx = this.x - player.x;
-    const dy = this.y - player.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-
-    return distance < this.radius + player.radius; // Collision occurs if the distance is smaller than the sum of the radii
-  }
 }
