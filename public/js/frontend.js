@@ -14,7 +14,7 @@ const scoreEl = document.querySelector("#scoreEl"); // Finds the element with ID
 // Device Pixel Ratio and Canvas Dimensions
 // ------------------------------
 const devicePixelRatio = window.devicePixelRatio || 1; // Gets the device's pixel ratio (for high-DPI displays), defaulting to 1 if unavailable
-
+console.log("Device Pixel Ratio:", devicePixelRatio);
 canvas.width = 1024 * devicePixelRatio; // Sets the canvas’s internal width
 canvas.height = 576 * devicePixelRatio; // Sets the canvas’s internal height
 
@@ -285,10 +285,11 @@ function animate() {
 
   const localPlayer = frontEndPlayers[socket.id];
   let cameraX = 0, cameraY = 0;
+  let pixelNumber = 2 * devicePixelRatio;
 
   if (localPlayer) {
-    cameraX = localPlayer.x - canvas.width / 2;
-    cameraY = localPlayer.y - canvas.height / 2;
+    cameraX = localPlayer.x - canvas.width / pixelNumber;
+    cameraY = localPlayer.y - canvas.height / pixelNumber;
   }
 
   c.save();

@@ -4,6 +4,7 @@
  * relative to the player's position and sends that data to the server.
  */
 addEventListener("click", (event) => {
+  const devicePixelRatio = window.devicePixelRatio || 1;
   const canvas = document.querySelector("canvas"); // Select the canvas element
   const canvasRect = canvas.getBoundingClientRect(); // Gets the top and left position of the canvas relative to the viewport
   const mouseX = event.clientX - canvasRect.left; // Get the mouse x cordinate relative to the canvas
@@ -20,8 +21,13 @@ addEventListener("click", (event) => {
   };
 
   // Get the camera offsets as used in animate()
-  const cameraX = localPlayer.x - canvas.width / 2;
-  const cameraY = localPlayer.y - canvas.height / 2;
+  let cameraX = 0, cameraY = 0;
+  let pixelNumber = 2 * devicePixelRatio;
+
+  if (localPlayer) {
+    cameraX = localPlayer.x - canvas.width / pixelNumber;
+    cameraY = localPlayer.y - canvas.height / pixelNumber;
+  }
 
   // Convert mouse (screen) coordinates to game world cordinates
   const worldMouseX = mouseX + cameraX;
