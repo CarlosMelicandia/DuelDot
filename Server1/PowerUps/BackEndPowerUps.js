@@ -47,7 +47,7 @@ function spawnPowerUps(backEndPowerUps, io) {
 
     // Notify all clients about the new power-up
     io.emit("updatePowerUps", backEndPowerUps, powerUpData);
-  }, 5000); // Power-ups spawn every 5 seconds (same as weapons)
+  }, 1000); // Power-ups spawn every 5 seconds (same as weapons)
 }
 
 // ------------------------------

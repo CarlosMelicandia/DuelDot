@@ -100,8 +100,8 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
 
       // Calculate the velocity of the projectile based on the angle provided by the client
       const velocity = {
-        x: Math.cos(angle) * 5,  //Weapon Velocity 
-        y: Math.sin(angle) * 5   // Weapon Velocity
+        x: Math.cos(projectileAngle) * 5,  //Weapon Velocity 
+        y: Math.sin(projectileAngle) * 5   // Weapon Velocity
       }
 
       // Create a new server-side projectile
@@ -117,9 +117,10 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
 
     // If multi-shot is active, create additional projectiles
     if (player.hasMultiShot) {
-      const spreadAngle = 15 * (Math.PI / 180) // 15 degrees in radians
+      const spreadAngle = 30 * (Math.PI / 180) // 15 degrees in radians
       createProjectile(angle - spreadAngle) // Left shot
       createProjectile(angle + spreadAngle) // Right shot
+      
     }
 
       // Delay Calculation 
