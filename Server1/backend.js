@@ -56,8 +56,8 @@ const backEndProjectiles = {}; // List of projectile objects server-side
 const backEndWeapons = []; // List of weapon references server-side
 
 // Assigns the canvas height and width to variables
-const GAME_WIDTH = 1024; // Default width
-const GAME_HEIGHT = 576; // Default height
+const GAME_WIDTH = 5000; // Default width
+const GAME_HEIGHT = 5000; // Default height
 
 const PROJECTILE_RADIUS = 5; // Radius of projectiles
 let projectileId = 0; // Unique ID counter for each projectile created

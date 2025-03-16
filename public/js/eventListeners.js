@@ -5,21 +5,32 @@
  */
 addEventListener("click", (event) => {
   const canvas = document.querySelector("canvas"); // Select the canvas element
-  const { top, left } = canvas.getBoundingClientRect(); // Gets the top and left position of the canvas relative to the viewport
+  const canvasRect = canvas.getBoundingClientRect(); // Gets the top and left position of the canvas relative to the viewport
+  const mouseX = event.clientX - canvasRect.left; // Get the mouse x cordinate relative to the canvas
+  const mouseY = event.clientY - canvasRect.top; // Get the mouse y cordinate relative to the canvas
 
   // Ensure the local player exists before proceeding
-  if (!frontEndPlayers[socket.id]) return;
+  const localPlayer = frontEndPlayers[socket.id];
+  if (!localPlayer) return;
 
   const playerPosition = {
     // Stores the local player’s current position
-    x: frontEndPlayers[socket.id].x,
-    y: frontEndPlayers[socket.id].y,
+    x: localPlayer.x,
+    y: localPlayer.y,
   };
 
-  // Calculates the angle between the player's position and the mouse click location.
+  // Get the camera offsets as used in animate()
+  const cameraX = localPlayer.x - canvas.width / 2;
+  const cameraY = localPlayer.y - canvas.height / 2;
+
+  // Convert mouse (screen) coordinates to game world cordinates
+  const worldMouseX = mouseX + cameraX;
+  const worldMouseY = mouseY + cameraY;
+
+  // Calculates the angle between the player's position to world mouse click location.
   const angle = Math.atan2(
-    event.clientY - top - playerPosition.y,
-    event.clientX - left - playerPosition.x
+    worldMouseY- playerPosition.y,
+    worldMouseX - playerPosition.x
   );
 
   /**

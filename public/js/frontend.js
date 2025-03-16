@@ -24,6 +24,9 @@ c.scale(devicePixelRatio, devicePixelRatio); // Scales the drawing context so th
 const x = canvas.width / 2;
 const y = canvas.height / 2;
 
+const backgroundImage = new Image();
+backgroundImage.src = "../img/DuelDot-Background.png";
+
 // ------------------------------
 // Possible Random Player Names
 // ------------------------------
@@ -280,6 +283,18 @@ function animate() {
   // c.fillStyle = 'rgba(0, 0, 0, 0.1)' // Optional "ghosting" effect if needed
   c.clearRect(0, 0, canvas.width, canvas.height); // Clears the entire canvas
 
+  const localPlayer = frontEndPlayers[socket.id];
+  let cameraX = 0, cameraY = 0;
+
+  if (localPlayer) {
+    cameraX = localPlayer.x - canvas.width / 2;
+    cameraY = localPlayer.y - canvas.height / 2;
+  }
+
+  c.save();
+  c.translate(-cameraX, -cameraY);
+  c.drawImage(backgroundImage, 0, 0, 5000, 5000);
+
   // Interpolate and draw each player
   for (const id in frontEndPlayers) {
     const frontEndPlayer = frontEndPlayers[id];
@@ -291,7 +306,7 @@ function animate() {
       frontEndPlayers[id].y +=
         (frontEndPlayers[id].target.y - frontEndPlayers[id].y) * 0.5;
     }
-    frontEndPlayer.draw();
+    frontEndPlayer.draw(c); // Im trying to figure out how to make draw calling from weapondrawing or player *Khang*
   }
 
   for (const weapon in frontEndWeapons) {
@@ -304,6 +319,8 @@ function animate() {
     const frontEndProjectile = frontEndProjectiles[id];
     frontEndProjectile.draw();
   }
+
+  c.restore();
 }
 
 animate();

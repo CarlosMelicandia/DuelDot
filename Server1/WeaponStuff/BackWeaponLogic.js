@@ -1,8 +1,8 @@
 const { Pistol, SubmachineGun, Sniper, Shuriken } = require("./Weapons")
 const BasePlayer = require("../BasePlayer.js")
 
-const GAME_WIDTH = 1024 // Default width
-const GAME_HEIGHT = 576 // Default height
+const GAME_WIDTH = 5000 // Default width
+const GAME_HEIGHT = 5000 // Default height
 let deletedWeaponIds = []
 
 let weaponId = 0
@@ -41,7 +41,7 @@ function spawnWeapons(backEndWeapons, io) {
     backEndWeapons.push(weaponData)
 
     io.emit("updateWeapons", backEndWeapons, weaponData)
-  }, 5000) // Sets the time rate at which weapons spawn (Default = 7500)
+  }, 2000) // Sets the time rate at which weapons spawn (Default = 7500)
 }
 
 function checkCollision(backEndWeapons, io, player) {
