@@ -11,7 +11,7 @@ const Rogue = require('./Rogue.js')
 const Gunner = require('./Gunner.js')
 const { Weapon, Pistol, SubmachineGun, Sniper, Shuriken, Fist } = require('./WeaponStuff/Weapons.js')
 const { spawnWeapons, checkCollision } = require('./WeaponStuff/BackWeaponLogic.js')
-const { spawnPowerUps, checkPowerUpCollision } = require('./PowerUps/BackEndPowerUps.js')
+const { spawnPowerUps, checkPowerUpCollision } = require('./PowerUps/BackPowerUpLogic.js')
 
 // ------------------------------
 // Socket.IO Setup
@@ -53,17 +53,6 @@ const GAME_HEIGHT = 576 // Default height
 
 const PROJECTILE_RADIUS = 5 // Radius of projectiles
 let projectileId = 0 // Unique ID counter for each projectile created
-
-// Initialize player properties related to powerups
-function initializePlayerPowerupProperties(player) {
-  player.hasMultiShot = false;
-  player.damageMultiplier = 1;
-  player.shieldAmount = 0; 
-  player.hasPowerUp = false;
-  player.activePowerup = null;
-  if(!player.originalSpeed) player.originalSpeed = player.speed;
-  return player;
-}
 
 const FIST = new Fist() // initiates the fist
 
@@ -155,9 +144,6 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
       score: 0,
       sequenceNumber: 0
     })
-
-    // Initialize powerup-related properties
-    initializePlayerPowerupProperties(newPlayer);
     
     backEndPlayers[socket.id] = newPlayer
     newPlayer.socketId = socket.id // Adds the player ID to their player profile
