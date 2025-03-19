@@ -212,7 +212,7 @@ socket.on('updatePlayers', (backEndPlayers) => {
 })
 
 // Waits for an updateWeapons from the back end to sync and spawn weapons
-socket.on('updateWeapons', (backEndWeapons, weaponData) =>{
+socket.on('updateWeapons', (weaponData) =>{
   if (weaponData.remove){ // if the weapon has been removed due to collision
     delete frontEndWeapons[weaponData.id] // deletes weapon
   }else{
@@ -221,6 +221,10 @@ socket.on('updateWeapons', (backEndWeapons, weaponData) =>{
     }
   }
 })
+
+socket.on('dropWeapon', (weaponData) => {
+  frontEndWeapons[weaponData.id] = new WeaponDrawing(weaponData)
+}) 
 
 class PowerUpDrawing {
   constructor({ id, x, y, radius, type }) {
@@ -379,7 +383,7 @@ function animate() {
 animate()
 
 // ------------------------------
-// Player Input Handling (Movement)
+// Player Input Handling
 // ------------------------------
 /**
  * Tracks which movement keys (W, A, S, D) are currently pressed.
@@ -390,6 +394,7 @@ const keys = {
   a: { pressed: false },
   s: { pressed: false },
   d: { pressed: false },
+  q: { pressed: false },
   num1: { pressed: false },
   num2: { pressed: false }
 }
@@ -441,6 +446,16 @@ setInterval(() => {
     playerInputs.push({ sequenceNumber, dx: SPEED, dy: 0 })
     socket.emit('keydown', { keycode: 'KeyD', sequenceNumber })
   }
+
+  /**
+   * Drop Weapons
+   */
+
+    if (keys.q.pressed){
+      sequenceNumber++
+      playerInputs.push({ sequenceNumber, dx: 0, dy: 0 })
+      socket.emit('weaponDrop', { keycode: 'KeyD', sequenceNumber })
+    }
 
   /**
    * Inventory 
@@ -495,6 +510,9 @@ window.addEventListener('keydown', (event) => {
     case 'KeyD':
       keys.d.pressed = true
       break
+    case 'KeyQ':
+      keys.q.pressed = true
+      break
     case 'Digit1':
       keys.num1.pressed = true
       break
@@ -522,6 +540,9 @@ window.addEventListener('keyup', (event) => {
       break
     case 'KeyD':
       keys.d.pressed = false
+      break
+    case 'KeyQ':
+      keys.q.pressed = false
       break
     case 'Digit1':
       keys.num1.pressed = false

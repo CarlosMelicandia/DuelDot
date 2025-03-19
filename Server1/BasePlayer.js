@@ -18,6 +18,14 @@ class BasePlayer {
       this.sequenceNumber = sequenceNumber // Tracks last processed movement input
       this.score = score // Player's current score
 
+      // Power Properties
+      this.hasMultiShot = false
+      this.damageMultiplier = 1
+      this.shieldAmount = 0
+      this.hasPowerUp = false
+      this.activePowerup = null
+      this.originalSpeed = this.speed
+
       // Hand Properties
       this.handX = 1.5 
       this.handY = 10

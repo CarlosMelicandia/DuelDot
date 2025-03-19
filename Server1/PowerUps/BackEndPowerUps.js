@@ -59,6 +59,7 @@ function checkPowerUpCollision(backEndPowerUps, io, player) {
     let dist = Math.hypot(player.x - powerUp.x, player.y - powerUp.y);
 
     if (dist < player.radius + powerUp.radius) { // Collision detected
+      console.log(`Player picked up ${powerUp.type}`)
       switch (powerUp.type) {
         case 'speed':
           if (!player.originalSpeed) player.originalSpeed = player.speed;

@@ -10,7 +10,7 @@ const Mage = require('./Mage.js')
 const Rogue = require('./Rogue.js')
 const Gunner = require('./Gunner.js')
 const { Weapon, Pistol, SubmachineGun, Sniper, Shuriken, Fist } = require('./WeaponStuff/Weapons.js')
-const { spawnWeapons, checkCollision } = require('./WeaponStuff/BackWeaponLogic.js')
+const { spawnWeapons, checkCollision, weaponDrop } = require('./WeaponStuff/BackWeaponLogic.js')
 const { spawnPowerUps, checkPowerUpCollision } = require('./PowerUps/BackEndPowerUps.js')
 
 // ------------------------------
@@ -52,18 +52,7 @@ const GAME_WIDTH = 1024 // Default width
 const GAME_HEIGHT = 576 // Default height
 
 const PROJECTILE_RADIUS = 5 // Radius of projectiles
-let projectileId = 0 // Unique ID counter for each projectile created
-
-// Initialize player properties related to powerups
-function initializePlayerPowerupProperties(player) {
-  player.hasMultiShot = false;
-  player.damageMultiplier = 1;
-  player.shieldAmount = 0; 
-  player.hasPowerUp = false;
-  player.activePowerup = null;
-  if(!player.originalSpeed) player.originalSpeed = player.speed;
-  return player;
-}
+let projectileId = 0 // Unique ID counter for each projectile create
 
 const FIST = new Fist() // initiates the fist
 
@@ -144,9 +133,6 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
       score: 0,
       sequenceNumber: 0
     })
-
-    // Initialize powerup-related properties
-    initializePlayerPowerupProperties(newPlayer);
     
     backEndPlayers[socket.id] = newPlayer
     newPlayer.socketId = socket.id // Adds the player ID to their player profile
@@ -185,7 +171,6 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
     switch (keycode){
       case "Digit1":
         if (backEndPlayer.inventory[0]){
-          console.log(backEndPlayer.equippedWeapon)
           backEndPlayer.equippedWeapon = backEndPlayer.inventory[0] // adds the weapon to their first slot in inventory
         } else if (backEndPlayer.equippedWeapon != "Fist"){ // Goes back to fist if inventory slot is empty
           backEndPlayer.equippedWeapon = FIST
@@ -201,6 +186,19 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
         }
         break
     }
+  })
+
+  socket.on('weaponDrop', ({keycode, sequenceNumber}) => {
+    const backEndPlayer = backEndPlayers[socket.id]
+
+    if (!backEndPlayer.equippedWeapon || backEndPlayer.equippedWeapon.name == "Fist"|| !backEndPlayer) return
+
+    backEndPlayer.sequenceNumber = sequenceNumber
+    const droppedWeapon = backEndPlayer.equippedWeapon
+
+    backEndPlayer.inventory = backEndPlayer.inventory.filter((slot) => slot != droppedWeapon)
+    
+    weaponDrop(droppedWeapon, backEndPlayer.x, backEndPlayer.y, io, backEndWeapons)
   })
 
   /**
@@ -256,8 +254,6 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
         backEndPlayers[socket.id].x += 5 * backEndPlayer.speed
         break
     }
-
-    
 
     // Prevent the player from moving out of bounds
     const playerSides = {
