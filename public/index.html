@@ -7,6 +7,9 @@
         text-rendering: optimizeLegibility;
         margin: 0;
         background: black;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
       }
 
       input::placeholder {
@@ -16,7 +19,7 @@
       canvas {
         width: 1024px;
         height: 576px;
-        background-image: url('/img/background.png');
+        background-image: url('/assets/background.png');
         border: 2px solid #ccccd5;
       }
 
@@ -74,13 +77,12 @@
         <div id="playerLabels"></div>
       </div>
       <canvas></canvas>
-
       
       <!-- Inventory slots -->
       <div 
         id = "inventoryArea"
         style = "
-          display: flex;
+          display: none;
           position: relative;
           flex-direction: column;
           align-items: center;
@@ -105,13 +107,10 @@
         </div>
       </div>
 
-
-
-
       <!-- Username and Class Selection Form -->
       <div
         id = "menu"
-        style="
+        style=" 
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -244,13 +243,13 @@
     <!-- Custom Cursor Script -->
     <script>
       // Set a custom cursor for the body and canvas
-      const customCursorImage = "/img/CrosshairCursor.png"; // Update the path if needed
+      const customCursorImage = "/assets/CrosshairCursor.png"; // Update the path if needed
 
       // Apply the custom cursor to the body
-      document.body.style.cursor = `url(${customCursorImage}), auto`;
+      document.body.style.cursor = `url(${customCursorImage}) ${16} ${16}, auto`;
 
       // Apply the custom cursor to the canvas
-      canvas.style.cursor = `url(${customCursorImage}), auto`;
+      canvas.style.cursor = `url(${customCursorImage}) ${16} ${16}, auto`;
     </script>
   </body>
 </html>

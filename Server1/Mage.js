@@ -4,7 +4,7 @@ const BasePlayer = require('./BasePlayer.js')
  * This class represents the Rogue player type.
  * Rogues have high speed but lower health and a small hitbox.
  */
-class Rogue extends BasePlayer {
+class Mage extends BasePlayer {
     /**
      * Constructor for the Rogue class.
      * @param {Object} props - The configuration object for the player.
@@ -27,4 +27,4 @@ class Rogue extends BasePlayer {
     }
 }
 
-module.exports = Rogue // Exports the class for use in other files
+module.exports = Mage // Exports the class for use in other files

@@ -1,35 +1,68 @@
 class Weapon{
-    constructor(name, type, damage, velocity){
+    constructor({ name, type, damage, fireRate, velocity }){
         this.name = name
-        this.type = type;
-        this.damage = damage;
-        this.velocity = velocity;
+        this.type = type
+        this.damage = damage
+        this.fireRate = fireRate
+        this.velocity = velocity
+        isDropped = false
     }
 }
 
 class Pistol extends Weapon{
     constructor(){
-        super("Pistol", "light", 20, 5);
+        super({
+            name: "Pistol", 
+            type: "light",
+            damage: 20,
+            fireRate: 1,
+            velocity: 5});
     }
     
 }
 class SubmachineGun extends Weapon{
     constructor(){
-        super("Submachine Gun","light",10,5);
+        super({
+            name:
+            "Submachine Gun",
+            type: "light",
+            damage: 10,
+            fireRate: .5,
+            velocity: 5});
     }
     
 }
 class Sniper extends Weapon{
     constructor(){
-        super("Sniper","heavy",50,10);
+        super({
+            name:"Sniper",
+            type: "heavy",
+            damage: 50,
+            fireRate: 4,
+            velocity: 10});
     }
     
 }
 class Shuriken extends Weapon{
     constructor(){
-        super("Shuriken", "light",25,5);
+        super({
+            name: "Shuriken",
+            type: "light",
+            damage: 25,
+            fireRate: 1.2,
+            velocity: 5});
     }
-    
+}
+
+class Fist extends Weapon{
+    constructor(){
+        super({
+            name: "Fist",
+            type: "melee",
+            damage: 40,
+            fireRate: 0.3,
+            velocity: 5});
+    }
 }
 
 module.exports = {
@@ -37,5 +70,6 @@ module.exports = {
     Pistol,
     SubmachineGun,
     Sniper,
-    Shuriken
+    Shuriken,
+    Fist
 }

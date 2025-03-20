@@ -17,7 +17,7 @@ class Player {
    * @param {number} health - The player's initial health (Test branch addition).
    * @param {number} speed - The player's movement speed (Test branch addition).
    */
-  constructor({ x, y, radius, color, username, health, speed }) {
+  constructor({ x, y, radius, color, username, health, speed, canShoot, equippedWeapon }) {
     this.x = x
     this.y = y
     this.radius = radius
@@ -26,6 +26,11 @@ class Player {
     this.health = health // Initialize health 
     this.maxHealth = health // Store max health for calculations 
     this.speed = speed // Movement speed 
+    this.canShoot = canShoot
+    this.equippedWeapon = equippedWeapon
+
+    this.aimAngle = 0
+    this.handXMove = 0
   }
 
   /**
@@ -35,56 +40,55 @@ class Player {
    * - Adds a glowing effect to enhance visibility.
    * - Renders a health bar above the player.
    */
-  draw() {
-    // ------------------------------
-    // Draw Player's Username
-    // ------------------------------
+  draw({ xPosition = 1.5, yPosition = 10, angle }) {
+    // --- Draw Username ---
     c.font = '12px sans-serif'
-    c.fillStyle = 'white' // Sets the color of the name text
-
-    // Measure text width to center the username below the player
+    c.fillStyle = 'white'
     const textWidth = c.measureText(this.username).width
-    const textX = this.x - textWidth / 2 // Centers text horizontally
-    const textY = this.y + this.radius + 15 // Places text below the player
-    
-    c.fillText(this.username, textX, textY) // Draw username
-
-    // ------------------------------
-    // Draw Player's Health Bar
-    // ------------------------------
+    const textX = this.x - textWidth / 2
+    const textY = this.y + this.radius + 15
+    c.fillText(this.username, textX, textY)
+  
+    // --- Draw Health Bar ---
     const healthBarWidth = 40
     const healthBarHeight = 4
-    const healthPercentage = this.health / this.maxHealth // Calculate remaining health
-
-    // Health bar background (fixed width, slightly transparent)
+    const healthPercentage = this.health / this.maxHealth
+  
     c.fillStyle = 'rgba(255, 255, 255, 0.5)'
-    c.fillRect(
-      this.x - healthBarWidth / 2, // Center it horizontally
-      this.y - this.radius - 10, // Position it above the player
-      healthBarWidth,
-      healthBarHeight
-    )
-
-    // Health bar fill - color shifts from green to red based on remaining health
-    const healthColor = `hsl(${healthPercentage * 120}, 100%, 50%)` // Green (full) → Red (low)
+    c.fillRect(this.x - healthBarWidth / 2, this.y - this.radius - 10, healthBarWidth, healthBarHeight)
+  
+    const healthColor = `hsl(${healthPercentage * 120}, 100%, 50%)`
     c.fillStyle = healthColor
-    c.fillRect(
-      this.x - healthBarWidth / 2, // Keep aligned with background
-      this.y - this.radius - 10, // Same Y position
-      healthBarWidth * healthPercentage, // Shrinks as health decreases
-      healthBarHeight
-    )
-
-    // ------------------------------
+    c.fillRect(this.x - healthBarWidth / 2, this.y - this.radius - 10, healthBarWidth * healthPercentage, healthBarHeight)
+  
+    // 
     // Draw Player's Body
-    // ------------------------------
-    c.save() // Save the current canvas state
-    c.shadowColor = this.color // Apply a glow effect with the player's color
-    c.shadowBlur = 20 // Defines the glow intensity
-    c.beginPath() // Clears previous path so the circle isn't connected to older shapes
-    c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false) // Draws the player as a circle
-    c.fillStyle = this.color // Colors the circle to match the player's assigned color
-    c.fill() // Fills the shape with the chosen color
-    c.restore() // Restores the canvas state to avoid affecting other elements
+    // 
+    c.save()
+    c.translate(this.x, this.y)
+    c.rotate(this.aimAngle)
+  
+    // Body
+    c.shadowColor = this.color
+    c.shadowBlur = 20
+    c.beginPath()
+    c.fillStyle = this.color
+    c.arc(0, 0, this.radius, 0, Math.PI * 2) // << draw from center now
+    c.fill()
+  
+    // Draw facing indicator – optional: pointer or "eye"
+    c.beginPath()
+    c.fillStyle = 'black'
+    c.arc(this.radius * 0.7, 0, this.radius * 0.2, 0, Math.PI * 2) // a small "eye" or dot to show direction
+    c.fill()
+  
+    // Draw hand
+    c.beginPath()
+    c.fillStyle = this.color
+    c.arc(this.radius * xPosition, yPosition, this.radius / 3, 0, Math.PI * 2)
+    c.arc(this.radius * xPosition, -yPosition, this.radius / 3, 0, Math.PI * 2)
+    c.fill()
+  
+    c.restore()
   }
 }

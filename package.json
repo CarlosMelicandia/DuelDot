@@ -1,6 +1,6 @@
 {
   "name": "dueldot",
-  "version": "1.0.0",
+  "version": "1.0.5",
   "scripts": {
     "prestart": "npm install",
     "start": "node Server1/backend.js",

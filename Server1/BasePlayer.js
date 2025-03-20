@@ -1,6 +1,7 @@
 // ------------------------------
 // BasePlayer Class (Abstract)
 // ------------------------------
+const { Fist } = require('./WeaponStuff/Weapons')
 class BasePlayer {
   /**
    * Constructor for the BasePlayer class.
@@ -10,12 +11,26 @@ class BasePlayer {
    * @param {number} [sequenceNumber=0] - The last processed input sequence number.
    * @param {number} [score=0] - The player's current score.
    */
-  constructor({ username, x, y, sequenceNumber = 0, score = 0 }) {
+  constructor({ username, x, y, sequenceNumber = 0, score = 0, equippedWeapon }) {
       this.username = username // Player's display name
       this.x = x // X position on the map
       this.y = y // Y position on the map
       this.sequenceNumber = sequenceNumber // Tracks last processed movement input
       this.score = score // Player's current score
+
+      // Power Properties
+      this.hasMultiShot = false
+      this.damageMultiplier = 1
+      this.shieldAmount = 0
+      this.hasPowerUp = false
+      this.activePowerup = null
+      this.originalSpeed = this.speed
+
+      // Hand Properties
+      this.handX = 1.5 
+      this.handY = 10
+      this.aimAngle = 0
+      this.canPunch = true
 
       // Default properties
       this.health = 0
@@ -25,14 +40,16 @@ class BasePlayer {
       this.maxHealth = 0 // Maximum health value (set by subclasses)
       this.speed = 0 // Movement speed (set by subclasses)
 
-      // Weapon multipliers
+      // Default Weapon multipliers
       this.lightWpnMtp = 1.0
       this.heavyWpnMtp = 1.0
       this.magicWpnMtp = 1.0
 
       // Inventory and Equipped
       this.inventory = []
-      this.equippedWeapon = null
+      this.equippedWeapon = equippedWeapon
+
+      this.canShoot = true
   }
 }
 

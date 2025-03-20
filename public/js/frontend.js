@@ -1,3 +1,4 @@
+
 // ------------------------------
 // Canvas and Context Setup
 // ------------------------------
@@ -54,6 +55,8 @@ const playerNames = [
 const frontEndPlayers = {}  // Object to keep track of all player objects on the client
 const frontEndProjectiles = {} // Object to keep track of all projectile objects on the client
 let frontEndWeapons = {} // Object to keep track of all weapons objects on the client
+let frontEndPowerUps = {}; // Object to track power-ups on the client
+
 
 /**
  * ------------------------------
@@ -107,7 +110,7 @@ socket.on('updateProjectiles', (backEndProjectiles) => {
  * When the server emits 'updatePlayers', update or create player objects as needed.
  */
 socket.on('updatePlayers', (backEndPlayers) => {
-  for (const id in backEndPlayers) {
+  for (const id in backEndPlayers) { // displays the same info as if using socket.id, might want to remove the for loop
     const backEndPlayer = backEndPlayers[id]
 
     /**
@@ -122,17 +125,29 @@ socket.on('updatePlayers', (backEndPlayers) => {
         color: backEndPlayer.color,
         username: backEndPlayer.username,
         health: backEndPlayer.health,  
-        speed: backEndPlayer.speed      
+        speed: backEndPlayer.speed,
       })
-
+      
       // Add this player to the leaderboard 
       document.querySelector('#playerLabels').innerHTML += 
         `<div data-id="${id}" data-score="${backEndPlayer.score}">
           ${backEndPlayer.username}: ${backEndPlayer.score}
          </div>`
     } else {
+      frontEndPlayer = frontEndPlayers[id]
+      // Updates the player equipped weapon in the front end
+      frontEndPlayer.equippedWeapon = backEndPlayer.equippedWeapon
+
+      // Updates whether the player can shoot in the front end
+      frontEndPlayer.canShoot = backEndPlayer.canShoot
+
+      // Updates about the punching
+      frontEndPlayer.aimAngle = backEndPlayer.aimAngle
+      frontEndPlayer.handXMove = backEndPlayer.handX // TEST
+      frontEndPlayer.canPunch = backEndPlayer.canPunch
+
       // Update player health in the frontend
-      frontEndPlayers[id].health = backEndPlayer.health
+      frontEndPlayer.health = backEndPlayer.health
 
       // Update the player’s score in the leaderboard
       document.querySelector(`div[data-id="${id}"]`).innerHTML = 
@@ -158,7 +173,7 @@ socket.on('updatePlayers', (backEndPlayers) => {
       })
 
       // Used for interpolation (moving the player closer to its new position)
-      frontEndPlayers[id].target = {
+      frontEndPlayer.target = {
         x: backEndPlayer.x,
         y: backEndPlayer.y
       }
@@ -174,8 +189,8 @@ socket.on('updatePlayers', (backEndPlayers) => {
 
         // Reapply remaining inputs
         playerInputs.forEach((input) => {
-          frontEndPlayers[id].target.x += input.dx
-          frontEndPlayers[id].target.y += input.dy
+          frontEndPlayer.target.x += input.dx
+          frontEndPlayer.target.y += input.dy
         })
       }
     }
@@ -197,7 +212,7 @@ socket.on('updatePlayers', (backEndPlayers) => {
 })
 
 // Waits for an updateWeapons from the back end to sync and spawn weapons
-socket.on('updateWeapons', (backEndWeapons, weaponData) =>{
+socket.on('updateWeapons', (weaponData) =>{
   if (weaponData.remove){ // if the weapon has been removed due to collision
     delete frontEndWeapons[weaponData.id] // deletes weapon
   }else{
@@ -206,6 +221,88 @@ socket.on('updateWeapons', (backEndWeapons, weaponData) =>{
     }
   }
 })
+
+socket.on('dropWeapon', (weaponData) => {
+  frontEndWeapons[weaponData.id] = new WeaponDrawing(weaponData)
+}) 
+
+class PowerUpDrawing {
+  constructor({ id, x, y, radius, type }) {
+    this.id = id;
+    this.x = x;
+    this.y = y;
+    this.radius = radius;
+    this.type = type;
+    this.image = new Image(); // Create an image object
+    this.pulseSize = 0; // For the pulse animation
+    this.pulseDirection = 1; // 1 for growing, -1 for shrinking
+    this.maxPulseSize = 2; // Maximum size the pulse can grow
+    this.pulseSpeed = 0.3; // Speed of the pulse animation
+
+
+    // Assign different PNGs based on power-up type
+    const powerUpImages = {
+      "speed": "../assets/speed.png", 
+      "multiShot": "../assets/MultishotPU.png",
+      "health": "../assets/HealthPU.png",
+      "damage": "../assets/DamagePU.png",
+      "shield": "../assets/ShieldPU.png"
+    };
+
+    // Colors for the glow effect based on powerup type
+    this.glowColors = {
+      "speed": "#FFFF00", // Yellow
+      "multiShot": "#FF0000", // Red
+      "health": "#00FF00", // Green
+      "damage": "#FFA500", // Orange
+      "shield": "#0000FF", // Blue
+    };
+
+    this.image.src = powerUpImages[this.type] || "../assets/speed.png";
+
+  }
+
+  draw() {
+    // Update the pulse animation
+    this.pulseSize += this.pulseDirection * this.pulseSpeed;
+    if (this.pulseSize >= this.maxPulseSize) {
+      this.pulseDirection = -1;
+    } else if (this.pulseSize <= 0) {
+      this.pulseDirection = 1;
+    }
+
+    // Draw the glow/pulse effect
+    c.save();
+    c.beginPath();
+    c.arc(this.x, this.y, this.radius + this.pulseSize, 0, Math.PI * 2);
+    c.fillStyle = this.glowColors[this.type] || "#FFFF00";
+    c.globalAlpha = 0.3; // Make the glow semi-transparent
+    c.fill();
+    c.closePath();
+    c.restore();
+
+    c.drawImage(this.image, this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
+  }
+}
+
+socket.on('updatePowerUps', (backEndPowerUps, powerUpData) => {
+  if (powerUpData.remove) { // If the power-up was collected, remove it
+    delete frontEndPowerUps[powerUpData.id];
+  } else {
+    if (!frontEndPowerUps[powerUpData.id]) { // Create the power-up if it doesn't exist
+      frontEndPowerUps[powerUpData.id] = new PowerUpDrawing(powerUpData); // Stores the power-up data
+    }
+  }
+});
+
+socket.on('powerupCollected', (powerupData) => {
+  const player = frontEndPlayers[socket.id];
+  if (!player) return;
+
+  // Apply powerup effect for visual feedback
+  player.applyPowerup(powerupData.type, powerupData.duration);
+});
+
 
 // When a players joins it shows them the weapons that had spawned previously
 socket.on('updateWeaponsOnJoin', (backEndWeapons) => {
@@ -216,15 +313,21 @@ socket.on('updateWeaponsOnJoin', (backEndWeapons) => {
   })
 })
 
+socket.on('updatePowerUpsOnJoin', (backEndPowerUps) => {
+  frontEndPowerUps = {};
+  backEndPowerUps.forEach((powerUp) => {
+    frontEndPowerUps[powerUp.id] = new PowerUpDrawing(powerUp);
+  });
+});
+
+
 // Waits for a weapon equip call from the server
 socket.on('equipWeapon', (weaponEquipped, player) => {
   if (player.inventory[0] && !player.inventory[1]){ // if the first inventory is open 
     document.querySelector('#inventorySlot1Text').textContent = weaponEquipped.name // Show weapon in inventory
-    console.log('Inventory Slot 1 Text Updated:', document.querySelector('#inventorySlot1Text'));
   }else {
     if(player.inventory[1]){ // if the second inventory is open
     document.querySelector('#inventorySlot2Text').textContent = weaponEquipped.name // Shows the weapon in the second slot
-    console.log('Inventory Slot 2 Text Updated:', document.querySelector('#inventorySlot2Text'));
   }
 }
 })
@@ -255,13 +358,20 @@ function animate() {
       frontEndPlayers[id].y +=
         (frontEndPlayers[id].target.y - frontEndPlayers[id].y) * 0.5
     }
-    frontEndPlayer.draw()
+    frontEndPlayer.draw({ xPosition: frontEndPlayer.handXMove, angle: frontEndPlayer.aimAngle })
   }
 
   for (const weapon in frontEndWeapons){
     const frontEndWeapon = frontEndWeapons[weapon]
     frontEndWeapon.draw()
   }
+
+  //Draw the PowerUps
+  for (const powerUp in frontEndPowerUps) {
+    const frontEndPowerUp = frontEndPowerUps[powerUp];
+    frontEndPowerUp.draw();
+  }
+  
 
   // Draw each projectile
   for (const id in frontEndProjectiles) {
@@ -273,7 +383,7 @@ function animate() {
 animate()
 
 // ------------------------------
-// Player Input Handling (Movement)
+// Player Input Handling
 // ------------------------------
 /**
  * Tracks which movement keys (W, A, S, D) are currently pressed.
@@ -284,6 +394,7 @@ const keys = {
   a: { pressed: false },
   s: { pressed: false },
   d: { pressed: false },
+  q: { pressed: false },
   num1: { pressed: false },
   num2: { pressed: false }
 }
@@ -335,6 +446,16 @@ setInterval(() => {
     playerInputs.push({ sequenceNumber, dx: SPEED, dy: 0 })
     socket.emit('keydown', { keycode: 'KeyD', sequenceNumber })
   }
+
+  /**
+   * Drop Weapons
+   */
+
+    if (keys.q.pressed){
+      sequenceNumber++
+      playerInputs.push({ sequenceNumber, dx: 0, dy: 0 })
+      socket.emit('weaponDrop', { keycode: 'KeyD', sequenceNumber })
+    }
 
   /**
    * Inventory 
@@ -389,6 +510,9 @@ window.addEventListener('keydown', (event) => {
     case 'KeyD':
       keys.d.pressed = true
       break
+    case 'KeyQ':
+      keys.q.pressed = true
+      break
     case 'Digit1':
       keys.num1.pressed = true
       break
@@ -416,6 +540,9 @@ window.addEventListener('keyup', (event) => {
       break
     case 'KeyD':
       keys.d.pressed = false
+      break
+    case 'KeyQ':
+      keys.q.pressed = false
       break
     case 'Digit1':
       keys.num1.pressed = false
@@ -505,7 +632,7 @@ document.querySelector('#randomNameBtn').addEventListener('click', () => {
 document.querySelector('#usernameForm').addEventListener('submit', (event) => {
   event.preventDefault() // Prevents the form from refreshing
   document.querySelector('#usernameForm').style.display = 'none' // Hides the username form
-
+  document.querySelector('#inventoryArea').style.display = 'flex'
   // Send data to the server to initialize the player
   socket.emit('initGame', {
     width: canvas.width,
