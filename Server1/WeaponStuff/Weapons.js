@@ -5,7 +5,7 @@ class Weapon{
         this.damage = damage
         this.fireRate = fireRate
         this.velocity = velocity
-        isDropped = false
+        this.isDropped = false
     }
 }
 
