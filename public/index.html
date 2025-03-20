@@ -1,6 +1,9 @@
 <html>
   <head>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=VT323&display=swap"
+      rel="stylesheet"
+    />
     <style>
       body {
         -webkit-font-smoothing: antialiased;
@@ -14,7 +17,7 @@
         color: #94a3b8;
       }
 
-      canvas {
+      .gameCanvas {
         width: 1024px;
         height: 576px;
         border: 2px solid #ccccd5;
@@ -67,20 +70,50 @@
         text-overflow: ellipsis;
         max-width: 100%;
       }
+      .miniMap {
+        user-select: none;
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        border: 3px solid white;
+        border-radius: 50%;
+        background-image:
+          linear-gradient(0deg, transparent 95%, rgba(255,255,255,0.2) 95%),
+          linear-gradient(90deg, transparent 95%, rgba(255,255,255,0.2) 95%);
+        background-color: black;
+        background-size: 15px 15px; /* Adjust the size of grid squares */
+        color: white;
+        width: 150px;
+        height: 150px;
+        text-align: center;
+        line-height: 100px;
+        overflow: hidden; /* Keeps the grid within the circle */
+    }
     </style>
   </head>
-  <body style="margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; background: black; font-family: 'VT323', monospace;">
+  <body
+    style="
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: black;
+      font-family: 'VT323', monospace;
+    "
+  >
     <!-- Game Container -->
-    <div style="position: relative; width: 1024px; height: 576px;">
+    <div style="position: relative; width: 1024px; height: 576px">
+      <!-- The Game Canvas -->
+      <canvas class="gameCanvas"id="gameCanvas"></canvas>
 
-    <!-- The Game Canvas -->
-    <canvas></canvas>
-
+      <!-- MiniMap -->
+      <canvas class="miniMap" id="miniMap"></canvas>
 
       <!-- Small Leaderboard-->
       <div class="small-leaderboard">
         <div>
-          <div style="margin-bottom: 8px; font-size: 30px; font-weight: 400;">
+          <div style="margin-bottom: 8px; font-size: 30px; font-weight: 400">
             LeaderBoard
           </div>
           <div id="update-sleaderboard"></div>
@@ -128,10 +161,10 @@
 
         .leaderboard-table th,
         .leaderboard-table td {
-          border: 1px #000000 solid;
           padding: 12px;
           text-align: left;
           border-bottom: 1px solid #444;
+          background: rgba(146, 146, 146, 0.8);
         }
       </style>
       <div class="leaderBoard">
@@ -144,7 +177,6 @@
         >
           <h1>Leaderboard</h1>
         </div>
-        <div style="padding: 1%"></div>
         <table class="leaderboard-table" id="playerLabelsLead">
           <thead>
             <th>Class</th>
@@ -160,12 +192,6 @@
             <td>Glock</td>
             <td>55%</td>
           </tr>
-          <tr>
-            <td>Gunner</td>
-            <td>Gabe</td>
-            <td>555</td>
-            <td>Glock</td>
-            <td>55%</td>
           </tr>
         </table>
         <!-- Big Leader Board End -->
@@ -186,7 +212,6 @@
           justify-content: space-evenly;
           width: 230px;
           height: 156px;
-          
         "
       >
         <div class="itemBorder" id="inventorySlot1">

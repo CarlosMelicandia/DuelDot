@@ -31,11 +31,42 @@ backgroundImage.src = "../img/DuelDot-Background.png";
 // Possible Random Player Names
 // ------------------------------
 const playerNames = [
-  "Shadow", "Raven", "Phoenix", "Blaze", "Viper", "Maverick", "Rogue",
-  "Hunter", "Nova", "Zephyr", "Falcon", "Titan", "Specter", "Cyclone",
-  "Inferno", "Reaper", "Stalker", "Venom", "Glitch", "Banshee", "Shadowstrike",
-  "Onyx", "Rebel", "Fury", "Apex", "Crimson", "Nightfall", "Saber", "Tempest",
-  "Lightning", "Bullet", "Vortex", "Echo", "Blitz", "Rift", "BOB"
+  "Shadow",
+  "Raven",
+  "Phoenix",
+  "Blaze",
+  "Viper",
+  "Maverick",
+  "Rogue",
+  "Hunter",
+  "Nova",
+  "Zephyr",
+  "Falcon",
+  "Titan",
+  "Specter",
+  "Cyclone",
+  "Inferno",
+  "Reaper",
+  "Stalker",
+  "Venom",
+  "Glitch",
+  "Banshee",
+  "Shadowstrike",
+  "Onyx",
+  "Rebel",
+  "Fury",
+  "Apex",
+  "Crimson",
+  "Nightfall",
+  "Saber",
+  "Tempest",
+  "Lightning",
+  "Bullet",
+  "Vortex",
+  "Echo",
+  "Blitz",
+  "Rift",
+  "BOB",
 ];
 
 // ------------------------------
@@ -104,7 +135,7 @@ socket.on("updatePlayers", (backEndPlayers) => {
      * If a player with this id does not exist on the client,
      * create a new Player object using the server's data.
      */
-    
+
     if (!frontEndPlayers[id]) {
       frontEndPlayers[id] = new Player({
         x: backEndPlayer.x,
@@ -137,19 +168,18 @@ socket.on("updatePlayers", (backEndPlayers) => {
       }
     }
 
-      /*
-      YO DUMBASSES WORK ON THIS :D
-      */
-      // Updates Player Waapon
-      // document.querySelector(
-      //   `tr[data-id="${id}weapon"]`
-      // ).innerHTML = `${backEndPlayer.equippedWeapon}`;
-      // Update Player Score to tabLeaderBoard
-      // document.querySelector(
-      //   `tr[data-id="${id}score"]`
-      // ).innerHTML = `${backEndPlayer.score}`;
+    /*
+     */
+    // Updates Player Waapon
+    // document.querySelector(
+    //   `tr[data-id="${id}weapon"]`
+    // ).innerHTML = `${backEndPlayer.equippedWeapon}`;
+    // Update Player Score to tabLeaderBoard
+    // document.querySelector(
+    //   `tr[data-id="${id}score"]`
+    // ).innerHTML = `${backEndPlayer.score}`;
 
-      // document.getElementById(id).style.color = color // breaks everything :(
+    // document.getElementById(id).style.color = color // breaks everything :(
   }
 
   // Remove any client-side players that no longer exist on the server
@@ -171,13 +201,13 @@ socket.on("updatePlayers", (backEndPlayers) => {
 socket.on("updateRanking", (topPlayers, backEndPlayers) => {
   // Check if the local player exist in the frontEndPlayers
   // If not, log a warning and return
-  if(!frontEndPlayers[socket.id]) {
+  if (!frontEndPlayers[socket.id]) {
     console.warn(`Player ${socket.id} not exist in frontEndPlayers`);
     return;
   }
 
-  // Check if the local player is in the top 10 players in terms of score 
-  const localPlayerInTop = topPlayers.some(p => p.id === socket.id);
+  // Check if the local player is in the top 10 players in terms of score
+  const localPlayerInTop = topPlayers.some((p) => p.id === socket.id);
 
   // If the local player is not in the top 10, mark them not rank and add them into the topPlayers array
   if (!localPlayerInTop) {
@@ -203,7 +233,7 @@ socket.on("updateRanking", (topPlayers, backEndPlayers) => {
     div.style.color = entry.color;
     div.innerHTML = `<span><strong>${rankDisplay}.</strong> ${entry.username}</span><span>${entry.score}</span>`;
     parentDiv.appendChild(div);
-   });
+  });
 
   // If lag being cause, make this more efficient instead of clearing the big leaderboard everytime
   const bigLeaderBoard = document.querySelector("#playerLabelsLead");
@@ -284,7 +314,8 @@ function animate() {
   c.clearRect(0, 0, canvas.width, canvas.height); // Clears the entire canvas
 
   const localPlayer = frontEndPlayers[socket.id];
-  let cameraX = 0, cameraY = 0;
+  let cameraX = 0,
+    cameraY = 0;
   let pixelNumber = 2 * devicePixelRatio;
 
   if (localPlayer) {
@@ -594,3 +625,7 @@ document.addEventListener("keyup", function (event) {
     document.querySelector(".leaderboard").style.display = "none";
   }
 });
+
+// ------------------------------
+// MiniMap Handler
+// ------------------------------
