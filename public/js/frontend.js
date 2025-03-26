@@ -223,6 +223,7 @@ socket.on('updateWeapons', (weaponData) =>{
 })
 
 socket.on('dropWeapon', (weaponData) => {
+  console.log("test", weaponData)
   frontEndWeapons[weaponData.id] = new WeaponDrawing(weaponData)
 }) 
 

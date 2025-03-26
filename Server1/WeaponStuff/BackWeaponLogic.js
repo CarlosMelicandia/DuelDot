@@ -44,8 +44,6 @@ function spawnWeapons(backEndWeapons, io) {
 }
 
 function weaponDrop(weapon, x, y, io, backEndWeapons){
-  console.log("Cooking")
-
   let newWeaponId = deletedWeaponIds.length > 0 ? deletedWeaponIds.shift() : weaponId++
 
   weaponData = ({
@@ -54,7 +52,7 @@ function weaponDrop(weapon, x, y, io, backEndWeapons){
     y: y,
     radius: 10,
     color: weapon.color,
-    type: weapon.type
+    type: weapon.name
   })
 
   console.log(`Dropped ${weapon.name} at ${x} and ${y}, ${weaponData}`, weaponData)
