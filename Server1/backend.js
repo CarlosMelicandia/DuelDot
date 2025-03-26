@@ -371,7 +371,7 @@ setInterval(() => {
   }
   
   io.emit('updateProjectiles', backEndProjectiles)
-  io.emit('updatePowerUps', backEndPowerUps)
+  io.emit('updatePowerUps', backEndPowerUps, {remove: false})
   io.emit('updatePlayers', backEndPlayers)
 }, 15)
 
