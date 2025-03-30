@@ -83,7 +83,13 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
     if (!player || player.equippedWeapon.type == "melee")return // checks that the player is alive and doesn't have a melee
     
     if (player.canShoot) { 
-      const fireRate = backEndPlayers[socket.id].equippedWeapon.fireRate * 1000
+      let fireRate = 0;
+      if (!player.hasRapidFire) {
+        fireRate = backEndPlayers[socket.id].equippedWeapon.fireRate * 1000
+      } else {
+        fireRate = backEndPlayers[socket.id].equippedWeapon.fireRate * 1000 / 10
+      }
+
       const createProjectile = (projectileAngle) => {
       projectileId++ // Increment the projectile ID
 

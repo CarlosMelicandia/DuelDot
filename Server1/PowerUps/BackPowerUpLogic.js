@@ -6,7 +6,7 @@ const GAME_WIDTH = 1024 // Default width
 const GAME_HEIGHT = 576 // Default height
 let powerUpId = 0; // Unique ID counter for power-ups
 
-const POWERUP_DURATION = 5000;
+const POWERUP_DURATION = 10000;
 
 
 function spawnPowerUps(backEndPowerUps, io) {
@@ -20,16 +20,8 @@ function spawnPowerUps(backEndPowerUps, io) {
     let spawnX = Math.random() * (maxX - min) + min;
     let spawnY = Math.random() * (maxY - min) + min;
 
-    const powerUpTypes = ["speed", "multiShot", "health", "damage", "shield"];
+    const powerUpTypes = ["speed", "multiShot", "health", "damage", "rapid"];
     let powerUpType = powerUpTypes[Math.floor(Math.random() * powerUpTypes.length)];
-
-    // let powerUpColors = { // temporary; using pngs afterwards-- obsolete
-    //   "speed": "yellow",
-    //   "multiShot": "red",
-    //   "health": "green",
-    //   "damage": "orange",
-    //   "shield": "blue"
-    // };
 
     let newPowerUpId = powerUpId++; // Unique ID for power-ups
 
@@ -38,7 +30,6 @@ function spawnPowerUps(backEndPowerUps, io) {
       x: spawnX,
       y: spawnY,
       radius: 22,
-      // color: powerUpColors[powerUpType], (temporary stuff)
       type: powerUpType
     };
 
@@ -154,6 +145,25 @@ function checkPowerUpCollision(backEndPowerUps, io, player) {
                 player.activePowerups.shield.active = false;
               }
             }, POWERUP_DURATION * 2);
+
+          case 'rapid':
+            player.hasRapidFire = true;
+            player.activePowerups = player.activePowerups || {};
+
+            player.activePowerups.rapidFire = {
+              active: true,
+              endTime: Date.now() + POWERUP_DURATION
+            };
+
+            setTimeout(() => {
+              if (player) {
+                player.hasRapidFire = false;
+                
+                if (player.activePowerups && player.activePowerups.rapidFire) {
+                  player.activePowerups.rapidFire.active = false;
+                }
+              }
+            }, POWERUP_DURATION);
           break;
       }
 
