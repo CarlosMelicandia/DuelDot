@@ -2,12 +2,11 @@
 // Power-up Spawner Logic
 // ------------------------------
 
-const { MultiShot, Speed, Health, Damage, Shield } = require("./BackPowerUps");
+const { MultiShot, Speed, Health, Damage, Shield, Rapid} = require("./BackPowerUps");
 
 const GAME_WIDTH = 1024 // Default width
 const GAME_HEIGHT = 576 // Default height
 let powerUpId = 0; // Unique ID counter for power-ups
-
 
 
 let spawning = true; // Use a global flag to control spawning
@@ -30,7 +29,7 @@ function spawnPowerUps(backEndPowerUps, io) {
         let spawnX = Math.random() * (maxX - min) + min;
         let spawnY = Math.random() * (maxY - min) + min;
 
-        const powerUpTypes = ["speed", "multiShot", "health", "damage", "shield"];
+        const powerUpTypes = ["speed", "multiShot", "health", "damage", "shield","rapid"];
         let powerUpType = powerUpTypes[Math.floor(Math.random() * powerUpTypes.length)];
 
         let newPowerUpId = powerUpId++; // Generate unique ID
@@ -67,6 +66,7 @@ function checkPowerUpCollision(backEndPowerUps, io, player) {
               health: Health,
               damage: Damage,
               shield: Shield,
+              rapid: Rapid
           };
           const PowerUpClass = powerUpClasses[powerUp.type];
 
@@ -92,7 +92,6 @@ function checkPowerUpCollision(backEndPowerUps, io, player) {
       }
   }
 }
-     
 
 // Modify the projectile collision handler to account for shield and damage multipliers
 function handleProjectileCollision(projectile, targetPlayer, shooterId) {
