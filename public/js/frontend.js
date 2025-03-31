@@ -216,15 +216,19 @@ socket.on('updateWeapons', (backEndWeapons, weaponData) =>{
   }
 })
 
-socket.on('updatePowerUps', (backEndPowerUps, powerUpData) => {
-  if (powerUpData.remove) { // If the power-up was collected, remove it
-    delete frontEndPowerUps[powerUpData.id];
-  } else {
-    if (!frontEndPowerUps[powerUpData.id]) { // Create the power-up if it doesn't exist
-      frontEndPowerUps[powerUpData.id] = new PowerUps(powerUpData); // Stores the power-up data
-    }
-  }
+socket.on("removePowerUp", (powerUp) => {
+  console.log(`removePowerUp event received: ID=${powerUp.id}`);
+      delete frontEndPowerUps[powerUp.id]; // Remove from frontend state
 });
+
+socket.on("updatePowerUps", (backEndPowerUps) => {
+  console.log(`Synchronizing powerups with backend:`, backEndPowerUps);
+  frontEndPowerUps = {}; // Clear the existing powerups
+  backEndPowerUps.forEach((powerUp) => {
+      frontEndPowerUps[powerUp.id] = new PowerUps(powerUp);
+  });
+});
+
 
 socket.on('powerupCollected', (powerupData) => {
   const player = frontEndPlayers[socket.id];
@@ -298,11 +302,13 @@ function animate() {
     frontEndWeapon.draw()
   }
 
-  //Draw the PowerUps
+  // Draw the PowerUps
   for (const powerUp in frontEndPowerUps) {
     const frontEndPowerUp = frontEndPowerUps[powerUp];
+    console.log(`Calling draw for powerup ID=${powerUp}, Position=(${frontEndPowerUp.x}, ${frontEndPowerUp.y})`);
     frontEndPowerUp.draw();
-  }
+}
+
   
 
   // Draw each projectile
