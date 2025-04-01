@@ -84,7 +84,7 @@ function checkCollision(backEndWeapons, io, player) {
 
       console.log("AFter pickup Inventory:", player.inventory) // Test
       
-      io.to(player.socketId).emit('equipWeapon', weaponEquipped, player)
+      io.to(player.socketId).emit('equipWeapon', slotIndex, player)
 
       backEndWeapons.splice(i, 1) // Remove weapon from array
       deletedWeaponIds.push(weapon.id)
