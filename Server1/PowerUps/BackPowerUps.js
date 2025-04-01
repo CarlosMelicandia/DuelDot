@@ -158,6 +158,34 @@ class Shield  extends PowerUp {
      removalEffect(){}
 }
 
+class Rapid extends PowerUp {
+    constructor(player, id) {
+        super("Rapid", "rapid", 5000, player, id);
+
+    }
+
+    apply(){
+        this.player.hasRapidFire = true;
+        this.player.activePowerups = this.player.activePowerups || {};
+
+        this.player.activePowerups.rapidFire = {
+          active: true,
+          endTime: Date.now() + this.duration
+        };
+
+        setTimeout(() => {  console.log(`Scheduled removalEffect for PowerUp ID=${this.id}, Type=${this.type} after ${this.duration} ms`);
+        this.removalEffect()
+    },   this.duration);
+
+    }
+
+    removalEffect(){
+        if (this.player.activePowerups && this.player.activePowerups.rapidFire) {
+            this.player.activePowerups.rapidFire.active = false;
+          }
+    }
+}
+
 
 // Exporting modules for use
 module.exports = {
@@ -166,5 +194,6 @@ module.exports = {
     Health,
     Damage,
     Shield ,
+    Rapid ,
     PowerUp,
 };

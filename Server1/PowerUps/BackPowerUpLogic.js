@@ -83,7 +83,7 @@ function checkPowerUpCollision(backEndPowerUps, io, player) {
               console.log(`PowerUp ID=${powerUp.id} removed from backend and emitted to frontend.`);
 
               // Check if spawning should restart
-              if (backEndPowerUps.length < 10 && !spawning) {
+              if (backEndPowerUps.length < 15 && !spawning) {
                   console.log("Powerup count below limit. Restarting spawn process.");
                   spawning = true;
                   spawnPowerUps(backEndPowerUps, io); // Restart spawning

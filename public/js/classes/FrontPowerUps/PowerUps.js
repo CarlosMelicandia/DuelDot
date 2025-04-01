@@ -18,6 +18,7 @@ class PowerUps {
         "multiShot": "../assets/MultishotPU.png",
         "health": "../assets/HealthPU.png",
         "damage": "../assets/DamagePU.png",
+        "shield": "../assets/ShieldPU.png",
         "rapid": "../assets/RapidFirePU.png"
       };
   
@@ -27,6 +28,7 @@ class PowerUps {
         "multiShot": "#FF0000", // Red
         "health": "#00FF00", // Green
         "damage": "#FFA500", // Orange
+        "shield": "#4bb3e1", //Blue
         "rapid": "#ff8600", // Orange-ish
       };
   
@@ -52,7 +54,7 @@ class PowerUps {
       c.fill();
       c.closePath();
       c.restore();
-      
+
       c.drawImage(this.image, this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
     }
   }
