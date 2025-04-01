@@ -223,7 +223,6 @@ socket.on('updateWeapons', (weaponData) =>{
 })
 
 socket.on('dropWeapon', (weaponData) => {
-  console.log("test", weaponData)
   frontEndWeapons[weaponData.id] = new WeaponDrawing(weaponData)
 }) 
 
@@ -324,13 +323,25 @@ socket.on('updatePowerUpsOnJoin', (backEndPowerUps) => {
 
 // Waits for a weapon equip call from the server
 socket.on('equipWeapon', (weaponEquipped, player) => {
-  if (player.inventory[0] && !player.inventory[1]){ // if the first inventory is open 
+  
+  if (player.inventory[0] != null){ // if the first inventory is open 
     document.querySelector('#inventorySlot1Text').textContent = weaponEquipped.name // Show weapon in inventory
   }else {
-    if(player.inventory[1]){ // if the second inventory is open
+    if(player.inventory[1] != null){ // if the second inventory is open
     document.querySelector('#inventorySlot2Text').textContent = weaponEquipped.name // Shows the weapon in the second slot
+    }
   }
-}
+})
+
+socket.on('removeWeapon', (player) => {
+  console.log(player.inventory) 
+  if (player.inventory[0] == null){ // if the first inventory is open 
+    document.querySelector('#inventorySlot1Text').textContent = " " // Show weapon in inventory
+  }else {
+    if(!player.inventory[1] == null){ // if the second inventory is open
+    document.querySelector('#inventorySlot2Text').textContent = " " // Shows the weapon in the second slot
+    }
+  }
 })
 
 // ------------------------------
@@ -396,6 +407,7 @@ const keys = {
   s: { pressed: false },
   d: { pressed: false },
   q: { pressed: false },
+  f: { pressed: false },
   num1: { pressed: false },
   num2: { pressed: false }
 }
@@ -449,13 +461,19 @@ setInterval(() => {
   }
 
   /**
-   * Drop Weapons
+   * Interact with Weapons
    */
 
     if (keys.q.pressed){
       sequenceNumber++
       playerInputs.push({ sequenceNumber, dx: 0, dy: 0 })
       socket.emit('weaponDrop', { keycode: 'KeyD', sequenceNumber })
+    }
+
+    if (keys.f.pressed){
+      sequenceNumber++
+      playerInputs.push({ sequenceNumber, dx: 0, dy: 0 })
+      socket.emit('pickUpWeapon', { keycode: 'KeyF', sequenceNumber })
     }
 
   /**
@@ -514,6 +532,9 @@ window.addEventListener('keydown', (event) => {
     case 'KeyQ':
       keys.q.pressed = true
       break
+    case 'KeyF':
+      keys.f.pressed = true
+      break
     case 'Digit1':
       keys.num1.pressed = true
       break
@@ -544,6 +565,9 @@ window.addEventListener('keyup', (event) => {
       break
     case 'KeyQ':
       keys.q.pressed = false
+      break
+    case 'KeyF':
+      keys.f.pressed = false
       break
     case 'Digit1':
       keys.num1.pressed = false

@@ -46,7 +46,7 @@ class BasePlayer {
       this.magicWpnMtp = 1.0
 
       // Inventory and Equipped
-      this.inventory = []
+      this.inventory = [null, null]
       this.equippedWeapon = equippedWeapon
 
       this.canShoot = true

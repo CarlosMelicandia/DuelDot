@@ -1,12 +1,13 @@
 class WeaponDrawing {
-    constructor({id, x, y, radius, color = "purple", type}) {
+    constructor({id, x, y, radius, color, name}) {
         this.id = id
         this.x = x
         this.y = y
         this.radius = radius
         this.color = color // Keep as fallback
-        this.type = type
+        this.name = name
         this.image = new Image()
+
 
         // Define image paths for each weapon type
         const weaponImages = {
@@ -28,7 +29,7 @@ class WeaponDrawing {
         this.sizeMultiplier = this.sizeMultipliers[this.type] || 2;
         
         // Set the image source based on weapon type
-        this.image.src = weaponImages[this.type]
+        this.image.src = weaponImages[this.name]
         
         // Flag to track if image loaded successfully
         this.imageLoaded = false;

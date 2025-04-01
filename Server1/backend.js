@@ -191,14 +191,32 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
   socket.on('weaponDrop', ({keycode, sequenceNumber}) => {
     const backEndPlayer = backEndPlayers[socket.id]
 
-    if (!backEndPlayer.equippedWeapon || backEndPlayer.equippedWeapon.name == "Fist"|| !backEndPlayer) return
+    if (!backEndPlayer.equippedWeapon || backEndPlayer.equippedWeapon.name == "fist"|| !backEndPlayer) return
 
     backEndPlayer.sequenceNumber = sequenceNumber
     const droppedWeapon = backEndPlayer.equippedWeapon
-
-    backEndPlayer.inventory = backEndPlayer.inventory.filter((slot) => slot != droppedWeapon)
+    console.log("Dropped:", droppedWeapon) // TEST
     
+    const slotIndex = backEndPlayer.inventory.findIndex(slot => slot === droppedWeapon)
+    
+    if (slotIndex !== -1) {
+      backEndPlayer.inventory[slotIndex] = null // Set the slot to null instead of removing
+    }
+
+    backEndPlayer.equippedWeapon = FIST
+
+    console.log("Inventory:", backEndPlayer.inventory) // Test
+    
+
     weaponDrop(droppedWeapon, backEndPlayer.x, backEndPlayer.y, io, backEndWeapons)
+    socket.emit('removeWeapon', backEndPlayer)
+  })
+
+  socket.on('pickUpWeapon', ({keycode, sequenceNumber}) => {
+    for (const playerId in backEndPlayers){
+      const player = backEndPlayers[playerId]
+      checkCollision(backEndWeapons, io, player) // Weapon collision
+    }
   })
 
   /**
@@ -280,7 +298,6 @@ spawnPowerUps(backEndPowerUps, io); // Function to spawn power-ups
 setInterval(() => { 
   for (const playerId in backEndPlayers){
     const player = backEndPlayers[playerId]
-    checkCollision(backEndWeapons, io, player) // Weapon collision
     checkPowerUpCollision(backEndPowerUps, io, player) // Power-up collision
   }
 
