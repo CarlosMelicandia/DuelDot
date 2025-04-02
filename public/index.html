@@ -78,6 +78,14 @@
       </div>
       <canvas></canvas>
       
+      <div 
+      id="fpsCounter" 
+      style="
+        position:absolute; 
+        top:10px; left:10px; 
+        color:white; 
+        font-family:monospace;">FPS: --</div>
+
       <!-- Inventory slots -->
       <div 
         id = "inventoryArea"
@@ -112,6 +120,7 @@
         id = "menu"
         style=" 
           display: flex;
+          position: absolute;
           flex-direction: column;
           align-items: center;
           justify-content: center;
@@ -237,6 +246,7 @@
     <script src="./js/classes/Player.js"></script>
     <script src="./js/classes/Particle.js"></script>
     <script src="./js/classes/Projectile.js"></script>
+    <script src="./js/FrontPowerUps/PowerUpDrawing.js"></script>
     <script src="./js/FrontWeaponStuff/WeaponDrawning.js"></script>
     <script src="./js/frontend.js"></script>
     <script src="./js/eventListeners.js"></script>

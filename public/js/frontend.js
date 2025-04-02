@@ -57,6 +57,14 @@ const frontEndProjectiles = {} // Object to keep track of all projectile objects
 let frontEndWeapons = {} // Object to keep track of all weapons objects on the client
 let frontEndPowerUps = {}; // Object to track power-ups on the client
 
+// ------------------------------
+// FPS ticker
+// ------------------------------ 
+
+let lastTime = performance.now()
+let frames = 0
+let fps = 0
+
 
 /**
  * ------------------------------
@@ -226,65 +234,6 @@ socket.on('dropWeapon', (weaponData) => {
   frontEndWeapons[weaponData.id] = new WeaponDrawing(weaponData)
 }) 
 
-class PowerUpDrawing {
-  constructor({ id, x, y, radius, type }) {
-    this.id = id;
-    this.x = x;
-    this.y = y;
-    this.radius = radius;
-    this.type = type;
-    this.image = new Image(); // Create an image object
-    this.pulseSize = 0; // For the pulse animation
-    this.pulseDirection = 1; // 1 for growing, -1 for shrinking
-    this.maxPulseSize = 2; // Maximum size the pulse can grow
-    this.pulseSpeed = 0.3; // Speed of the pulse animation
-
-
-    // Assign different PNGs based on power-up type
-    const powerUpImages = {
-      "speed": "../assets/speed.png", 
-      "multiShot": "../assets/MultishotPU.png",
-      "health": "../assets/HealthPU.png",
-      "damage": "../assets/DamagePU.png",
-      "shield": "../assets/ShieldPU.png"
-    };
-
-    // Colors for the glow effect based on powerup type
-    this.glowColors = {
-      "speed": "#FFFF00", // Yellow
-      "multiShot": "#FF0000", // Red
-      "health": "#00FF00", // Green
-      "damage": "#FFA500", // Orange
-      "shield": "#0000FF", // Blue
-    };
-
-    this.image.src = powerUpImages[this.type] || "../assets/speed.png";
-
-  }
-
-  draw() {
-    // Update the pulse animation
-    this.pulseSize += this.pulseDirection * this.pulseSpeed;
-    if (this.pulseSize >= this.maxPulseSize) {
-      this.pulseDirection = -1;
-    } else if (this.pulseSize <= 0) {
-      this.pulseDirection = 1;
-    }
-
-    // Draw the glow/pulse effect
-    c.save();
-    c.beginPath();
-    c.arc(this.x, this.y, this.radius + this.pulseSize, 0, Math.PI * 2);
-    c.fillStyle = this.glowColors[this.type] || "#FFFF00";
-    c.globalAlpha = 0.3; // Make the glow semi-transparent
-    c.fill();
-    c.closePath();
-    c.restore();
-
-    c.drawImage(this.image, this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
-  }
-}
-
 socket.on('updatePowerUps', (backEndPowerUps, powerUpData) => {
   if (powerUpData.remove) { // If the power-up was collected, remove it
     delete frontEndPowerUps[powerUpData.id];
@@ -322,14 +271,24 @@ socket.on('updatePowerUpsOnJoin', (backEndPowerUps) => {
 
 
 // Waits for a weapon equip call from the server
-socket.on('equipWeapon', (weaponEquipped, player) => {
-  if (player.inventory[0] && !player.inventory[1]){ // if the first inventory is open 
-    document.querySelector('#inventorySlot1Text').textContent = weaponEquipped.name // Show weapon in inventory
-  }else {
-    if(player.inventory[1]){ // if the second inventory is open
-    document.querySelector('#inventorySlot2Text').textContent = weaponEquipped.name // Shows the weapon in the second slot
+socket.on('equipWeapon', (slotIndex, player) => {
+  
+  if (player.inventory[0] != null  && player.inventory[1] == null){ // if the first inventory is open 
+    document.querySelector('#inventorySlot1Text').textContent = player.inventory[slotIndex].name // Show weapon in inventory
   }
-}
+  if(player.inventory[0] != null && player.inventory[1] != null){ // if the second inventory is open
+  document.querySelector('#inventorySlot2Text').textContent = player.inventory[slotIndex].name // Shows the weapon in the second slot
+  }
+})
+
+socket.on('removeWeapon', (player) => {
+  console.log(player.inventory) 
+  if (player.inventory[0] == null){ // if the first inventory is open 
+    document.querySelector('#inventorySlot1Text').textContent = " " // Show weapon in inventory
+  }
+  if(player.inventory[1] == null){ // if the second inventory is open
+  document.querySelector('#inventorySlot2Text').textContent = " " // Shows the weapon in the second slot
+  }
 })
 
 // ------------------------------
@@ -346,6 +305,17 @@ function animate() {
   animationId = requestAnimationFrame(animate) // Tells the browser we want to perform an animation
   // c.fillStyle = 'rgba(0, 0, 0, 0.1)' // Optional "ghosting" effect if needed
   c.clearRect(0, 0, canvas.width, canvas.height) // Clears the entire canvas
+
+  const now = performance.now()
+  frames++
+  if (now - lastTime >= 1000) {
+    fps = frames
+    frames = 0
+    lastTime = now
+
+    document.querySelector('#fpsCounter').textContent = `FPS: ${fps}`
+  }
+
 
   // Interpolate and draw each player
   for (const id in frontEndPlayers) {
@@ -395,6 +365,7 @@ const keys = {
   s: { pressed: false },
   d: { pressed: false },
   q: { pressed: false },
+  f: { pressed: false },
   num1: { pressed: false },
   num2: { pressed: false }
 }
@@ -448,13 +419,19 @@ setInterval(() => {
   }
 
   /**
-   * Drop Weapons
+   * Interact with Weapons
    */
 
     if (keys.q.pressed){
       sequenceNumber++
       playerInputs.push({ sequenceNumber, dx: 0, dy: 0 })
       socket.emit('weaponDrop', { keycode: 'KeyD', sequenceNumber })
+    }
+
+    if (keys.f.pressed){
+      sequenceNumber++
+      playerInputs.push({ sequenceNumber, dx: 0, dy: 0 })
+      socket.emit('pickUpWeapon', { keycode: 'KeyF', sequenceNumber })
     }
 
   /**
@@ -513,6 +490,9 @@ window.addEventListener('keydown', (event) => {
     case 'KeyQ':
       keys.q.pressed = true
       break
+    case 'KeyF':
+      keys.f.pressed = true
+      break
     case 'Digit1':
       keys.num1.pressed = true
       break
@@ -543,6 +523,9 @@ window.addEventListener('keyup', (event) => {
       break
     case 'KeyQ':
       keys.q.pressed = false
+      break
+    case 'KeyF':
+      keys.f.pressed = false
       break
     case 'Digit1':
       keys.num1.pressed = false

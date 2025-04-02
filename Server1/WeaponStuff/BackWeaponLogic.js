@@ -33,7 +33,7 @@ function spawnWeapons(backEndWeapons, io) {
       y: spawnY,
       radius: 10,
       color: weaponColors[weaponToSpawn],
-      type: weaponToSpawn
+      name: weaponToSpawn // Changed
     })
 
     // Add new weapon and then sort by ID
@@ -44,8 +44,6 @@ function spawnWeapons(backEndWeapons, io) {
 }
 
 function weaponDrop(weapon, x, y, io, backEndWeapons){
-  console.log("Cooking")
-
   let newWeaponId = deletedWeaponIds.length > 0 ? deletedWeaponIds.shift() : weaponId++
 
   weaponData = ({
@@ -54,10 +52,8 @@ function weaponDrop(weapon, x, y, io, backEndWeapons){
     y: y,
     radius: 10,
     color: weapon.color,
-    type: weapon.type
+    name: weapon.name
   })
-
-  console.log(`Dropped ${weapon.name} at ${x} and ${y}, ${weaponData}`, weaponData)
   
   backEndWeapons.push(weaponData)
 
@@ -66,16 +62,14 @@ function weaponDrop(weapon, x, y, io, backEndWeapons){
 
 function checkCollision(backEndWeapons, io, player) {
   for (let i = backEndWeapons.length - 1; i >= 0; i--) {
-
-    if (backEndWeapons[i].isDropped == true) return // Currently I am stuck in trying to figure out how to not pick up weapon when player drops it 
-
     let weapon = backEndWeapons[i]
     let dist = Math.hypot(player.x - weapon.x, player.y - weapon.y)
 
     if (dist < player.radius + weapon.radius) {
-      if (player.inventory.length >= 2) return
+      const slotIndex = player.inventory.findIndex(slot => slot === null)
+      if (player.inventory[0] != null && player.inventory[1] != null) return
 
-      console.log(`Player picked up ${weapon.name}`)
+      // console.log('Player picked up', weapon) // Test
       
       const weapons = {
         pistol: Pistol,
@@ -84,11 +78,13 @@ function checkCollision(backEndWeapons, io, player) {
         shuriken: Shuriken
       }
       
-      const weaponEquipped = new weapons[weapon.type]() // Creates a weapon object when a player picks it up
+      const weaponEquipped = new weapons[weapon.name]() // Creates a weapon object when a player picks it up
       
-      player.inventory.push(weaponEquipped)
+      player.inventory[slotIndex] = weaponEquipped
+
+      console.log("AFter pickup Inventory:", player.inventory) // Test
       
-      io.to(player.socketId).emit('equipWeapon', weaponEquipped, player)
+      io.to(player.socketId).emit('equipWeapon', slotIndex, player)
 
       backEndWeapons.splice(i, 1) // Remove weapon from array
       deletedWeaponIds.push(weapon.id)

@@ -3,8 +3,8 @@
  * - A position (`x`, `y`)
  * - A visual representation (a colored circle)
  * - A username displayed above them
- * - Health and a health bar (Test branch addition)
- * - Speed (Test branch addition)
+ * - Health and a health bar 
+ * - Speed 
  */
 class Player {
   /**
@@ -14,8 +14,8 @@ class Player {
    * @param {number} radius - The radius of the player (size).
    * @param {string} color - The color of the player.
    * @param {string} username - The player's displayed username.
-   * @param {number} health - The player's initial health (Test branch addition).
-   * @param {number} speed - The player's movement speed (Test branch addition).
+   * @param {number} health - The player's initial health.
+   * @param {number} speed - The player's movement speed.
    */
   constructor({ x, y, radius, color, username, health, speed, canShoot, equippedWeapon }) {
     this.x = x
