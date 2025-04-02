@@ -213,10 +213,12 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
   })
 
   socket.on('pickUpWeapon', ({keycode, sequenceNumber}) => {
-    for (const playerId in backEndPlayers){
-      const player = backEndPlayers[playerId]
-      checkCollision(backEndWeapons, io, player) // Weapon collision
-    }
+    const backEndPlayer = backEndPlayers[socket.id]
+
+    if (!backEndPlayer) return
+
+    backEndPlayer.sequenceNumber = sequenceNumber
+    checkCollision(backEndWeapons, io, backEndPlayer) // Weapon collision
   })
 
   /**

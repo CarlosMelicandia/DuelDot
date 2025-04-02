@@ -57,6 +57,14 @@ const frontEndProjectiles = {} // Object to keep track of all projectile objects
 let frontEndWeapons = {} // Object to keep track of all weapons objects on the client
 let frontEndPowerUps = {}; // Object to track power-ups on the client
 
+// ------------------------------
+// FPS ticker
+// ------------------------------ 
+
+let lastTime = performance.now()
+let frames = 0
+let fps = 0
+
 
 /**
  * ------------------------------
@@ -326,10 +334,9 @@ socket.on('equipWeapon', (slotIndex, player) => {
   
   if (player.inventory[0] != null  && player.inventory[1] == null){ // if the first inventory is open 
     document.querySelector('#inventorySlot1Text').textContent = player.inventory[slotIndex].name // Show weapon in inventory
-  }else {
-    if(player.inventory[0] != null && player.inventory[1] != null){ // if the second inventory is open
-    document.querySelector('#inventorySlot2Text').textContent = player.inventory[slotIndex].name // Shows the weapon in the second slot
-    }
+  }
+  if(player.inventory[0] != null && player.inventory[1] != null){ // if the second inventory is open
+  document.querySelector('#inventorySlot2Text').textContent = player.inventory[slotIndex].name // Shows the weapon in the second slot
   }
 })
 
@@ -357,6 +364,17 @@ function animate() {
   animationId = requestAnimationFrame(animate) // Tells the browser we want to perform an animation
   // c.fillStyle = 'rgba(0, 0, 0, 0.1)' // Optional "ghosting" effect if needed
   c.clearRect(0, 0, canvas.width, canvas.height) // Clears the entire canvas
+
+  const now = performance.now()
+  frames++
+  if (now - lastTime >= 1000) {
+    fps = frames
+    frames = 0
+    lastTime = now
+
+    document.querySelector('#fpsCounter').textContent = `FPS: ${fps}`
+  }
+
 
   // Interpolate and draw each player
   for (const id in frontEndPlayers) {
