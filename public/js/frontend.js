@@ -29,6 +29,14 @@ const backgroundImage = new Image();
 backgroundImage.src = "../assets/background.png";
 
 // ------------------------------
+// Minimap canvas and context
+// ------------------------------
+const miniMap = document.querySelector("#miniMapC")
+const miniMapCtx = miniMap.getContext("2d")
+miniMap.width = 150
+miniMap.height = 150
+
+// ------------------------------
 // Possible Random Player Names
 // ------------------------------
 const playerNames = [
@@ -193,7 +201,7 @@ socket.on('updatePlayers', (backEndPlayers) => {
   for (const id in frontEndPlayers) {
     if (!backEndPlayers[id]) {
       const divToDelete = document.querySelector(`div[data-id="${id}"]`);
-      divToDelete.parentNode.removeChild(divToDelete);
+      //divToDelete.parentNode.removeChild(divToDelete);
 
       // If the local player has been removed, show the username form again
       if (id === socket.id) {
@@ -356,25 +364,28 @@ function animate() {
 
     document.querySelector('#fpsCounter').textContent = `FPS: ${fps}`
   }
+  
+  const localPlayer = frontEndPlayers[socket.id]
 
+  if (!localPlayer) return
 
-  const localPlayer = frontEndPlayers[socket.id];
   let cameraX = 0,
     cameraY = 0;
   let pixelNumber = 2 * devicePixelRatio;
-
-  if (localPlayer) {
-    cameraX = localPlayer.x - canvas.width / pixelNumber;
-    cameraY = localPlayer.y - canvas.height / pixelNumber;
-  }
+  
+  cameraX = localPlayer.x - canvas.width / pixelNumber;
+  cameraY = localPlayer.y - canvas.height / pixelNumber;
 
   c.save();
   c.translate(-cameraX, -cameraY);
   c.drawImage(backgroundImage, 0, 0, 5000, 5000);
 
+  miniMapCtx.clearRect(0, 0, miniMap.width, miniMap.height)
   // Interpolate and draw each player
   for (const id in frontEndPlayers) {
     const frontEndPlayer = frontEndPlayers[id];
+
+    drawOnMiniMap(frontEndPlayer)
 
     // linear interpolation (move the player closer to its target)
     if (frontEndPlayer.target) {
@@ -389,12 +400,14 @@ function animate() {
   for (const weapon in frontEndWeapons) {
     const frontEndWeapon = frontEndWeapons[weapon];
     frontEndWeapon.draw();
+    drawOnMiniMap(frontEndWeapon)
   }
 
   //Draw the PowerUps
   for (const powerUp in frontEndPowerUps) {
     const frontEndPowerUp = frontEndPowerUps[powerUp];
     frontEndPowerUp.draw();
+    drawOnMiniMap(frontEndPowerUp)
   }
 
   // Draw each projectile
@@ -601,6 +614,39 @@ window.addEventListener("keyup", (event) => {
 });
 
 // ------------------------------
+// Mini Map
+// ------------------------------
+function drawOnMiniMap(item, worldWidth = 5000, worldHeight = 5000) {
+  const minimapScaleX = miniMap.width / worldWidth
+  const minimapScaleY = miniMap.height / worldHeight
+
+  const miniX = item.x * minimapScaleX
+  const miniY = item.y * minimapScaleY
+
+  if (item instanceof Player){
+    miniMapCtx.beginPath()
+    miniMapCtx.arc(miniX, miniY, 2, 0, Math.PI * 2)
+    miniMapCtx.fillStyle = item.color
+    miniMapCtx.fill()
+    miniMapCtx.closePath()
+  } else if (item instanceof WeaponDrawing){
+    miniMapCtx.beginPath()
+    miniMapCtx.rect(miniX, miniY, 4, 4)
+    miniMapCtx.fillStyle = "yellow";
+    miniMapCtx.fill()
+    miniMapCtx.closePath()
+  } else if (item instanceof PowerUpDrawing){
+    miniMapCtx.beginPath();
+    miniMapCtx.moveTo(miniX, miniY - 4)
+    miniMapCtx.lineTo(miniX - 4, miniY)
+    miniMapCtx.lineTo(miniX + 4, miniY)
+    miniMapCtx.fillStyle = "green"
+    miniMapCtx.fill()
+    miniMapCtx.closePath()
+  }
+}
+
+// ------------------------------
 // Class Selection Handling
 // ------------------------------
 const classSelectors = ["Tank", "Rogue", "Mage", "Gunner"]; // Possible classes
@@ -707,6 +753,3 @@ document.addEventListener("keyup", function (event) {
   }
 });
 
-// ------------------------------
-// MiniMap Handler
-// ------------------------------
