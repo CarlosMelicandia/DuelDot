@@ -234,6 +234,13 @@ io.on("connection", (socket) => {
   })
 
   /**
+   * When client emits a ping check event, it sends the signal back
+   */
+  socket.on("pingCheck", () => {
+    socket.emit("pongCheck");
+  });
+
+  /**
    * When client emits a punch event, a punch is made
    */
   socket.on('punch', () => {

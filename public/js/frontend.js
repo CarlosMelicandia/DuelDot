@@ -61,12 +61,15 @@ let frontEndWeapons = {} // Object to keep track of all weapons objects on the c
 let frontEndPowerUps = {} // Object to track power-ups on the client
 
 // ------------------------------
-// FPS ticker
+// FPS ticker & Ping
 // ------------------------------ 
 
 let lastTime = performance.now()
 let frames = 0
 let fps = 0
+
+let lastPingTime = 0;
+let ping = 0;
 
 
 /**
@@ -330,6 +333,24 @@ socket.on('removeWeapon', (player) => {
   if(player.inventory[1] == null){ // if the second inventory is open
   document.querySelector('#inventorySlot2Text').textContent = " " // Shows the weapon in the second slot
   }
+})
+
+// ------------------------------
+// Ping Checker
+// ------------------------------
+// Send ping to server every 2 seconds
+setInterval(() => {
+  lastPingTime = performance.now() // Timestamp
+  socket.emit("pingCheck")
+}, 2000)
+
+// Listen for pong from server
+socket.on("pongCheck", () => {
+  const now = performance.now()
+  ping = Math.round(now - lastPingTime) // ping in ms
+
+  // Update the ping display
+  document.querySelector("#pingDisplay").textContent = `Ping: ${ping}ms`
 })
 
 // ------------------------------
