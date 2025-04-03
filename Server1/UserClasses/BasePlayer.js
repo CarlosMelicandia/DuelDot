@@ -1,7 +1,6 @@
 // ------------------------------
 // BasePlayer Class (Abstract)
 // ------------------------------
-const { Fist } = require('./WeaponStuff/Weapons')
 class BasePlayer {
   /**
    * Constructor for the BasePlayer class.

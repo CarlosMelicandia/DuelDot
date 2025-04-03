@@ -1,7 +1,7 @@
 const { Pistol, SubmachineGun, Sniper, Shuriken } = require("./Weapons")
 
-const GAME_WIDTH = 1024 // Default width
-const GAME_HEIGHT = 576 // Default height
+const GAME_WIDTH = 5000 // Default width
+const GAME_HEIGHT = 5000 // Default height
 let deletedWeaponIds = []
 
 let weaponId = 0

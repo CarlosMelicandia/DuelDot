@@ -2,28 +2,31 @@
 // ------------------------------
 // Canvas and Context Setup
 // ------------------------------
-const canvas = document.querySelector('canvas') // Finds the canvas element from the HTML file
-const c = canvas.getContext('2d') // Context in which the canvas is being made
+const canvas = document.querySelector("canvas"); // Finds the canvas element from the HTML file
+const c = canvas.getContext("2d"); // Context in which the canvas is being made
 
 // ------------------------------
 // Socket.IO and DOM Element Setup
 // ------------------------------
-const socket = io() // Allows for communication between the client and the server
-const scoreEl = document.querySelector('#scoreEl') // Finds the element with ID "scoreEl" from the HTML file
+const socket = io(); // Allows for communication between the client and the server
+const scoreEl = document.querySelector("#scoreEl"); // Finds the element with ID "scoreEl" from the HTML file
 
 // ------------------------------
 // Device Pixel Ratio and Canvas Dimensions
 // ------------------------------
-const devicePixelRatio = window.devicePixelRatio || 1 // Gets the device's pixel ratio (for high-DPI displays), defaulting to 1 if unavailable
+const devicePixelRatio = window.devicePixelRatio || 1; // Gets the device's pixel ratio (for high-DPI displays), defaulting to 1 if unavailable
 
-canvas.width = 1024 * devicePixelRatio // Sets the canvas’s internal width
-canvas.height = 576 * devicePixelRatio // Sets the canvas’s internal height
+canvas.width = 1024 * devicePixelRatio; // Sets the canvas’s internal width
+canvas.height = 576 * devicePixelRatio; // Sets the canvas’s internal height
 
-c.scale(devicePixelRatio, devicePixelRatio) // Scales the drawing context so that drawing commands correspond to CSS pixels
+c.scale(devicePixelRatio, devicePixelRatio); // Scales the drawing context so that drawing commands correspond to CSS pixels
 
 // Center of the canvas
-const x = canvas.width / 2
-const y = canvas.height / 2
+const x = canvas.width / 2;
+const y = canvas.height / 2;
+
+const backgroundImage = new Image();
+backgroundImage.src = "../assets/background.png";
 
 // ------------------------------
 // Possible Random Player Names
@@ -46,16 +49,16 @@ const playerNames = [
   "Tempest","Lightning",
   "Bullet","Vortex",
   "Echo","Blitz",
-  "Rift", "BOB"
-]
+  "Rift","BOB",
+];
 
 // ------------------------------
 // Data Structures for Game Objects
 // ------------------------------
-const frontEndPlayers = {}  // Object to keep track of all player objects on the client
+const frontEndPlayers = {} // Object to keep track of all player objects on the client
 const frontEndProjectiles = {} // Object to keep track of all projectile objects on the client
 let frontEndWeapons = {} // Object to keep track of all weapons objects on the client
-let frontEndPowerUps = {}; // Object to track power-ups on the client
+let frontEndPowerUps = {} // Object to track power-ups on the client
 
 // ------------------------------
 // FPS ticker
@@ -76,10 +79,10 @@ let fps = 0
  * When the server emits 'updateProjectiles', iterate over each projectile and
  * create or update them locally.
  */
-socket.on('updateProjectiles', (backEndProjectiles) => { 
+socket.on("updateProjectiles", (backEndProjectiles) => {
   // Loop over each projectile from the server (each has a unique id)
   for (const id in backEndProjectiles) {
-    const backEndProjectile = backEndProjectiles[id]
+    const backEndProjectile = backEndProjectiles[id];
 
     /**
      * If a projectile with this id doesn't exist on the client,
@@ -91,12 +94,12 @@ socket.on('updateProjectiles', (backEndProjectiles) => {
         y: backEndProjectile.y,
         radius: 5,
         color: frontEndPlayers[backEndProjectile.playerId]?.color, // Checks if client Player with server projectiles id exists and assigns color if it does
-        velocity: backEndProjectile.velocity
-      })
+        velocity: backEndProjectile.velocity,
+      });
     } else {
       // Update the client projectile’s position based on the server’s velocity
-      frontEndProjectiles[id].x += backEndProjectiles[id].velocity.x
-      frontEndProjectiles[id].y += backEndProjectiles[id].velocity.y
+      frontEndProjectiles[id].x += backEndProjectiles[id].velocity.x;
+      frontEndProjectiles[id].y += backEndProjectiles[id].velocity.y;
     }
   }
 
@@ -105,10 +108,10 @@ socket.on('updateProjectiles', (backEndProjectiles) => {
    */
   for (const frontEndProjectileId in frontEndProjectiles) {
     if (!backEndProjectiles[frontEndProjectileId]) {
-      delete frontEndProjectiles[frontEndProjectileId]
+      delete frontEndProjectiles[frontEndProjectileId];
     }
   }
-})
+});
 
 //------------------------------
 // Handling Server Updates for Players
@@ -125,8 +128,9 @@ socket.on('updatePlayers', (backEndPlayers) => {
      * If a player with this id does not exist on the client,
      * create a new Player object using the server's data.
      */
+
     if (!frontEndPlayers[id]) {
-      frontEndPlayers[id] = new Player ({
+      frontEndPlayers[id] = new Player({
         x: backEndPlayer.x,
         y: backEndPlayer.y,
         radius: backEndPlayer.radius,
@@ -135,12 +139,6 @@ socket.on('updatePlayers', (backEndPlayers) => {
         health: backEndPlayer.health,  
         speed: backEndPlayer.speed,
       })
-      
-      // Add this player to the leaderboard 
-      document.querySelector('#playerLabels').innerHTML += 
-        `<div data-id="${id}" data-score="${backEndPlayer.score}">
-          ${backEndPlayer.username}: ${backEndPlayer.score}
-         </div>`
     } else {
       frontEndPlayer = frontEndPlayers[id]
       // Updates the player equipped weapon in the front end
@@ -157,29 +155,6 @@ socket.on('updatePlayers', (backEndPlayers) => {
       // Update player health in the frontend
       frontEndPlayer.health = backEndPlayer.health
 
-      // Update the player’s score in the leaderboard
-      document.querySelector(`div[data-id="${id}"]`).innerHTML = 
-        `${backEndPlayer.username}: ${backEndPlayer.score}`
-
-      document
-              .querySelector(`div[data-id="${id}"]`) // Selects a DOM element that matches the player's id
-              .setAttribute('data-score', backEndPlayer.score) // Updates the label in HTML to show the players latest score from the server
-
-      // Sort the players displayed in descending order by score
-      const parentDiv = document.querySelector('#playerLabels')
-      const childDivs = Array.from(parentDiv.querySelectorAll('div'))
-      childDivs.sort((a, b) => {
-        const scoreA = Number(a.getAttribute('data-score'))
-        const scoreB = Number(b.getAttribute('data-score'))
-        return scoreB - scoreA
-      })
-      childDivs.forEach((div) => {
-        parentDiv.removeChild(div)
-      })
-      childDivs.forEach((div) => {
-        parentDiv.appendChild(div)
-      })
-
       // Used for interpolation (moving the player closer to its new position)
       frontEndPlayer.target = {
         x: backEndPlayer.x,
@@ -187,37 +162,103 @@ socket.on('updatePlayers', (backEndPlayers) => {
       }
 
       if (id === socket.id) {
-        const lastBackendInputIndex = playerInputs.findIndex((input) => { // Gets the last input from the server of that player
-          return backEndPlayer.sequenceNumber === input.sequenceNumber
-        })
-
+        const lastBackendInputIndex = playerInputs.findIndex((input) => {
+          return backEndPlayer.sequenceNumber === input.sequenceNumber;
+        });
         if (lastBackendInputIndex > -1) {
-          playerInputs.splice(0, lastBackendInputIndex + 1)
+          playerInputs.splice(0, lastBackendInputIndex + 1);
         }
-
-        // Reapply remaining inputs
         playerInputs.forEach((input) => {
           frontEndPlayer.target.x += input.dx
           frontEndPlayer.target.y += input.dy
         })
       }
     }
+
+    /*
+     */
+    // Updates Player Waapon
+    // document.querySelector(
+    //   `tr[data-id="${id}weapon"]`
+    // ).innerHTML = `${backEndPlayer.equippedWeapon}`;
+    // Update Player Score to tabLeaderBoard
+    // document.querySelector(
+    //   `tr[data-id="${id}score"]`
+    // ).innerHTML = `${backEndPlayer.score}`;
+
+    // document.getElementById(id).style.color = color // breaks everything :(
   }
 
   // Remove any client-side players that no longer exist on the server
   for (const id in frontEndPlayers) {
     if (!backEndPlayers[id]) {
-      const divToDelete = document.querySelector(`div[data-id="${id}"]`)
-      divToDelete.parentNode.removeChild(divToDelete)
+      const divToDelete = document.querySelector(`div[data-id="${id}"]`);
+      divToDelete.parentNode.removeChild(divToDelete);
 
       // If the local player has been removed, show the username form again
       if (id === socket.id) {
-        document.querySelector('#usernameForm').style.display = 'block'
+        document.querySelector("#usernameForm").style.display = "block";
       }
-      delete frontEndPlayers[id]
+      delete frontEndPlayers[id];
     }
   }
-})
+});
+
+// Update LeaderBoard when ever new player joins, player dies, or player leaves
+socket.on("updateRanking", (topPlayers, backEndPlayers) => {
+  // Check if the local player exist in the frontEndPlayers
+  // If not, log a warning and return
+  if (!frontEndPlayers[socket.id]) {
+    console.warn(`Player ${socket.id} not exist in frontEndPlayers`);
+    return;
+  }
+
+  // Check if the local player is in the top 10 players in terms of score
+  const localPlayerInTop = topPlayers.some((p) => p.id === socket.id);
+
+  // If the local player is not in the top 10, mark them not rank and add them into the topPlayers array
+  if (!localPlayerInTop) {
+    frontEndPlayers[socket.id].notRanked = true;
+    topPlayers.push(frontEndPlayers[socket.id]);
+  }
+
+  // Find and clear the small leaderboard
+  const parentDiv = document.querySelector("#update-sleaderboard");
+  parentDiv.innerHTML = "";
+
+  // Loop through the topPlayers array and display them on the small leaderboard
+  // If a player mark unranked, display "X" as their rank
+  topPlayers.forEach((entry, index) => {
+    let rankDisplay = entry.notRanked ? "X" : index + 1;
+    const div = document.createElement("div");
+    div.setAttribute("data-id", entry.id);
+    div.setAttribute("data-score", entry.score);
+    div.setAttribute("data-username", entry.username);
+    div.style.display = "flex";
+    div.style.justifyContent = "space-between";
+    div.style.width = "100%";
+    div.style.color = entry.color;
+    div.innerHTML = `<span><strong>${rankDisplay}.</strong> ${entry.username}</span><span>${entry.score}</span>`;
+    parentDiv.appendChild(div);
+  });
+
+  // If lag being cause, make this more efficient instead of clearing the big leaderboard everytime
+  const bigLeaderBoard = document.querySelector("#playerLabelsLead");
+  bigLeaderBoard.innerHTML = "";
+
+  // Loop through backEndPlayers and display them on the big leaderboard
+  for (const id in backEndPlayers) {
+    const backendPlayer = backEndPlayers[id];
+    document.querySelector("#playerLabelsLead").innerHTML += `
+          <tr>
+            <td>${backendPlayer.class}</td>
+            <td>${backendPlayer.username}</td>
+            <td data-id="${id}score">${backendPlayer.score}</td>
+            <td data-id="${id}weapon">Nothing</td>
+            <td>55%</td>
+          </tr>`;
+  }
+});
 
 // Waits for an updateWeapons from the back end to sync and spawn weapons
 socket.on('updateWeapons', (weaponData) =>{
@@ -254,8 +295,8 @@ socket.on('powerupCollected', (powerupData) => {
 
 
 // When a players joins it shows them the weapons that had spawned previously
-socket.on('updateWeaponsOnJoin', (backEndWeapons) => {
-  frontEndWeapons = {}
+socket.on("updateWeaponsOnJoin", (backEndWeapons) => {
+  frontEndWeapons = {};
 
   backEndWeapons.forEach((weapon) => {
     frontEndWeapons[weapon.id] = new WeaponDrawing(weapon)
@@ -300,11 +341,11 @@ socket.on('removeWeapon', (player) => {
  * 2) Moves players toward their target positions via interpolation
  * 3) Draws all players and projectiles
  */
-let animationId
+let animationId;
 function animate() {
-  animationId = requestAnimationFrame(animate) // Tells the browser we want to perform an animation
+  animationId = requestAnimationFrame(animate); // Tells the browser we want to perform an animation
   // c.fillStyle = 'rgba(0, 0, 0, 0.1)' // Optional "ghosting" effect if needed
-  c.clearRect(0, 0, canvas.width, canvas.height) // Clears the entire canvas
+  c.clearRect(0, 0, canvas.width, canvas.height); // Clears the entire canvas
 
   const now = performance.now()
   frames++
@@ -317,23 +358,37 @@ function animate() {
   }
 
 
+  const localPlayer = frontEndPlayers[socket.id];
+  let cameraX = 0,
+    cameraY = 0;
+  let pixelNumber = 2 * devicePixelRatio;
+
+  if (localPlayer) {
+    cameraX = localPlayer.x - canvas.width / pixelNumber;
+    cameraY = localPlayer.y - canvas.height / pixelNumber;
+  }
+
+  c.save();
+  c.translate(-cameraX, -cameraY);
+  c.drawImage(backgroundImage, 0, 0, 5000, 5000);
+
   // Interpolate and draw each player
   for (const id in frontEndPlayers) {
-    const frontEndPlayer = frontEndPlayers[id]
+    const frontEndPlayer = frontEndPlayers[id];
 
     // linear interpolation (move the player closer to its target)
     if (frontEndPlayer.target) {
       frontEndPlayers[id].x +=
-        (frontEndPlayers[id].target.x - frontEndPlayers[id].x) * 0.5
+        (frontEndPlayers[id].target.x - frontEndPlayers[id].x) * 0.5;
       frontEndPlayers[id].y +=
-        (frontEndPlayers[id].target.y - frontEndPlayers[id].y) * 0.5
+        (frontEndPlayers[id].target.y - frontEndPlayers[id].y) * 0.5;
     }
     frontEndPlayer.draw({ xPosition: frontEndPlayer.handXMove, angle: frontEndPlayer.aimAngle })
   }
 
-  for (const weapon in frontEndWeapons){
-    const frontEndWeapon = frontEndWeapons[weapon]
-    frontEndWeapon.draw()
+  for (const weapon in frontEndWeapons) {
+    const frontEndWeapon = frontEndWeapons[weapon];
+    frontEndWeapon.draw();
   }
 
   //Draw the PowerUps
@@ -341,16 +396,17 @@ function animate() {
     const frontEndPowerUp = frontEndPowerUps[powerUp];
     frontEndPowerUp.draw();
   }
-  
 
   // Draw each projectile
   for (const id in frontEndProjectiles) {
-    const frontEndProjectile = frontEndProjectiles[id]
-    frontEndProjectile.draw()
+    const frontEndProjectile = frontEndProjectiles[id];
+    frontEndProjectile.draw();
   }
+
+  c.restore();
 }
 
-animate()
+animate();
 
 // ------------------------------
 // Player Input Handling
@@ -366,17 +422,18 @@ const keys = {
   d: { pressed: false },
   q: { pressed: false },
   f: { pressed: false },
+  tab: { pressed: false },
   num1: { pressed: false },
-  num2: { pressed: false }
-}
+  num2: { pressed: false },
+};
 
 /**
- * We keep a local buffer (playerInputs) of all unacknowledged inputs. 
+ * We keep a local buffer (playerInputs) of all unacknowledged inputs.
  * The server eventually sends back a sequenceNumber acknowledging the last
  * processed input, and we remove old inputs from this list.
  */
-const playerInputs = []
-let sequenceNumber = 0
+const playerInputs = [];
+let sequenceNumber = 0;
 
 /**
  * Every 15 milliseconds, check which keys are pressed.
@@ -384,38 +441,38 @@ let sequenceNumber = 0
  */
 setInterval(() => {
   // Ensure the local player exists before trying to move
-  const player = frontEndPlayers[socket.id]
-  if (!player) return
+  const player = frontEndPlayers[socket.id];
+  if (!player) return;
 
   // Dynamically get the player's speed
-  const SPEED = 5 * player.speed 
+  const SPEED = 5 * player.speed;
 
   /**
    * Player movement
    */
 
   if (keys.w.pressed) {
-    sequenceNumber++
-    playerInputs.push({ sequenceNumber, dx: 0, dy: -SPEED })
-    socket.emit('keydown', { keycode: 'KeyW', sequenceNumber })
+    sequenceNumber++;
+    playerInputs.push({ sequenceNumber, dx: 0, dy: -SPEED });
+    socket.emit("keydown", { keycode: "KeyW", sequenceNumber });
   }
 
   if (keys.a.pressed) {
-    sequenceNumber++
-    playerInputs.push({ sequenceNumber, dx: -SPEED, dy: 0 })
-    socket.emit('keydown', { keycode: 'KeyA', sequenceNumber })
+    sequenceNumber++;
+    playerInputs.push({ sequenceNumber, dx: -SPEED, dy: 0 });
+    socket.emit("keydown", { keycode: "KeyA", sequenceNumber });
   }
 
   if (keys.s.pressed) {
-    sequenceNumber++
-    playerInputs.push({ sequenceNumber, dx: 0, dy: SPEED })
-    socket.emit('keydown', { keycode: 'KeyS', sequenceNumber })
+    sequenceNumber++;
+    playerInputs.push({ sequenceNumber, dx: 0, dy: SPEED });
+    socket.emit("keydown", { keycode: "KeyS", sequenceNumber });
   }
 
   if (keys.d.pressed) {
-    sequenceNumber++
+    sequenceNumber++;
     playerInputs.push({ sequenceNumber, dx: SPEED, dy: 0 })
-    socket.emit('keydown', { keycode: 'KeyD', sequenceNumber })
+    socket.emit("keydown", { keycode: "KeyD", sequenceNumber })
   }
 
   /**
@@ -435,30 +492,30 @@ setInterval(() => {
     }
 
   /**
-   * Inventory 
+   * Inventory
    */
   if (keys.num1.pressed) {
-    sequenceNumber++ 
-    playerInputs.push({ sequenceNumber, dx: 0, dy: 0 })
-    document.querySelector('#inventorySlot1').style.borderColor = "blue" // Highlights the first Inventory Slot
-    socket.emit('weaponSelected', { keycode: 'Digit1', sequenceNumber} ) // Emits the information back to the server
-  } else{
-    if (!keys.num1.pressed && keys.num2.pressed){
-      document.querySelector('#inventorySlot1').style.borderColor = "white" // Turns the inventory back to original color
+    sequenceNumber++;
+    playerInputs.push({ sequenceNumber, dx: 0, dy: 0 });
+    document.querySelector("#inventorySlot1").style.borderColor = "blue"; // Highlights the first Inventory Slot
+    socket.emit("weaponSelected", { keycode: "Digit1", sequenceNumber }); // Emits the information back to the server
+  } else {
+    if (!keys.num1.pressed && keys.num2.pressed) {
+      document.querySelector("#inventorySlot1").style.borderColor = "white"; // Turns the inventory back to original color
     }
   }
 
   if (keys.num2.pressed) {
-    sequenceNumber++
-    playerInputs.push({ sequenceNumber, dx: 0, dy: 0 })
-    document.querySelector('#inventorySlot2').style.borderColor = "blue" // Highlights the second Inventory Slot
-    socket.emit('weaponSelected', { keycode: 'Digit2', sequenceNumber} ) // Emits the information back to the server 
-  } else{
-    if (keys.num1.pressed && !keys.num2.pressed){
-      document.querySelector('#inventorySlot2').style.borderColor = "white" // Turns the inventory back to original color
+    sequenceNumber++;
+    playerInputs.push({ sequenceNumber, dx: 0, dy: 0 });
+    document.querySelector("#inventorySlot2").style.borderColor = "blue"; // Highlights the second Inventory Slot
+    socket.emit("weaponSelected", { keycode: "Digit2", sequenceNumber }); // Emits the information back to the server
+  } else {
+    if (keys.num1.pressed && !keys.num2.pressed) {
+      document.querySelector("#inventorySlot2").style.borderColor = "white"; // Turns the inventory back to original color
     }
   }
-}, 15) // (default: 15)
+}, 15); // (default: 15)
 
 // ------------------------------
 // Event Listeners for Key Presses
@@ -467,58 +524,61 @@ setInterval(() => {
  * Listen for keydown events and mark the corresponding key as pressed.
  * This allows for continuous movement while the key is held.
  */
-window.addEventListener('keydown', (event) => {
+window.addEventListener("keydown", (event) => {
   // If the local player's data is not yet available, ignore input events
-  if (!frontEndPlayers[socket.id]) return
+  if (!frontEndPlayers[socket.id]) return;
 
-  
-  if ((event.code === 'Digit1' || event.code === 'Digit2') && event.repeat) return
+  if ((event.code === "Digit1" || event.code === "Digit2") && event.repeat)
+    return;
 
   switch (event.code) {
-    case 'KeyW':
+    case "KeyW":
       keys.w.pressed = true
-      break
-    case 'KeyA':
+      break;
+    case "KeyA":
       keys.a.pressed = true
-      break
-    case 'KeyS':
+      break;
+    case "KeyS":
       keys.s.pressed = true
-      break
-    case 'KeyD':
+      break;
+    case "KeyD":
       keys.d.pressed = true
-      break
+      break;
     case 'KeyQ':
       keys.q.pressed = true
       break
     case 'KeyF':
       keys.f.pressed = true
       break
-    case 'Digit1':
+    case "Tab":
+      keys.tab.pressed = true
+      break;
+    case "Digit1":
       keys.num1.pressed = true
-      break
-    case 'Digit2':
+      break;
+    case "Digit2":
       keys.num2.pressed = true
-      break
+      break;
   }
-})
+});
 
 /**
  * Listen for keyup events and mark the corresponding key as no longer pressed.
  */
-window.addEventListener('keyup', (event) => {
-  if (!frontEndPlayers[socket.id]) return
+window.addEventListener("keyup", (event) => {
+  if (!frontEndPlayers[socket.id]) return;
 
   switch (event.code) {
-    case 'KeyW':
+    case "KeyW":
       keys.w.pressed = false
       break
-    case 'KeyA':
+    case "KeyA":
       keys.a.pressed = false
-      break
-    case 'KeyS':
+      break;
+    case "KeyS":
       keys.s.pressed = false
       break
-    case 'KeyD':
+    case "KeyD":
       keys.d.pressed = false
       break
     case 'KeyQ':
@@ -527,29 +587,33 @@ window.addEventListener('keyup', (event) => {
     case 'KeyF':
       keys.f.pressed = false
       break
-    case 'Digit1':
+    case "Tab":
+      keys.tab.pressed = false
+      // console.log("Tab up")
+      break
+    case "Digit1":
       keys.num1.pressed = false
       break
-    case 'Digit2':
+    case "Digit2":
       keys.num2.pressed = false
       break
   }
-})
+});
 
 // ------------------------------
 // Class Selection Handling
 // ------------------------------
-const classSelectors = ["Tank", "Rogue", "Mage", "Gunner"] // Possible classes
-let classSelection = 0 // Starts in Tank
-let className = classSelectors[classSelection] // Selects the class
+const classSelectors = ["Tank", "Rogue", "Mage", "Gunner"]; // Possible classes
+let classSelection = 0; // Starts in Tank
+let className = classSelectors[classSelection]; // Selects the class
 
 /**
  * Cycles forward in the array
  * @returns the selected class
  */
 function nextClass() {
-  classSelection = (classSelection + 1) % (classSelectors.length)
-  return classSelectors[classSelection]
+  classSelection = (classSelection + 1) % classSelectors.length;
+  return classSelectors[classSelection];
 }
 
 /**
@@ -557,23 +621,24 @@ function nextClass() {
  * @returns the selected class
  */
 function previousClass() {
-  classSelection = (classSelection - 1 + classSelectors.length) % classSelectors.length
-  return classSelectors[classSelection]
+  classSelection =
+    (classSelection - 1 + classSelectors.length) % classSelectors.length;
+  return classSelectors[classSelection];
 }
 
-document.querySelector('#showClass').textContent = "Class: " + className // Displays the first class
+document.querySelector("#showClass").textContent = "Class: " + className; // Displays the first class
 
-// When the user clicks the -> arrow it goes to the next class  
-document.querySelector('#classSelectorRight').addEventListener('click', () => { 
-  className = nextClass()
-  document.querySelector('#showClass').textContent = "Class: " + className
-})
+// When the user clicks the -> arrow it goes to the next class
+document.querySelector("#classSelectorRight").addEventListener("click", () => {
+  className = nextClass();
+  document.querySelector("#showClass").textContent = "Class: " + className;
+});
 
-// When the user clicks the <- arrow it goes to the previous class 
-document.querySelector('#classSelectorLeft').addEventListener('click', () => {
-  className = previousClass()
-  document.querySelector('#showClass').textContent = "Class: " + className
-})
+// When the user clicks the <- arrow it goes to the previous class
+document.querySelector("#classSelectorLeft").addEventListener("click", () => {
+  className = previousClass();
+  document.querySelector("#showClass").textContent = "Class: " + className;
+});
 
 // ------------------------------
 // Random Username Handling
@@ -583,25 +648,25 @@ document.querySelector('#classSelectorLeft').addEventListener('click', () => {
  * If the generated name is taken, recurse until a unique name is found.
  */
 function selectName() {
-  let playerNameNumber = Math.floor(Math.random() * playerNames.length)
-  let name = playerNames[playerNameNumber] 
-  for (const id in frontEndPlayers) { 
+  let playerNameNumber = Math.floor(Math.random() * playerNames.length);
+  let name = playerNames[playerNameNumber];
+  for (const id in frontEndPlayers) {
     if (frontEndPlayers[id].username === name) {
       // If name is already taken by a current player, try again
-      return selectName()
+      return selectName();
     }
   }
-  return name
+  return name;
 }
 
-let playerName = selectName()
-document.querySelector('#selectedRandomName').textContent = playerName
+let playerName = selectName();
+document.querySelector("#selectedRandomName").textContent = playerName;
 
-document.querySelector('#randomNameBtn').addEventListener('click', () => {
+document.querySelector("#randomNameBtn").addEventListener("click", () => {
   // Generate a new random name when clicked
-  playerName = selectName()
-  document.querySelector('#selectedRandomName').textContent = playerName
-})
+  playerName = selectName();
+  document.querySelector("#selectedRandomName").textContent = playerName;
+});
 
 // ------------------------------
 // Username Form Handling
@@ -617,11 +682,31 @@ document.querySelector('#usernameForm').addEventListener('submit', (event) => {
   document.querySelector('#usernameForm').style.display = 'none' // Hides the username form
   document.querySelector('#inventoryArea').style.display = 'flex'
   // Send data to the server to initialize the player
-  socket.emit('initGame', {
+  socket.emit("initGame", {
     width: canvas.width,
     height: canvas.height,
     devicePixelRatio,
     username: playerName,
-    className
-  })
-})
+    className,
+  });
+});
+
+// ------------------------------
+// Leader Board Show Handler
+// ------------------------------
+document.addEventListener("keydown", function (event) {
+  if (event.key === "Tab") {
+    event.preventDefault(); // Prevent default tab behavior
+    document.querySelector(".leaderboard").style.display = "block";
+  }
+});
+
+document.addEventListener("keyup", function (event) {
+  if (event.key === "Tab") {
+    document.querySelector(".leaderboard").style.display = "none";
+  }
+});
+
+// ------------------------------
+// MiniMap Handler
+// ------------------------------

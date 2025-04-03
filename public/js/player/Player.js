@@ -1,4 +1,3 @@
-
 /** Represents a player in the game. Each player has:
  * - A position (`x`, `y`)
  * - A visual representation (a colored circle)
@@ -66,14 +65,14 @@ class Player {
     // 
     c.save()
     c.translate(this.x, this.y)
-    c.rotate(this.aimAngle)
+    c.rotate(angle)
   
     // Body
     c.shadowColor = this.color
     c.shadowBlur = 20
     c.beginPath()
     c.fillStyle = this.color
-    c.arc(0, 0, this.radius, 0, Math.PI * 2) // << draw from center now
+    c.arc(0, 0, this.radius, 0, Math.PI * 2) // draw from center
     c.fill()
   
     // Draw facing indicator – optional: pointer or "eye"
