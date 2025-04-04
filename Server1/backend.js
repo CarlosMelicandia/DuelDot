@@ -158,6 +158,7 @@ io.on("connection", (socket) => {
     io.emit("updatePlayers", backEndPlayers); // Send an updated player list to all clients
     updateLeaderBoard(backEndPlayers, io); // Update the leaderboard when a new player join
     socket.emit("updateWeaponsOnJoin", backEndWeapons); // Send the current list of weapons to the new player
+    socket.emit("updatePowerUpsOnJoin", backEndPowerUps)
   })
 
   /**

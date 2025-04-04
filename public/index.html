@@ -207,7 +207,8 @@
       id="fpsCounter" 
       style="
         position:absolute; 
-        top:10px; left:170px; 
+        top:10px; 
+        left:170px; 
         color:white; 
         font-family:monospace;
         z-index: 3">FPS: --</div>
@@ -216,9 +217,11 @@
         id="pingDisplay" 
         style="
         position:absolute; 
-        top:30px; left:10px; 
+        top:30px; 
+        left:170px; 
         color:white; 
-        font-family:monospace;">Ping: --</div>
+        font-family:monospace;
+        z-index: 2;">Ping: --</div>
 
       <!-- Inventory slots -->
       <div 
@@ -392,8 +395,11 @@
     ></script>
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
     <script src="./js/frontend.js"></script>
-    <script src="./js/player/Player.js"></script>
+    <script src="./js/Leaderboard.js"></script>
+    <script src="./js/Minimap.js"></script>
+    <script src="./js/FrontPlayer/Player.js"></script>
     <script src="./js/FrontPowerUps/PowerUpDrawing.js"></script>
+    <script src="./js/FrontPowerUps/PowerUpInteractions.js"></script>
     <script src="./js/FrontWeaponStuff/WeaponDrawning.js"></script>
     <script src="./js/FrontWeaponStuff/WeaponInteraction.js"></script>
     <script src="./js/FrontWeaponStuff/Projectile.js"></script>

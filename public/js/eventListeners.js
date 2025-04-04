@@ -9,7 +9,7 @@ const canvasRect = canvas.getBoundingClientRect(); // Gets the top and left posi
 let cameraX = 0, cameraY = 0;
 let pixelNumber = 2 * devicePixelRatio;
 
-addEventListener("click", (event) => {
+window.addEventListener("click", (event) => {
   const player = frontEndPlayers[socket.id]
   
   // Ensure the local player exists before proceeding
@@ -58,7 +58,7 @@ addEventListener("click", (event) => {
     })
 })
 
-addEventListener('mousemove', (event) => {
+window.addEventListener('mousemove', (event) => {
   const player = frontEndPlayers[socket.id]
   
   if (!player) return
@@ -76,3 +76,86 @@ addEventListener('mousemove', (event) => {
 
   socket.emit('updateHands', mouseAngle)
 })
+
+// ------------------------------
+// Event Listeners for Key Presses
+// ------------------------------
+/**
+ * Listen for keydown events and mark the corresponding key as pressed.
+ * This allows for continuous movement while the key is held.
+ */
+window.addEventListener("keydown", (event) => {
+  // If the local player's data is not yet available, ignore input events
+  if (!frontEndPlayers[socket.id]) return;
+
+  if ((event.code === "Digit1" || event.code === "Digit2") && event.repeat)
+    return;
+
+  switch (event.code) {
+    case "KeyW":
+      keys.w.pressed = true
+      break;
+    case "KeyA":
+      keys.a.pressed = true
+      break;
+    case "KeyS":
+      keys.s.pressed = true
+      break;
+    case "KeyD":
+      keys.d.pressed = true
+      break;
+    case 'KeyQ':
+      keys.q.pressed = true
+      break
+    case 'KeyF':
+      keys.f.pressed = true
+      break
+    case "Tab":
+      keys.tab.pressed = true
+      break;
+    case "Digit1":
+      keys.num1.pressed = true
+      break;
+    case "Digit2":
+      keys.num2.pressed = true
+      break;
+  }
+});
+
+/**
+ * Listen for keyup events and mark the corresponding key as no longer pressed.
+ */
+window.addEventListener("keyup", (event) => {
+  if (!frontEndPlayers[socket.id]) return;
+
+  switch (event.code) {
+    case "KeyW":
+      keys.w.pressed = false
+      break
+    case "KeyA":
+      keys.a.pressed = false
+      break;
+    case "KeyS":
+      keys.s.pressed = false
+      break
+    case "KeyD":
+      keys.d.pressed = false
+      break
+    case 'KeyQ':
+      keys.q.pressed = false
+      break
+    case 'KeyF':
+      keys.f.pressed = false
+      break
+    case "Tab":
+      keys.tab.pressed = false
+      // console.log("Tab up")
+      break
+    case "Digit1":
+      keys.num1.pressed = false
+      break
+    case "Digit2":
+      keys.num2.pressed = false
+      break
+  }
+});
