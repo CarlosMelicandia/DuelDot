@@ -38,6 +38,14 @@ class BasePlayer {
       this.health = 0 // Current health (set by subclasses)
       this.maxHealth = 0 // Maximum health value (set by subclasses)
       this.speed = 0 // Movement speed (set by subclasses)
+      this.originalSpeed = 0
+
+      // Power ups default properties 
+      this.hasMultiShot = false
+      this.damageMultiplier = 1
+      this.shieldAmount = 0
+      this.hasPowerUp = false
+      this.activePowerups = null
 
       // Default Weapon multipliers
       this.lightWpnMtp = 1.0

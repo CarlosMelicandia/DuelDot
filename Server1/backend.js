@@ -21,7 +21,7 @@ const {
   checkCollision, weaponDrop,
 } = require("./WeaponStuff/BackWeaponLogic.js");
 const { updateLeaderBoard } = require("./backendLeaderBoard.js");
-const { spawnPowerUps, checkPowerUpCollision } = require('./PowerUps/BackEndPowerUps.js')
+const { spawnPowerUps, checkPowerUpCollision } = require('./PowerUps/BackPowerUpLogic.js')
 
 // ------------------------------
 // Socket.IO Setup
@@ -29,6 +29,7 @@ const { spawnPowerUps, checkPowerUpCollision } = require('./PowerUps/BackEndPowe
 const http = require("http"); // Import Node's built-in HTTP module
 const server = http.createServer(app); // Create an HTTP server using the Express app
 const { Server } = require("socket.io"); // Import the Socket.IO Server class
+const { PowerUp } = require('./PowerUps/BackPowerUps.js')
 
 /**
  * Creates a Socket.io server instance
@@ -62,7 +63,7 @@ const GAME_WIDTH = 5000; // Default width
 const GAME_HEIGHT = 5000; // Default height
 
 const PROJECTILE_RADIUS = 5 // Radius of projectiles
-let projectileId = 0 // Unique ID counter for each projectile create
+let projectileId = 0 // Unique ID counter for each projectile created
 
 const FIST = new Fist() // initiates the fist
 
@@ -83,14 +84,20 @@ io.on("connection", (socket) => {
     if (!player || player.equippedWeapon.type == "melee")return // checks that the player is alive and doesn't have a melee
     
     if (player.canShoot) { 
-      const fireRate = backEndPlayers[socket.id].equippedWeapon.fireRate * 1000
+      let fireRate = 0;
+      if (!player.hasRapidFire) {
+        fireRate = backEndPlayers[socket.id].equippedWeapon.fireRate * 1000
+      } else {
+        fireRate = backEndPlayers[socket.id].equippedWeapon.fireRate * 1000 / 10
+      }
+
       const createProjectile = (projectileAngle) => {
       projectileId++ // Increment the projectile ID
 
       // Calculate the velocity of the projectile based on the angle provided by the client
       const velocity = {
-        x: Math.cos(angle) * 5,  //Weapon Velocity 
-        y: Math.sin(angle) * 5   // Weapon Velocity
+        x: Math.cos(projectileAngle) * 5,  //Weapon Velocity 
+        y: Math.sin(projectileAngle) * 5   // Weapon Velocity
       }
 
       // Create a new server-side projectile
@@ -106,9 +113,10 @@ io.on("connection", (socket) => {
 
     // If multi-shot is active, create additional projectiles
     if (player.hasMultiShot) {
-      const spreadAngle = 15 * (Math.PI / 180) // 15 degrees in radians
+      const spreadAngle = 30 * (Math.PI / 180) // 15 degrees in radians
       createProjectile(angle - spreadAngle) // Left shot
       createProjectile(angle + spreadAngle) // Right shot
+      
     }
 
       // Delay Calculation 
@@ -158,6 +166,7 @@ io.on("connection", (socket) => {
     io.emit("updatePlayers", backEndPlayers); // Send an updated player list to all clients
     updateLeaderBoard(backEndPlayers, io); // Update the leaderboard when a new player join
     socket.emit("updateWeaponsOnJoin", backEndWeapons); // Send the current list of weapons to the new player
+    socket.emit("updatePowerUpsOnJoin", backEndPowerUps)
   })
 
   /**
@@ -389,6 +398,22 @@ setInterval(() => {
         if (totalDamage > 0) { // Checks if this line is needed
           backEndPlayer.health -= totalDamage
         }
+
+        if (shooter.hasFire) { 
+          // Fire effect is active, so we start applying periodic damage
+      
+          const fireInterval = setInterval(() => {
+              
+              backEndPlayer.health -= 35;
+          }, 3000); // Damage occurs in 3-second intervals
+      
+          // Stop the fire effect after 5 seconds
+          setTimeout(() => {
+              clearInterval(fireInterval); // Clears the interval so damage stops
+          }, 5000);
+      }
+
+      
       }
 
         // If health reaches 0, remove the player and reward the shooter

@@ -275,6 +275,10 @@ socket.on('dropWeapon', (weaponData) => {
   frontEndWeapons[weaponData.id] = new WeaponDrawing(weaponData)
 }) 
 
+socket.on("removePowerUp", (powerUp) => {
+  delete frontEndPowerUps[powerUp.id]; // Remove from frontend state
+})
+
 socket.on('updatePowerUps', (backEndPowerUps, powerUpData) => {
   if (powerUpData.remove) { // If the power-up was collected, remove it
     delete frontEndPowerUps[powerUpData.id];
@@ -284,6 +288,7 @@ socket.on('updatePowerUps', (backEndPowerUps, powerUpData) => {
     }
   }
 });
+
 
 socket.on('powerupCollected', (powerupData) => {
   const player = frontEndPlayers[socket.id];
@@ -306,7 +311,7 @@ socket.on("updateWeaponsOnJoin", (backEndWeapons) => {
 socket.on('updatePowerUpsOnJoin', (backEndPowerUps) => {
   frontEndPowerUps = {};
   backEndPowerUps.forEach((powerUp) => {
-    frontEndPowerUps[powerUp.id] = new PowerUpDrawing(powerUp);
+    frontEndPowerUps[powerUp.id] = new PowerUps(powerUp);
   });
 });
 
@@ -391,7 +396,7 @@ function animate() {
     frontEndWeapon.draw();
   }
 
-  //Draw the PowerUps
+  // Draw the PowerUps
   for (const powerUp in frontEndPowerUps) {
     const frontEndPowerUp = frontEndPowerUps[powerUp];
     frontEndPowerUp.draw();
