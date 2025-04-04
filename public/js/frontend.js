@@ -29,6 +29,14 @@ const backgroundImage = new Image();
 backgroundImage.src = "../assets/background.png";
 
 // ------------------------------
+// Minimap canvas and context
+// ------------------------------
+const miniMap = document.querySelector("#miniMapC")
+const miniMapCtx = miniMap.getContext("2d")
+miniMap.width = 150
+miniMap.height = 150
+
+// ------------------------------
 // Possible Random Player Names
 // ------------------------------
 const playerNames = [
@@ -177,26 +185,13 @@ socket.on('updatePlayers', (backEndPlayers) => {
         })
       }
     }
-
-    /*
-     */
-    // Updates Player Waapon
-    // document.querySelector(
-    //   `tr[data-id="${id}weapon"]`
-    // ).innerHTML = `${backEndPlayer.equippedWeapon}`;
-    // Update Player Score to tabLeaderBoard
-    // document.querySelector(
-    //   `tr[data-id="${id}score"]`
-    // ).innerHTML = `${backEndPlayer.score}`;
-
-    // document.getElementById(id).style.color = color // breaks everything :(
   }
 
   // Remove any client-side players that no longer exist on the server
   for (const id in frontEndPlayers) {
     if (!backEndPlayers[id]) {
       const divToDelete = document.querySelector(`div[data-id="${id}"]`);
-      divToDelete.parentNode.removeChild(divToDelete);
+      //divToDelete.parentNode.removeChild(divToDelete);
 
       // If the local player has been removed, show the username form again
       if (id === socket.id) {
@@ -263,21 +258,6 @@ socket.on("updateRanking", (topPlayers, backEndPlayers) => {
   }
 });
 
-// Waits for an updateWeapons from the back end to sync and spawn weapons
-socket.on('updateWeapons', (weaponData) =>{
-  if (weaponData.remove){ // if the weapon has been removed due to collision
-    delete frontEndWeapons[weaponData.id] // deletes weapon
-  }else{
-    if (!frontEndWeapons[weaponData.id]){ // Creates the weapon in the frontEnd if it doesn't exist
-      frontEndWeapons[weaponData.id] = new WeaponDrawing(weaponData) // Contains only x, y, type, radius, and color
-    }
-  }
-})
-
-socket.on('dropWeapon', (weaponData) => {
-  frontEndWeapons[weaponData.id] = new WeaponDrawing(weaponData)
-}) 
-
 socket.on('updatePowerUps', (backEndPowerUps, powerUpData) => {
   if (powerUpData.remove) { // If the power-up was collected, remove it
     delete frontEndPowerUps[powerUpData.id];
@@ -296,15 +276,6 @@ socket.on('powerupCollected', (powerupData) => {
   player.applyPowerup(powerupData.type, powerupData.duration);
 });
 
-
-// When a players joins it shows them the weapons that had spawned previously
-socket.on("updateWeaponsOnJoin", (backEndWeapons) => {
-  frontEndWeapons = {};
-
-  backEndWeapons.forEach((weapon) => {
-    frontEndWeapons[weapon.id] = new WeaponDrawing(weapon)
-  })
-})
 
 socket.on('updatePowerUpsOnJoin', (backEndPowerUps) => {
   frontEndPowerUps = {};
@@ -377,25 +348,28 @@ function animate() {
 
     document.querySelector('#fpsCounter').textContent = `FPS: ${fps}`
   }
+  
+  const localPlayer = frontEndPlayers[socket.id]
 
+  if (!localPlayer) return
 
-  const localPlayer = frontEndPlayers[socket.id];
   let cameraX = 0,
     cameraY = 0;
   let pixelNumber = 2 * devicePixelRatio;
-
-  if (localPlayer) {
-    cameraX = localPlayer.x - canvas.width / pixelNumber;
-    cameraY = localPlayer.y - canvas.height / pixelNumber;
-  }
+  
+  cameraX = localPlayer.x - canvas.width / pixelNumber;
+  cameraY = localPlayer.y - canvas.height / pixelNumber;
 
   c.save();
   c.translate(-cameraX, -cameraY);
   c.drawImage(backgroundImage, 0, 0, 5000, 5000);
 
+  miniMapCtx.clearRect(0, 0, miniMap.width, miniMap.height)
   // Interpolate and draw each player
   for (const id in frontEndPlayers) {
     const frontEndPlayer = frontEndPlayers[id];
+
+    drawOnMiniMap(frontEndPlayer)
 
     // linear interpolation (move the player closer to its target)
     if (frontEndPlayer.target) {
@@ -410,12 +384,14 @@ function animate() {
   for (const weapon in frontEndWeapons) {
     const frontEndWeapon = frontEndWeapons[weapon];
     frontEndWeapon.draw();
+    drawOnMiniMap(frontEndWeapon)
   }
 
   //Draw the PowerUps
   for (const powerUp in frontEndPowerUps) {
     const frontEndPowerUp = frontEndPowerUps[powerUp];
     frontEndPowerUp.draw();
+    drawOnMiniMap(frontEndPowerUp)
   }
 
   // Draw each projectile
@@ -622,6 +598,39 @@ window.addEventListener("keyup", (event) => {
 });
 
 // ------------------------------
+// Mini Map
+// ------------------------------
+function drawOnMiniMap(item, worldWidth = 5000, worldHeight = 5000) {
+  const minimapScaleX = miniMap.width / worldWidth
+  const minimapScaleY = miniMap.height / worldHeight
+
+  const miniX = item.x * minimapScaleX
+  const miniY = item.y * minimapScaleY
+
+  if (item instanceof Player){
+    miniMapCtx.beginPath()
+    miniMapCtx.arc(miniX, miniY, 2, 0, Math.PI * 2)
+    miniMapCtx.fillStyle = item.color
+    miniMapCtx.fill()
+    miniMapCtx.closePath()
+  } else if (item instanceof WeaponDrawing){
+    miniMapCtx.beginPath()
+    miniMapCtx.rect(miniX, miniY, 4, 4)
+    miniMapCtx.fillStyle = "yellow";
+    miniMapCtx.fill()
+    miniMapCtx.closePath()
+  } else if (item instanceof PowerUpDrawing){
+    miniMapCtx.beginPath();
+    miniMapCtx.moveTo(miniX, miniY - 4)
+    miniMapCtx.lineTo(miniX - 4, miniY)
+    miniMapCtx.lineTo(miniX + 4, miniY)
+    miniMapCtx.fillStyle = "green"
+    miniMapCtx.fill()
+    miniMapCtx.closePath()
+  }
+}
+
+// ------------------------------
 // Class Selection Handling
 // ------------------------------
 const classSelectors = ["Tank", "Rogue", "Mage", "Gunner"]; // Possible classes
@@ -728,6 +737,3 @@ document.addEventListener("keyup", function (event) {
   }
 });
 
-// ------------------------------
-// MiniMap Handler
-// ------------------------------

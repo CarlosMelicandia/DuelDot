@@ -2,17 +2,17 @@
 // Power-up Spawner Logic
 // ------------------------------
 
-const GAME_WIDTH = 1024 // Default width
-const GAME_HEIGHT = 576 // Default height
+const GAME_WIDTH = 5000 // Default width
+const GAME_HEIGHT = 5000 // Default height
 let powerUpId = 0; // Unique ID counter for power-ups
 
 const POWERUP_DURATION = 5000;
 
 
 function spawnPowerUps(backEndPowerUps, io) {
-  const maxX = GAME_WIDTH - 50;
-  const maxY = GAME_HEIGHT - 50;
-  const min = 50;
+  const maxX = GAME_WIDTH - 100;
+  const maxY = GAME_HEIGHT - 100;
+  const min = 100;
 
   setInterval(() => {
     if (backEndPowerUps.length > 15) return; // Limit number of power-ups
