@@ -19,7 +19,8 @@ class PowerUps {
         "health": "../assets/HealthPU.png",
         "damage": "../assets/DamagePU.png",
         "shield": "../assets/ShieldPU.png",
-        "rapid": "../assets/RapidFirePU.png"
+        "rapid": "../assets/RapidFirePU.png",
+        "fire": "../assets/FirePU.png",
       };
   
       // Colors for the glow effect based on powerup type
@@ -30,6 +31,7 @@ class PowerUps {
         "damage": "#FFA500", // Orange
         "shield": "#4bb3e1", //Blue
         "rapid": "#ff8600", // Orange-ish
+        "fire": "#FF4500",  // Orange-Red
       };
   
       this.image.src = powerUpImages[this.type] || "../assets/DefaultPU.png";

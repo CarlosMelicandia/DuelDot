@@ -2,7 +2,7 @@
 // Power-up Spawner Logic
 // ------------------------------
 
-const { MultiShot, Speed, Health, Damage, Shield, Rapid} = require("./BackPowerUps");
+const { MultiShot, Speed, Health, Damage, Shield, Rapid, Fire} = require("./BackPowerUps");
 
 const GAME_WIDTH = 1024 // Default width
 const GAME_HEIGHT = 576 // Default height
@@ -29,7 +29,7 @@ function spawnPowerUps(backEndPowerUps, io) {
         let spawnX = Math.random() * (maxX - min) + min;
         let spawnY = Math.random() * (maxY - min) + min;
 
-        const powerUpTypes = ["speed", "multiShot", "health", "damage", "shield","rapid"];
+        const powerUpTypes = ["speed", "multiShot", "health", "damage", "shield","rapid","fire"];
         let powerUpType = powerUpTypes[Math.floor(Math.random() * powerUpTypes.length)];
 
         let newPowerUpId = powerUpId++; // Generate unique ID
@@ -56,42 +56,44 @@ function spawnPowerUps(backEndPowerUps, io) {
 // ------------------------------
 function checkPowerUpCollision(backEndPowerUps, io, player) {
   for (let i = backEndPowerUps.length - 1; i >= 0; i--) {
-      let powerUp = backEndPowerUps[i];
-      let dist = Math.hypot(player.x - powerUp.x, player.y - powerUp.y);
+    let powerUp = backEndPowerUps[i];
+    let dist = Math.hypot(player.x - powerUp.x, player.y - powerUp.y);
 
-      if (dist < player.radius + powerUp.radius) { // Collision detected
-          const powerUpClasses = {
-              speed: Speed,
-              multiShot: MultiShot,
-              health: Health,
-              damage: Damage,
-              shield: Shield,
-              rapid: Rapid
-          };
-          const PowerUpClass = powerUpClasses[powerUp.type];
+    if (dist < player.radius + powerUp.radius) { // Collision detected
+        const powerUpClasses = {
+            speed: Speed,
+            multiShot: MultiShot,
+            health: Health,
+            damage: Damage,
+            shield: Shield,
+            rapid: Rapid,
+            fire: Fire,
+        };
+        const PowerUpClass = powerUpClasses[powerUp.type];
 
-          if (PowerUpClass) {
-              console.log(`Collision detected for PowerUp ID=${powerUp.id}, Type=${powerUp.type}`);
-              
-              // Apply powerup effects
-              const powerUpInstance = new PowerUpClass(player, powerUp.id);
-              powerUpInstance.apply();
+        if (PowerUpClass) {
+            console.log(`Collision detected for PowerUp ID=${powerUp.id}, Type=${powerUp.type}`);
+            
+            // Apply powerup effects
+            const powerUpInstance = new PowerUpClass(player, powerUp.id);
+            powerUpInstance.apply();
 
-              // Remove powerup from backend and notify frontend
-              backEndPowerUps.splice(i, 1);
-              io.emit("removePowerUp", { id: powerUp.id, remove: true });
-              console.log(`PowerUp ID=${powerUp.id} removed from backend and emitted to frontend.`);
+            // Remove powerup from backend and notify frontend
+            backEndPowerUps.splice(i, 1);
+            io.emit("removePowerUp", { id: powerUp.id, remove: true });
+            console.log(`PowerUp ID=${powerUp.id} removed from backend and emitted to frontend.`);
 
-              // Check if spawning should restart
-              if (backEndPowerUps.length < 15 && !spawning) {
-                  console.log("Powerup count below limit. Restarting spawn process.");
-                  spawning = true;
-                  spawnPowerUps(backEndPowerUps, io); // Restart spawning
-              }
-          }
-      }
+            // Check if spawning should restart
+            if (backEndPowerUps.length < 13 && !spawning) {
+                console.log("Powerup count below limit. Restarting spawn process.");
+                spawning = true;
+                spawnPowerUps(backEndPowerUps, io); // Restart spawning
+            }
+        }
+    }
   }
 }
+
 
 // Modify the projectile collision handler to account for shield and damage multipliers
 function handleProjectileCollision(projectile, targetPlayer, shooterId) {

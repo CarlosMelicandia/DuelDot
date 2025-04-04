@@ -331,6 +331,22 @@ setInterval(() => {
         if (totalDamage > 0) {
           backEndPlayer.health -= totalDamage
         }
+
+        if (shooter.hasFire) { 
+          // Fire effect is active, so we start applying periodic damage
+      
+          const fireInterval = setInterval(() => {
+              
+              backEndPlayer.health -= 35;
+          }, 3000); // Damage occurs in 3-second intervals
+      
+          // Stop the fire effect after 5 seconds
+          setTimeout(() => {
+              clearInterval(fireInterval); // Clears the interval so damage stops
+          }, 5000);
+      }
+
+      
       }
 
         // If health reaches 0, remove the player and reward the shooter

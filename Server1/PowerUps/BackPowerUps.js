@@ -1,47 +1,66 @@
-// PowerUps.js
+// ------------------------------
+// Base PowerUp Class
+// ------------------------------
+
 class PowerUp {
     constructor(name, type, duration, player, id) {
-        this.name = name;
-        this.type = type;
-        this.duration = duration; // in ms
-        this.player = player;
-        this.activePowerups = {};
-        this.id = id;
-        console.log(`PowerUp created: ID=${this.id}, Type=${this.type}, Duration=${this.duration}`);
+        this.name = name; // Name of the powerup
+        this.type = type; // Type identifier for the powerup
+        this.duration = duration; // Duration in milliseconds
+        this.player = player; // The player who picked up the powerup
+        this.activePowerups = {}; // Store active powerups
+        this.id = id; // Unique ID for tracking
 
+        console.log(`PowerUp created: ID=${this.id}, Type=${this.type}, Duration=${this.duration}`);
     }
 }
+
+// ------------------------------
+// Speed PowerUp - Increases Player Speed
+// ------------------------------
 
 class Speed extends PowerUp {
     constructor(player, id) {
         super("SpeedUp", "speed", 5000, player, id);
-        this.speedMultiplier = 1.8;
+        this.speedMultiplier = 1.8; // Speed increase factor
     }
 
     apply() {
+        console.log(`Applying ${this.type} powerup to player.`);
+        
+        // Save original speed if it hasn't been stored
         if (!this.player.originalSpeed) this.player.originalSpeed = this.player.speed;
-          this.player.speed = this.player.originalSpeed * 1.8; // Increase speed
-          
-          // Store powerup info to display the aura
-          this.player.activePowerups = this.player.activePowerups || {};
-          this.player.activePowerups.speed = {
+
+        // Apply speed increase
+        this.player.speed = this.player.originalSpeed * this.speedMultiplier;
+        
+        // Store powerup info for tracking
+        this.player.activePowerups = this.player.activePowerups || {};
+        this.player.activePowerups.speed = {
             active: true,
             endTime: Date.now() + this.duration
-          };
-          setTimeout(() => {  console.log(`Scheduled removalEffect for PowerUp ID=${this.id}, Type=${this.type} after ${this.duration} ms`);
-            this.removalEffect()
-        },   this.duration);
+        };
+
+        // Schedule powerup removal after its duration
+        setTimeout(() => {
+            this.removalEffect();
+        }, this.duration);
     }
 
     removalEffect() {
-        console.log("speed effect removed.");
-
+       
         this.player.speed = this.player.originalSpeed;
+
+        // Mark powerup as inactive
         if (this.player.activePowerups && this.player.activePowerups.speed) {
             this.player.activePowerups.speed.active = false;
-          }
+        }
     }
 }
+
+// ------------------------------
+// MultiShot PowerUp - Enables Multiple Shots at Once
+// ------------------------------
 
 class MultiShot extends PowerUp {
     constructor(player, id) {
@@ -49,151 +68,214 @@ class MultiShot extends PowerUp {
     }
 
     apply() {
-        this.player.hasMultiShot = true;
-          
-        // Store powerup info to display the aura
+        this.player.hasMultiShot = true; // Enable multishot mode
+
+        // Store powerup info for tracking
         this.player.activePowerups = this.player.activePowerups || {};
         this.player.activePowerups.multiShot = {
-          active: true,
-          endTime: Date.now() + this.duration
+            active: true,
+            endTime: Date.now() + this.duration
         };
 
-        setTimeout(() => {console.log(`Scheduled removalEffect for PowerUp ID=${this.id}, Type=${this.type} after ${this.duration} ms`);
-            this.removalEffect()
-        },   this.duration);
+        // Schedule powerup removal after duration
+        setTimeout(() => {
+            this.removalEffect();
+        }, this.duration);
     }
 
     removalEffect() {
-        console.log("MultiShot effect removed.");
-
+        
         this.player.hasMultiShot = false;
-              
-              if (this.player.activePowerups && this.player.activePowerups.multiShot) {
-                this.player.activePowerups.multiShot.active = false;
-              }
+
+        if (this.player.activePowerups && this.player.activePowerups.multiShot) {
+            this.player.activePowerups.multiShot.active = false;
+        }
     }
 }
 
+// ------------------------------
+// Health PowerUp - Restores Player Health
+// ------------------------------
+
 class Health extends PowerUp {
     constructor(player, id) {
-        super("Health", "health", 5000, player, id);
-        this.healthBoost = 0.35;
+        super("Health", "health", 1000, player, id);
+        this.healthBoost = 0.35; // Restores 35% of max health
     }
 
     apply() {
+        // Increase health, ensuring it doesn't exceed max health
         this.player.health = Math.min(
             this.player.maxHealth,
             this.player.health + this.player.maxHealth * this.healthBoost
         );
 
+        // Store powerup info temporarily
         this.player.activePowerups = this.player.activePowerups || {};
-          this.player.activePowerups.health = {
+        this.player.activePowerups.health = {
             active: true,
-            endTime: Date.now() + 1000 // Show effect briefly
+            endTime: Date.now() + 1000 // Effect shows briefly
         };
 
-        setTimeout(() => {  console.log(`Scheduled removalEffect for PowerUp ID=${this.id}, Type=${this.type} after ${this.duration} ms`);
-            this.removalEffect()
-        },  1000);
+        // Schedule removal effect after 1 second
+        setTimeout(() => {
+            this.removalEffect();
+        }, 1000);
     }
 
-    removalEffect(){
-        console.log("health effect removed.");
-
+    removalEffect() {
+       
         if (this.player && this.player.activePowerups && this.player.activePowerups.health) {
             this.player.activePowerups.health.active = false;
-          }
+        }
     }
 }
+
+// ------------------------------
+// Damage PowerUp - Increases Player Damage
+// ------------------------------
 
 class Damage extends PowerUp {
     constructor(player, id) {
         super("Damage", "damage", 5000, player, id);
-        this.damageMultiplier = 2;
+        this.damageMultiplier = 2; // Doubles damage
     }
 
     apply() {
+        // Apply damage multiplier
         this.player.damageMultiplier = (this.player.damageMultiplier || 1) + this.damageMultiplier;
+
+        // Store powerup info
         this.player.activePowerups = this.player.activePowerups || {};
-          this.player.activePowerups.damage = {
+        this.player.activePowerups.damage = {
             active: true,
             endTime: Date.now() + this.duration
-          };
+        };
 
-          setTimeout(() => {  console.log(`Scheduled removalEffect for PowerUp ID=${this.id}, Type=${this.type} after ${this.duration} ms`);
-            this.removalEffect()
-        },   this.duration);
+        // Schedule removal effect
+        setTimeout(() => {
+            this.removalEffect();
+        }, this.duration);
     }
 
     removalEffect() {
-        console.log("damage effect removed.");
-
+        
         this.player.damageMultiplier -= this.damageMultiplier;
+
         if (this.player.activePowerups && this.player.activePowerups.damage) {
             this.player.activePowerups.damage.active = false;
-          }
+        }
     }
 }
 
-class Shield  extends PowerUp {
-     constructor(player, id) {
-           super("Shield ", "shield", 5000, player, id);
-           this.shieldPoints = 50;
-        }
+// ------------------------------
+// Shield PowerUp - Provides Protective Shield
+// ------------------------------
 
-     apply() {
-         this.player.shield = (this.player.shield || 0) + this.shieldPoints;
+class Shield extends PowerUp {
+    constructor(player, id) {
+        super("Shield", "shield", 5000, player, id);
+        this.shieldPoints = 50; // Amount of shield points
+    }
 
-         this.player.activePowerups = this.player.activePowerups || {};
-         this.player.activePowerups.shield = {
-               active: true,
-              endTime: Date.now() + this.duration,
-         };
+    apply() {
+        this.player.shield = (this.player.shield || 0) + this.shieldPoints; // Add shield points
 
-         setTimeout(() => {  console.log(`Scheduled removalEffect for PowerUp ID=${this.id}, Type=${this.type} after ${this.duration} ms`);
-         this.removalEffect()
-     },   this.duration);
-     }
+        // Store powerup info
+        this.player.activePowerups = this.player.activePowerups || {};
+        this.player.activePowerups.shield = {
+            active: true,
+            endTime: Date.now() + this.duration
+        };
 
-     removalEffect(){}
+        // Schedule removal effect
+        setTimeout(() => {
+            this.removalEffect();
+        }, this.duration);
+    }
+
+    removalEffect() {
+        
+    }
 }
+
+// ------------------------------
+// Rapid Fire PowerUp - Increases Firing Rate
+// ------------------------------
 
 class Rapid extends PowerUp {
     constructor(player, id) {
         super("Rapid", "rapid", 5000, player, id);
-
     }
 
-    apply(){
-        this.player.hasRapidFire = true;
-        this.player.activePowerups = this.player.activePowerups || {};
+    apply() {
+        this.player.hasRapidFire = true; // Enable rapid fire mode
 
+        // Store powerup info
+        this.player.activePowerups = this.player.activePowerups || {};
         this.player.activePowerups.rapidFire = {
-          active: true,
-          endTime: Date.now() + this.duration
+            active: true,
+            endTime: Date.now() + this.duration
         };
 
-        setTimeout(() => {  console.log(`Scheduled removalEffect for PowerUp ID=${this.id}, Type=${this.type} after ${this.duration} ms`);
-        this.removalEffect()
-    },   this.duration);
-
+        // Schedule removal effect
+        setTimeout(() => {
+            this.removalEffect();
+        }, this.duration);
     }
 
-    removalEffect(){
+    removalEffect() {
         if (this.player.activePowerups && this.player.activePowerups.rapidFire) {
             this.player.activePowerups.rapidFire.active = false;
-          }
+        }
     }
 }
 
+// ------------------------------
+// Fire PowerUp - Enables Fire-Based Attack
+// ------------------------------
 
-// Exporting modules for use
+class Fire extends PowerUp {
+    constructor(player, id) {
+        super("Fire", "fire", 5000, player, id);
+    }
+
+    apply() {
+        this.player.hasFire = true; // Enable fire effect
+
+        // Store powerup info
+        this.player.activePowerups = this.player.activePowerups || {};
+        this.player.activePowerups.fire = {
+            active: true,
+            endTime: Date.now() + this.duration
+        };
+
+        // Schedule removal effect
+        setTimeout(() => {
+            this.removalEffect();
+        }, this.duration);
+    }
+
+    removalEffect() {
+        this.player.hasFire = false;
+
+        if (this.player.activePowerups && this.player.activePowerups.fire) {
+            this.player.activePowerups.fire.active = false;
+        }
+    }
+}
+
+// ------------------------------
+// Export PowerUp Classes for Backend Use
+// ------------------------------
+
 module.exports = {
     Speed,
     MultiShot,
     Health,
     Damage,
-    Shield ,
-    Rapid ,
+    Shield,
+    Rapid,
+    Fire,
     PowerUp,
 };
