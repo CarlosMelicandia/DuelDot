@@ -81,13 +81,23 @@ class Player {
     c.arc(this.radius * 0.7, 0, this.radius * 0.2, 0, Math.PI * 2) // a small "eye" or dot to show direction
     c.fill()
   
-    // Draw hand
-    c.beginPath()
-    c.fillStyle = this.color
-    c.arc(this.radius * xPosition, yPosition, this.radius / 3, 0, Math.PI * 2)
-    c.arc(this.radius * xPosition, -yPosition, this.radius / 3, 0, Math.PI * 2)
-    c.fill()
+    if (this.equippedWeapon?.name === "fist"){
+      // Draw hand
+      c.beginPath()
+      c.fillStyle = this.color
+      c.arc(this.radius * xPosition, yPosition, this.radius / 3, 0, Math.PI * 2)
+      c.arc(this.radius * xPosition, -yPosition, this.radius / 3, 0, Math.PI * 2)
+      c.fill()
+    }
   
+    if (this.equippedWeapon?.name != "fist" &&
+      this.equippedWeapon?.image instanceof HTMLImageElement &&
+      this.equippedWeapon?.image.complete){
+      const img = this.equippedWeapon.image
+      
+      c.drawImage(img, (-this.radius * xPosition - img.width / 2) + 15, (-img.height / 2) + 20)
+    }
+
     c.restore()
   }
 }

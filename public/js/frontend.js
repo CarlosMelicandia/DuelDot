@@ -103,6 +103,12 @@ socket.on('updatePlayers', (backEndPlayers) => {
       // Updates the player equipped weapon in the front end
       frontEndPlayer.equippedWeapon = backEndPlayer.equippedWeapon
 
+      if (backEndPlayer.equippedWeapon.imagePath) {
+        const weaponImg = new Image();
+        weaponImg.src = backEndPlayer.equippedWeapon.imagePath;
+        frontEndPlayer.equippedWeapon.image = weaponImg;
+      }
+      
       // Updates whether the player can shoot in the front end
       frontEndPlayer.canShoot = backEndPlayer.canShoot
 
@@ -193,16 +199,16 @@ function animate() {
     document.querySelector('#fpsCounter').textContent = `FPS: ${fps}`
   }
   
-  const localPlayer = frontEndPlayers[socket.id]
+  const frontEndPlayer = frontEndPlayers[socket.id]
 
-  if (!localPlayer) return
+  if (!frontEndPlayer) return
 
   let cameraX = 0,
     cameraY = 0;
   let pixelNumber = 2 * devicePixelRatio;
   
-  cameraX = localPlayer.x - canvas.width / pixelNumber;
-  cameraY = localPlayer.y - canvas.height / pixelNumber;
+  cameraX = frontEndPlayer.x - canvas.width / pixelNumber;
+  cameraY = frontEndPlayer.y - canvas.height / pixelNumber;
 
   c.save();
   c.translate(-cameraX, -cameraY);

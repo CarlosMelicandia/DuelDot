@@ -4,6 +4,8 @@
 
 let projectileId = 0 // Unique ID counter for each projectile create
 
+const { updateLeaderBoard } = require("../backendLeaderBoard.js");
+
 function playerShoot(socket, backEndPlayers, backEndProjectiles){
     socket.on('shoot', ({ x, y, angle }) => { 
         const player = backEndPlayers[socket.id]
