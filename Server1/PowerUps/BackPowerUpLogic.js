@@ -19,7 +19,6 @@ function spawnPowerUps(backEndPowerUps, io) {
     const interval = setInterval(() => {
         // Stop spawning entirely if the limit is reached
         if (backEndPowerUps.length >= 15) {
-            console.log("Powerup limit reached. Stopping spawning process.");
             spawning = false;
             clearInterval(interval); // Stop setInterval
             return;
@@ -44,7 +43,6 @@ function spawnPowerUps(backEndPowerUps, io) {
 
         // Add new powerup
         backEndPowerUps.push(powerUpData);
-        console.log(`Spawning powerup: ID=${newPowerUpId}, Type=${powerUpType}`);
 
         // Notify clients
         io.emit("updatePowerUps", backEndPowerUps, powerUpData);
@@ -81,11 +79,9 @@ function checkPowerUpCollision(backEndPowerUps, io, player) {
             // Remove powerup from backend and notify frontend
             backEndPowerUps.splice(i, 1);
             io.emit("removePowerUp", { id: powerUp.id, remove: true });
-            console.log(`PowerUp ID=${powerUp.id} removed from backend and emitted to frontend.`);
 
             // Check if spawning should restart
             if (backEndPowerUps.length < 13 && !spawning) {
-                console.log("Powerup count below limit. Restarting spawn process.");
                 spawning = true;
                 spawnPowerUps(backEndPowerUps, io); // Restart spawning
             }

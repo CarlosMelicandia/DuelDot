@@ -34,9 +34,7 @@ addEventListener('click', (event) => {
       event.clientY - top - playerPosition.y,
       event.clientX - left - playerPosition.x
     )
-
-    // frontEndPlayers[socket.id].drawHands() 
-    console.log("Shoot")
+    
 
     /**
      * Sends a "shoot" event to the server.
@@ -46,8 +44,6 @@ addEventListener('click', (event) => {
      * - `x, y`: Player’s current position.
      * - `angle`: The angle at which the projectile should be fired.
      */
-
-    console.log("shoot")
     socket.emit('shoot', {
     x: playerPosition.x,
     y: playerPosition.y,

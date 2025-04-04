@@ -217,12 +217,10 @@ socket.on('updateWeapons', (backEndWeapons, weaponData) =>{
 })
 
 socket.on("removePowerUp", (powerUp) => {
-  console.log(`removePowerUp event received: ID=${powerUp.id}`);
       delete frontEndPowerUps[powerUp.id]; // Remove from frontend state
 });
 
 socket.on("updatePowerUps", (backEndPowerUps) => {
-  console.log(`Synchronizing powerups with backend:`, backEndPowerUps);
   frontEndPowerUps = {}; // Clear the existing powerups
   backEndPowerUps.forEach((powerUp) => {
       frontEndPowerUps[powerUp.id] = new PowerUps(powerUp);
@@ -305,7 +303,6 @@ function animate() {
   // Draw the PowerUps
   for (const powerUp in frontEndPowerUps) {
     const frontEndPowerUp = frontEndPowerUps[powerUp];
-    console.log(`Calling draw for powerup ID=${powerUp}, Position=(${frontEndPowerUp.x}, ${frontEndPowerUp.y})`);
     frontEndPowerUp.draw();
 }
 

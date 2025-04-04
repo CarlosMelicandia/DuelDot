@@ -189,7 +189,6 @@ io.on('connection', (socket) => { //  io.on listens for an event that is sent to
     switch (keycode){
       case "Digit1":
         if (backEndPlayer.inventory[0]){
-          console.log(backEndPlayer.equippedWeapon)
           backEndPlayer.equippedWeapon = backEndPlayer.inventory[0] // adds the weapon to their first slot in inventory
         } else if (backEndPlayer.equippedWeapon != "Fist"){ // Goes back to fist if inventory slot is empty
           backEndPlayer.equippedWeapon = FIST
