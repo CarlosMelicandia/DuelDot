@@ -76,7 +76,6 @@ let lastTime = performance.now()
 let frames = 0
 let fps = 0
 
-
 /**
  * ------------------------------
  * Handling Server Updates for Projectiles
@@ -182,19 +181,6 @@ socket.on('updatePlayers', (backEndPlayers) => {
         })
       }
     }
-
-    /*
-     */
-    // Updates Player Waapon
-    // document.querySelector(
-    //   `tr[data-id="${id}weapon"]`
-    // ).innerHTML = `${backEndPlayer.equippedWeapon}`;
-    // Update Player Score to tabLeaderBoard
-    // document.querySelector(
-    //   `tr[data-id="${id}score"]`
-    // ).innerHTML = `${backEndPlayer.score}`;
-
-    // document.getElementById(id).style.color = color // breaks everything :(
   }
 
   // Remove any client-side players that no longer exist on the server
@@ -268,21 +254,6 @@ socket.on("updateRanking", (topPlayers, backEndPlayers) => {
   }
 });
 
-// Waits for an updateWeapons from the back end to sync and spawn weapons
-socket.on('updateWeapons', (weaponData) =>{
-  if (weaponData.remove){ // if the weapon has been removed due to collision
-    delete frontEndWeapons[weaponData.id] // deletes weapon
-  }else{
-    if (!frontEndWeapons[weaponData.id]){ // Creates the weapon in the frontEnd if it doesn't exist
-      frontEndWeapons[weaponData.id] = new WeaponDrawing(weaponData) // Contains only x, y, type, radius, and color
-    }
-  }
-})
-
-socket.on('dropWeapon', (weaponData) => {
-  frontEndWeapons[weaponData.id] = new WeaponDrawing(weaponData)
-}) 
-
 socket.on('updatePowerUps', (backEndPowerUps, powerUpData) => {
   if (powerUpData.remove) { // If the power-up was collected, remove it
     delete frontEndPowerUps[powerUpData.id];
@@ -302,43 +273,12 @@ socket.on('powerupCollected', (powerupData) => {
 });
 
 
-// When a players joins it shows them the weapons that had spawned previously
-socket.on("updateWeaponsOnJoin", (backEndWeapons) => {
-  frontEndWeapons = {};
-
-  backEndWeapons.forEach((weapon) => {
-    frontEndWeapons[weapon.id] = new WeaponDrawing(weapon)
-  })
-})
-
 socket.on('updatePowerUpsOnJoin', (backEndPowerUps) => {
   frontEndPowerUps = {};
   backEndPowerUps.forEach((powerUp) => {
     frontEndPowerUps[powerUp.id] = new PowerUpDrawing(powerUp);
   });
 });
-
-
-// Waits for a weapon equip call from the server
-socket.on('equipWeapon', (slotIndex, player) => {
-  
-  if (player.inventory[0] != null  && player.inventory[1] == null){ // if the first inventory is open 
-    document.querySelector('#inventorySlot1Text').textContent = player.inventory[slotIndex].name // Show weapon in inventory
-  }
-  if(player.inventory[0] != null && player.inventory[1] != null){ // if the second inventory is open
-  document.querySelector('#inventorySlot2Text').textContent = player.inventory[slotIndex].name // Shows the weapon in the second slot
-  }
-})
-
-socket.on('removeWeapon', (player) => {
-  console.log(player.inventory) 
-  if (player.inventory[0] == null){ // if the first inventory is open 
-    document.querySelector('#inventorySlot1Text').textContent = " " // Show weapon in inventory
-  }
-  if(player.inventory[1] == null){ // if the second inventory is open
-  document.querySelector('#inventorySlot2Text').textContent = " " // Shows the weapon in the second slot
-  }
-})
 
 // ------------------------------
 // Animation Loop (Game Rendering)
