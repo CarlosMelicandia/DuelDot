@@ -18,7 +18,8 @@ class PowerUps {
         "multiShot": "../assets/MultishotPU.png",
         "health": "../assets/HealthPU.png",
         "damage": "../assets/DamagePU.png",
-        "shield": "../assets/ShieldPU.png"
+        "shield": "../assets/ShieldPU.png",
+        "rapid": "../assets/DefaultPU.png"
       };
   
       // Colors for the glow effect based on powerup type
@@ -27,10 +28,11 @@ class PowerUps {
         "multiShot": "#FF0000", // Red
         "health": "#00FF00", // Green
         "damage": "#FFA500", // Orange
-        "shield": "#0000FF", // Blue
+        "shield": "#0ADD8E6", // teal
+        "rapid": "#FFFFFF" // white
       };
   
-      this.image.src = powerUpImages[this.type] || "../assets/speed.png";
+      this.image.src = powerUpImages[this.type] || "../assets/DefaultPU.png";
   
     }
   
@@ -55,4 +57,4 @@ class PowerUps {
   
       c.drawImage(this.image, this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
     }
-  }
+}

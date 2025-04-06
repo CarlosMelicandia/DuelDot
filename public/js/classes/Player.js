@@ -28,6 +28,7 @@ class Player {
     this.speed = speed // Movement speed 
     this.canShoot = canShoot
     this.equippedWeapon = equippedWeapon
+    this.activePowerUps = {} // To track active power-ups
   }
 
   /**

@@ -20,16 +20,8 @@ function spawnPowerUps(backEndPowerUps, io) {
     let spawnX = Math.random() * (maxX - min) + min;
     let spawnY = Math.random() * (maxY - min) + min;
 
-    const powerUpTypes = ["speed", "multiShot", "health", "damage", "shield"];
+    const powerUpTypes = ["speed", "multiShot", "health", "damage", "shield", "rapid"];
     let powerUpType = powerUpTypes[Math.floor(Math.random() * powerUpTypes.length)];
-
-    // let powerUpColors = { // temporary; using pngs afterwards-- obsolete
-    //   "speed": "yellow",
-    //   "multiShot": "red",
-    //   "health": "green",
-    //   "damage": "orange",
-    //   "shield": "blue"
-    // };
 
     let newPowerUpId = powerUpId++; // Unique ID for power-ups
 
@@ -38,7 +30,6 @@ function spawnPowerUps(backEndPowerUps, io) {
       x: spawnX,
       y: spawnY,
       radius: 22,
-      // color: powerUpColors[powerUpType], (temporary stuff)
       type: powerUpType
     };
 
@@ -147,13 +138,32 @@ function checkPowerUpCollision(backEndPowerUps, io, player) {
           }, POWERUP_DURATION);
           
           case 'shield':
-            // Only remove the shield effect aura after duration
-            // (The shield points will remain until depleted)
-            setTimeout(() => {
-              if (player && player.activePowerups && player.activePowerups.shield) {
-                player.activePowerups.shield.active = false;
-              }
-            }, POWERUP_DURATION * 2);
+            // player.shieldAmount = player.shieldAmount < 50 || 0
+            // if (player.shieldAmount + 50 > 50) {
+            //   player.shieldAmount = 50
+            // } else {
+            //   player.shieldAmount += 50
+            // }
+            // console.log("Shield: " + player.shieldAmount) // debug
+            
+            // player.activePowerUps = player.activePowerUps || {}
+            // player.activePowerUps.shield = {
+            //   active: true,
+            //   endTime: Date.now() + POWERUP_DURATION * 2
+            // }
+
+            // setTimeout(() => {
+            //   if (player && player.activePowerUps && player.activePowerUps.shield) {
+            //     player.activePowerUps.shield.active = false;
+            //     player.shieldAmount = 0
+
+            //     console.log("Shield resetted back to: " + player.shieldAmount) // debug
+            //   }
+            // }, POWERUP_DURATION * 2);
+
+          case 'rapid':
+            console.log("Rapid!!")
+           
           break;
       }
 

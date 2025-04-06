@@ -227,6 +227,7 @@ socket.on('updatePowerUps', (backEndPowerUps, powerUpData) => {
 });
 
 socket.on('powerupCollected', (powerupData) => {
+  console.log("Powerup collected.")
   const player = frontEndPlayers[socket.id];
   if (!player) return;
 
@@ -275,7 +276,7 @@ socket.on('equipWeapon', (weaponEquipped, player) => {
 let animationId
 function animate() {
   animationId = requestAnimationFrame(animate) // Tells the browser we want to perform an animation
-  // c.fillStyle = 'rgba(0, 0, 0, 0.1)' // Optional "ghosting" effect if needed
+  c.fillStyle = 'rgba(0, 0, 0, 0.1)' // Optional "ghosting" effect if needed
   c.clearRect(0, 0, canvas.width, canvas.height) // Clears the entire canvas
 
   // Interpolate and draw each player
@@ -290,6 +291,7 @@ function animate() {
         (frontEndPlayers[id].target.y - frontEndPlayers[id].y) * 0.5
     }
     frontEndPlayer.draw()
+
     frontEndPlayer.drawHands({ xPosition: frontEndPlayer.handXMove, angle: frontEndPlayer.aimAngle })
   }
 
