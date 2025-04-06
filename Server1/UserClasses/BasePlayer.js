@@ -17,6 +17,20 @@ class BasePlayer {
       this.sequenceNumber = sequenceNumber // Tracks last processed movement input
       this.score = score // Player's current score
 
+      // Power Properties
+      this.hasMultiShot = false
+      this.damageMultiplier = 1
+      this.shieldAmount = 0
+      this.hasPowerUp = false
+      this.activePowerup = null
+      this.originalSpeed = this.speed
+
+      // Hand Properties
+      this.handX = 1.5 
+      this.handY = 10
+      this.aimAngle = 0
+      this.canPunch = true
+
       // Default properties
       this.health = 0
       this.maxHealth = 0
@@ -33,13 +47,13 @@ class BasePlayer {
       this.hasPowerUp = false
       this.activePowerups = null
 
-      // Weapon multipliers
+      // Default Weapon multipliers
       this.lightWpnMtp = 1.0
       this.heavyWpnMtp = 1.0
       this.magicWpnMtp = 1.0
 
       // Inventory and Equipped
-      this.inventory = []
+      this.inventory = [null, null]
       this.equippedWeapon = equippedWeapon
 
       this.canShoot = true

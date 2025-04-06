@@ -1,7 +1,7 @@
 const { Pistol, SubmachineGun, Sniper, Shuriken } = require("./Weapons")
 
-const GAME_WIDTH = 1024 // Default width
-const GAME_HEIGHT = 576 // Default height
+const GAME_WIDTH = 5000 // Default width
+const GAME_HEIGHT = 5000 // Default height
 let deletedWeaponIds = []
 
 let weaponId = 0
@@ -10,7 +10,7 @@ function spawnWeapons(backEndWeapons, io) {
   const maxX = GAME_WIDTH - 50
   const maxY = GAME_HEIGHT - 50
   const min = 50
-  
+
   setInterval(() => {
     if (backEndWeapons.length > 10 ) return
     let spawnX = Math.random() * (maxX - min) + min 
@@ -33,14 +33,31 @@ function spawnWeapons(backEndWeapons, io) {
       y: spawnY,
       radius: 10,
       color: weaponColors[weaponToSpawn],
-      type: weaponToSpawn
+      name: weaponToSpawn // Changed
     })
 
     // Add new weapon and then sort by ID
     backEndWeapons.push(weaponData)
 
-    io.emit("updateWeapons", backEndWeapons, weaponData)
+    io.emit("updateWeapons", weaponData)
   }, 5000) // Sets the time rate at which weapons spawn (Default = 7500)
+}
+
+function weaponDrop(weapon, x, y, io, backEndWeapons){
+  let newWeaponId = deletedWeaponIds.length > 0 ? deletedWeaponIds.shift() : weaponId++
+
+  weaponData = ({
+    id: newWeaponId,
+    x: x, 
+    y: y,
+    radius: 10,
+    color: weapon.color,
+    name: weapon.name
+  })
+  
+  backEndWeapons.push(weaponData)
+
+  io.emit("dropWeapon", weaponData)
 }
 
 function checkCollision(backEndWeapons, io, player) {
@@ -49,7 +66,10 @@ function checkCollision(backEndWeapons, io, player) {
     let dist = Math.hypot(player.x - weapon.x, player.y - weapon.y)
 
     if (dist < player.radius + weapon.radius) {
-      if (player.inventory.length >= 2) return
+      const slotIndex = player.inventory.findIndex(slot => slot === null)
+      if (player.inventory[0] != null && player.inventory[1] != null) return
+
+      // console.log('Player picked up', weapon) // Test
       
       const weapons = {
         pistol: Pistol,
@@ -58,17 +78,19 @@ function checkCollision(backEndWeapons, io, player) {
         shuriken: Shuriken
       }
       
-      const weaponEquipped = new weapons[weapon.type]()
+      const weaponEquipped = new weapons[weapon.name]() // Creates a weapon object when a player picks it up
       
-      player.inventory.push(weaponEquipped)
+      player.inventory[slotIndex] = weaponEquipped
+
+      console.log("AFter pickup Inventory:", player.inventory) // Test
       
-      io.to(player.socketId).emit('equipWeapon', weaponEquipped, player)
+      io.to(player.socketId).emit('equipWeapon', slotIndex, player)
 
       backEndWeapons.splice(i, 1) // Remove weapon from array
       deletedWeaponIds.push(weapon.id)
 
       // Send updated weapons + the removed weapon
-      io.emit("updateWeapons", backEndWeapons, { id: weapon.id, remove: true })
+      io.emit("updateWeapons", { id: weapon.id, remove: true })
 
       break;
     }
@@ -80,5 +102,6 @@ function checkCollision(backEndWeapons, io, player) {
 
 module.exports = { 
   spawnWeapons, 
-  checkCollision  
+  checkCollision,
+  weaponDrop  
 }

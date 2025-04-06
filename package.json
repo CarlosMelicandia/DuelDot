@@ -8,25 +8,32 @@
     "generate-docs": "jsdoc -c package.json"
   },
   "dependencies": {
+    "dueldot": "file:",
     "express": "^4.18.2",
     "socket.io": "^4.8.1"
   },
   "devDependencies": {
+    "jsdoc": "^3.6.7",
     "live-server": "^1.2.2",
-    "nodemon": "^3.0.0",
-    "jsdoc": "^3.6.7"
+    "nodemon": "^3.0.0"
   },
   "jsdoc": {
-  "source": {
-    "include": ["Server1", "Server1/WeaponStuff", "FrontWeaponStuff"],
-    "exclude": ["node_modules"],
-    "includePattern": ".*\\.js$",
-    "excludePattern": "(^|\\/|\\\\)_"
-  },
-  "opts": {
-    "destination": "./docs",
-    "recurse": true,
-    "template": "default"
+    "source": {
+      "include": [
+        "Server1",
+        "Server1/WeaponStuff",
+        "FrontWeaponStuff"
+      ],
+      "exclude": [
+        "node_modules"
+      ],
+      "includePattern": ".*\\.js$",
+      "excludePattern": "(^|\\/|\\\\)_"
+    },
+    "opts": {
+      "destination": "./docs",
+      "recurse": true,
+      "template": "default"
+    }
   }
-}
 }
