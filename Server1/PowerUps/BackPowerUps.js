@@ -21,7 +21,7 @@ class PowerUp {
 
 class Speed extends PowerUp {
     constructor(player, id) {
-        super("SpeedUp", "speed", 5000, player, id);
+        super("SpeedUp", "speed", 30000, player, id);
         this.speedMultiplier = 1.8; // Speed increase factor
     }
 
@@ -64,7 +64,7 @@ class Speed extends PowerUp {
 
 class MultiShot extends PowerUp {
     constructor(player, id) {
-        super("MultiShot", "multiShot", 5000, player, id);
+        super("MultiShot", "multiShot", 15000, player, id);
     }
 
     apply() {
@@ -137,7 +137,7 @@ class Health extends PowerUp {
 
 class Damage extends PowerUp {
     constructor(player, id) {
-        super("Damage", "damage", 5000, player, id);
+        super("Damage", "damage", 15000, player, id);
         this.damageMultiplier = 2; // Doubles damage
     }
 
@@ -174,7 +174,7 @@ class Damage extends PowerUp {
 
 class Shield extends PowerUp {
     constructor(player, id) {
-        super("Shield", "shield", 5000, player, id);
+        super("Shield", "shield", 15000, player, id);
         this.shieldPoints = 50; // Amount of shield points
     }
 
@@ -205,7 +205,7 @@ class Shield extends PowerUp {
 
 class Rapid extends PowerUp {
     constructor(player, id) {
-        super("Rapid", "rapid", 5000, player, id);
+        super("Rapid", "rapid", 15000, player, id);
     }
 
     apply() {
@@ -237,7 +237,7 @@ class Rapid extends PowerUp {
 
 class Fire extends PowerUp {
     constructor(player, id) {
-        super("Fire", "fire", 5000, player, id);
+        super("Fire", "fire", 15000, player, id);
     }
 
     apply() {

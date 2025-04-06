@@ -15,10 +15,11 @@ function spawnPowerUps(backEndPowerUps, io) {
     const maxX = GAME_WIDTH - 50;
     const maxY = GAME_HEIGHT - 50;
     const min = 50;
+    const spawnLimit = 30;
 
     const interval = setInterval(() => {
         // Stop spawning entirely if the limit is reached
-        if (backEndPowerUps.length >= 15) {
+        if (backEndPowerUps.length >= spawnLiit) {
             spawning = false;
             clearInterval(interval); // Stop setInterval
             return;
