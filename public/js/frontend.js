@@ -37,6 +37,14 @@ miniMap.width = 150
 miniMap.height = 150
 
 // ------------------------------
+// Big Leaderboard Page
+// ------------------------------
+const rowPerPage = 10;
+let globalPlayersArray = [];
+let currentPage = 1;
+let numberOfPage = 1;
+
+// ------------------------------
 // Possible Random Player Names
 // ------------------------------
 const playerNames = [
@@ -198,8 +206,10 @@ socket.on('updatePlayers', (backEndPlayers) => {
   }
 });
 
+// ------------------------------
 // Update LeaderBoard when ever new player joins, player dies, or player leaves
-socket.on("updateRanking", (topPlayers, backEndPlayers) => {
+// ------------------------------
+socket.on("updateRanking", (topPlayers, playersArray, backEndPlayers) => {
   // Check if the local player exist in the frontEndPlayers
   // If not, log a warning and return
   if (!frontEndPlayers[socket.id]) {
@@ -236,23 +246,64 @@ socket.on("updateRanking", (topPlayers, backEndPlayers) => {
     parentDiv.appendChild(div);
   });
 
+  // Assign playersArray to globalPlayersArray for pagination
+  // This is used for the pagniation of the big leaderboard
+  globalPlayersArray = playersArray;
+  updateLeaderboardPage(globalPlayersArray);
+});
+
+// Update the big leaderboard when the player dies
+function updateLeaderboardPage (players) {
   // If lag being cause, make this more efficient instead of clearing the big leaderboard everytime
-  const bigLeaderBoard = document.querySelector("#playerLabelsLead");
+  const bigLeaderBoard = document.querySelector("#player-labels");
   bigLeaderBoard.innerHTML = "";
 
-  // Loop through backEndPlayers and display them on the big leaderboard
-  for (const id in backEndPlayers) {
-    const backendPlayer = backEndPlayers[id];
-    document.querySelector("#playerLabelsLead").innerHTML += `
+  // Calculate the number of pages, start/end player of each page, and the players per page
+  numberOfPage = Math.ceil(players.length / rowPerPage);
+  let startIndex = (currentPage - 1) * rowPerPage;
+  let endIndex = startIndex + rowPerPage;
+  let playersPerPage = players.slice(startIndex, endIndex);
+
+  // Go through each of player inside the 10 players in playersPerPage and display them
+  // Display the local player in colored text
+  playersPerPage.forEach((entry, index) => {
+    let rankDisplay = index + 1;
+
+    const isLocalPlayer = entry.id === socket.id;
+    const rowColor = isLocalPlayer ?  `style="color: ${entry.color};"` : "";
+    document.querySelector("#player-labels").innerHTML += `
           <tr>
-            <td>${backendPlayer.class}</td>
-            <td>${backendPlayer.username}</td>
-            <td data-id="${id}score">${backendPlayer.score}</td>
-            <td data-id="${id}weapon">Nothing</td>
-            <td>55%</td>
+            <td ${rowColor}>${rankDisplay + startIndex}</td>
+            <td>${entry.username}</td>
+            <td data-id="${entry.id}score">${entry.score}</td>
+            <td data-id="${entry.id}class">${entry.class}</td>
           </tr>`;
+  });
+
+  // Update the number of page in the big leaderboard
+  document.getElementById("page-number").textContent = `${currentPage} / ${numberOfPage || 1}`;
+}
+
+// Update the big leaderboard page to previous page if have when click left arrow
+document.getElementById("prev-page").addEventListener("click", () => {
+  if (currentPage > 1) {
+    currentPage--;
+    updateLeaderboardPage(globalPlayersArray);
   }
 });
+
+// Update the big leaderboard page to next page if have when click left arrow
+document.getElementById("next-page").addEventListener("click", () => {
+  if (currentPage < numberOfPage) {
+    currentPage++;
+    updateLeaderboardPage(globalPlayersArray);
+  }
+});
+
+// ------------------------------
+// Leaderboard End
+// ------------------------------
+
 
 socket.on('updatePowerUps', (backEndPowerUps, powerUpData) => {
   if (powerUpData.remove) { // If the power-up was collected, remove it
