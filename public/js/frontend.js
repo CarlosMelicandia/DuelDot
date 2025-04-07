@@ -284,7 +284,7 @@ socket.on('updatePowerUps', (backEndPowerUps, powerUpData) => {
     delete frontEndPowerUps[powerUpData.id];
   } else {
     if (!frontEndPowerUps[powerUpData.id]) { // Create the power-up if it doesn't exist
-      frontEndPowerUps[powerUpData.id] = new PowerUpDrawing(powerUpData); // Stores the power-up data
+      frontEndPowerUps[powerUpData.id] = new PowerUps(powerUpData); // Stores the power-up data
     }
   }
 });

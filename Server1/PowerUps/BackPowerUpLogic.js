@@ -19,7 +19,7 @@ function spawnPowerUps(backEndPowerUps, io) {
 
     const interval = setInterval(() => {
         // Stop spawning entirely if the limit is reached
-        if (backEndPowerUps.length >= spawnLiit) {
+        if (backEndPowerUps.length >= spawnLimit) {
             spawning = false;
             clearInterval(interval); // Stop setInterval
             return;
@@ -76,6 +76,11 @@ function checkPowerUpCollision(backEndPowerUps, io, player) {
             // Apply powerup effects
             const powerUpInstance = new PowerUpClass(player, powerUp.id);
             powerUpInstance.apply();
+
+            io.to(player.socketId).emit('powerupCollected', { 
+              type: powerUp.type, 
+              duration: powerUpInstance.duration 
+            });
 
             // Remove powerup from backend and notify frontend
             backEndPowerUps.splice(i, 1);
