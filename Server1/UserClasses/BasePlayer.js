@@ -17,6 +17,9 @@ class BasePlayer {
       this.sequenceNumber = sequenceNumber // Tracks last processed movement input
       this.score = score // Player's current score
 
+
+      this.isPlaying = false
+
       // Power Properties
       this.hasMultiShot = false
       this.damageMultiplier = 1

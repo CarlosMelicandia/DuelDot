@@ -9,12 +9,22 @@ let powerUpId = 0; // Unique ID counter for power-ups
 const POWERUP_DURATION = 5000;
 
 
-function spawnPowerUps(backEndPowerUps, io) {
+function spawnPowerUps(backEndPowerUps, io, backEndPlayers) {
   const maxX = GAME_WIDTH - 100;
   const maxY = GAME_HEIGHT - 100;
   const min = 100;
 
   setInterval(() => {
+    let someoneIsPlaying = false;
+    for (const id in backEndPlayers){
+      if (backEndPlayers[id].isPlaying) {
+        someoneIsPlaying = true
+        break
+      }
+    }
+
+    if (!someoneIsPlaying) return
+
     if (backEndPowerUps.length > 15) return; // Limit number of power-ups
 
     let spawnX = Math.random() * (maxX - min) + min;
@@ -177,11 +187,11 @@ function handleProjectileCollision(projectile, targetPlayer, shooterId) {
   // Find the shooter player
   const shooter = backEndPlayers[shooterId];
   
-  if (!shooter) return 0; // Return if shooter doesn't exist
+  if (!shooter) return; // Return if shooter doesn't exist
   
   const equippedWeapon = shooter.equippedWeapon;
   
-  if (!equippedWeapon) return 0; // Return if no weapon equipped
+  if (!equippedWeapon) return; // Return if no weapon equipped
   
   const weaponMtps = {
     light: shooter.lightWpnMtp,

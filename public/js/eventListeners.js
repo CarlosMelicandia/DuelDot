@@ -86,7 +86,7 @@ window.addEventListener('mousemove', (event) => {
  */
 window.addEventListener("keydown", (event) => {
   // If the local player's data is not yet available, ignore input events
-  if (!frontEndPlayers[socket.id]) return;
+  if (!gameStarted || !frontEndPlayers[socket.id]) return;
 
   if ((event.code === "Digit1" || event.code === "Digit2") && event.repeat)
     return;
@@ -126,7 +126,7 @@ window.addEventListener("keydown", (event) => {
  * Listen for keyup events and mark the corresponding key as no longer pressed.
  */
 window.addEventListener("keyup", (event) => {
-  if (!frontEndPlayers[socket.id]) return;
+  if (!gameStarted || !frontEndPlayers[socket.id]) return;
 
   switch (event.code) {
     case "KeyW":

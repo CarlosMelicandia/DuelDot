@@ -140,6 +140,25 @@
         background-image: url("./assets/background.png");
       }
 
+      .displayAfter {
+        display: none;
+      }
+
+      .removeAfter {
+        display: flex;
+      }
+
+      h1 {
+        margin-top: 0;
+        margin-bottom: 15px;
+      }
+      p{
+        margin-bottom: 2px;
+      }
+      h1, p {
+        letter-spacing: 2px;
+      }
+
     </style>
   </head>
   <body
@@ -150,17 +169,15 @@
       justify-content: center;
       height: 100vh;
       background: black;
-      font-family: 'VT323', monospace;
-    "
-  >
+      font-family: 'VT323', monospace;">
     <!-- Game Container -->
     <div style="position: relative; width: 1024px; height: 576px">
       <!-- The Game Canvas -->
       <canvas class="canvas" id="canvas"></canvas>
 
       <!-- MiniMap -->
-      <canvas class="miniMapC" id="miniMapC"></canvas>
-      <img src="./assets/background.png" class="miniMap" id = "miniMap" alt="Map">
+      <canvas class="miniMapC displayAfter" id="miniMapC"></canvas>
+      <img src="./assets/background.png" class="miniMap displayAfter" id = "miniMap" alt="Map">
 
       <!-- Small Leaderboard-->
       <div class="small-leaderboard">
@@ -171,15 +188,14 @@
           <div id="update-sleaderboard"></div>
         </div>
       </div>
+
       <!-- Big Leader Board -->
       <div class="leaderBoard">
         <div
           style="
             background-image: linear-gradient(to right, #00d9ff, #0062ff);
             padding: 2%;
-            border-radius: 1cap;
-          "
-        >
+            border-radius: 1cap;">
           <h1>Leaderboard</h1>
         </div>
         <table class="leaderboard-table" id="playerLabelsLead">
@@ -225,9 +241,9 @@
 
       <!-- Inventory slots -->
       <div 
+        class = "displayAfter"
         id = "inventoryArea"
         style = "
-          display: none;
           position: relative;
           flex-direction: column;
           align-items: center;
@@ -252,11 +268,40 @@
         </div>
       </div>
 
+      <!-- Instruction Menu -->
+       <div 
+       class = "removeAfter"
+       id = "instructions"
+       style = "
+        display: flex;
+        position: absolute;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        height: 260px;
+        width: 200px;
+        top: 50%;
+        left: 270px;
+        transform: translate(-50%, -50%);
+        background-image: linear-gradient(to right, rgba(6, 182, 212, 0.5), rgba(59, 130, 246, 0.5));
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 10px;
+        color: white;">
+        <h1>How To Play</h1>
+        <p>W,A,S,D: Movement</p>
+        <p>F: Pick up guns</p>
+        <p>Q: Drop Weapons</p>
+        <p>1: Item Slot 1</p>
+        <p>2: Item Slot 2</p>
+        <p>Left-Click: Shoot/Punch</p>
+      </div>
+
       <!-- Username and Class Selection Form -->
       <div
+        class = "removeAfter"
         id = "menu"
         style=" 
-          display: flex;
           position: absolute;
           flex-direction: column;
           align-items: center;
@@ -265,9 +310,8 @@
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
-          text-align: center;
-        "
-      >
+          text-align: center;">
+
         <!-- Shows the username -->
         <form id="usernameForm">
           <div

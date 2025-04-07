@@ -67,8 +67,6 @@ io.on("connection", (socket) => {
 
   io.emit("updatePlayers", backEndPlayers); // Send the current list of players to all connected clients
 
-  playerShoot(socket, backEndPlayers, backEndProjectiles)
-
   /**
    * Listens for an 'initGame' event from the client to create a new player.
    */
@@ -94,6 +92,7 @@ io.on("connection", (socket) => {
       sequenceNumber: 0
     })
     
+    newPlayer.isPlaying = true
     backEndPlayers[socket.id] = newPlayer
     newPlayer.socketId = socket.id // Adds the player ID to their player profile
 
@@ -191,8 +190,6 @@ io.on("connection", (socket) => {
     socket.emit("pongCheck");
   });
 
-  playerPunch(socket, backEndPlayers)
-
   socket.on('updateHands', (angle) => {
     const backEndPlayer = backEndPlayers[socket.id]
 
@@ -200,12 +197,14 @@ io.on("connection", (socket) => {
 
     backEndPlayer.aimAngle = angle
   })  
-
+  
+  playerPunch(socket, backEndPlayers)
+  playerShoot(socket, backEndPlayers, backEndProjectiles)
   playerMovement(socket, backEndPlayers, GAME_WIDTH, GAME_HEIGHT)
 })
 
-spawnWeapons(backEndWeapons, io); // Function to spawn weapons
-spawnPowerUps(backEndPowerUps, io); // Function to spawn power-ups
+spawnWeapons(backEndWeapons, io, backEndPlayers); // Function to spawn weapons
+spawnPowerUps(backEndPowerUps, io,backEndPlayers); // Function to spawn power-ups
 
 
 // ------------------------------

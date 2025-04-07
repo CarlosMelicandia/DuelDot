@@ -27,6 +27,8 @@ const y = canvas.height / 2;
 
 const backgroundImage = new Image();
 backgroundImage.src = "../assets/background.png";
+const gameWidth = backgroundImage.width
+const gameHeight = backgroundImage.height
 
 // ------------------------------
 // Possible Random Player Names
@@ -63,7 +65,6 @@ let frontEndPowerUps = {} // Object to track power-ups on the client
 // ------------------------------
 // FPS ticker & Ping
 // ------------------------------ 
-
 let lastTime = performance.now()
 let frames = 0
 let fps = 0
@@ -71,6 +72,7 @@ let fps = 0
 let lastPingTime = 0;
 let ping = 0;
 
+let gameStarted = false;
 
 //------------------------------
 // Handling Server Updates for Players
@@ -201,20 +203,25 @@ function animate() {
   
   const frontEndPlayer = frontEndPlayers[socket.id]
 
-  if (!frontEndPlayer) return
-
-  let cameraX = 0,
-    cameraY = 0;
-  let pixelNumber = 2 * devicePixelRatio;
-  
-  cameraX = frontEndPlayer.x - canvas.width / pixelNumber;
-  cameraY = frontEndPlayer.y - canvas.height / pixelNumber;
+  let cameraX = 0;
+  let cameraY = 0;
+  const zoomOut = 3
 
   c.save();
+
+  if (!gameStarted) {
+    cameraX = (gameWidth / 2) - (canvas.width / 2 * devicePixelRatio * zoomOut) // this needs fixing IDK WTF ITS HAPPENING AND WHY ITS NOT CENTERED
+    cameraY = (gameHeight / 2) - (canvas.height / 2 * devicePixelRatio * zoomOut)
+    c.scale(1 / zoomOut, 1 / zoomOut)
+
+  } else {
+    cameraX = frontEndPlayer.x - canvas.width / (2 * devicePixelRatio)
+    cameraY = frontEndPlayer.y - canvas.height / (2 * devicePixelRatio)
+  }
+
   c.translate(-cameraX, -cameraY);
   c.drawImage(backgroundImage, 0, 0, 5000, 5000);
-
-  miniMapCtx.clearRect(0, 0, miniMap.width, miniMap.height)
+  if (gameStarted) miniMapCtx.clearRect(0, 0, miniMap.width, miniMap.height)
   // Interpolate and draw each player
   for (const id in frontEndPlayers) {
     const frontEndPlayer = frontEndPlayers[id];
@@ -289,7 +296,7 @@ let sequenceNumber = 0;
 setInterval(() => {
   // Ensure the local player exists before trying to move
   const player = frontEndPlayers[socket.id];
-  if (!player) return;
+  if (!gameStarted) return;
 
   // Dynamically get the player's speed
   const SPEED = 5 * player.speed;
@@ -444,8 +451,16 @@ document.querySelector("#randomNameBtn").addEventListener("click", () => {
  */
 document.querySelector('#usernameForm').addEventListener('submit', (event) => {
   event.preventDefault() // Prevents the form from refreshing
-  document.querySelector('#usernameForm').style.display = 'none' // Hides the username form
-  document.querySelector('#inventoryArea').style.display = 'flex'
+  const itemsToHide = document.querySelectorAll('.removeAfter')
+  itemsToHide.forEach((item) => {
+    item.style.display = 'none' // Hides the whole menu
+  })
+  const itemsToShow = document.querySelectorAll('.displayAfter')
+  itemsToShow.forEach((item) => {
+    item.style.display = 'flex'
+  })
+  gameStarted = true
+
   // Send data to the server to initialize the player
   socket.emit("initGame", {
     width: canvas.width,
