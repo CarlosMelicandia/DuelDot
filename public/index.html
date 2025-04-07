@@ -85,21 +85,14 @@
         /* bottom: 0; */
         left: 0;
         width: 80%;
-        max-width: 900px;
-        margin: 40px auto;
-        background: rgba(206, 206, 206, 0.7);
+        max-width: 600px;
+        margin: 20px auto;
+        /* background: rgba(0, 0, 0, 0.288); */
         border-radius: 12px;
         padding: 15px;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
-        color: rgb(255, 255, 255);
-        font-family: "Arial", sans-serif;
+        /*box-shadow: 0 8px 16px rgba(95, 89, 89, 0.507);*/
+        /*color: rgb(255, 255, 255);*/
         z-index: 1;
-      }
-      /* Title */
-      .leaderboard h2 {
-        text-align: center;
-        font-size: 2rem;
-        margin-bottom: 10px;
       }
 
       /* Table Styles */
@@ -107,20 +100,47 @@
         margin: auto;
         width: 98%;
         border-collapse: collapse;
+        background: rgba(95, 89, 89, 0.507);
       }
-      .leaderboard-table thead {
+      /*.leaderboard-table thead {
         background: #5d5d69;
+      }*/
+
+      #leaderboard-header th {
+        font-size: 20px;
+        font-weight: 300;
+        padding: 12px;
+        color: white;
+        text-align: center;
+        vertical-align: middle;
+        border-bottom: 1px solid #444;
       }
 
-      .leaderboard-table th,
-        .leaderboard-table td {
-          padding: 12px;
-          text-align: left;
-          border-bottom: 1px solid #444;
-          background: rgba(146, 146, 146, 0.8);
-        }
+      .leaderboard-table td {
+        font-size: 16px;
+        font-weight: 200;
+        padding: 8px;
+        color: white;
+        text-align: center;
+        vertical-align: middle;
+        background: rgba(0, 0, 0, 0.452);
+      }
 
-      .miniMap, .miniMapC {
+      .pagination-footer {
+        margin: auto;
+        width: 564px;
+        padding: 12px;
+        font-size: 20px;
+        font-weight: 300;
+        color: white;
+        text-align: center;
+        vertical-align: middle;
+        background: rgba(95, 89, 89, 0.507);
+        border-top: 1px solid #444;
+      }
+
+      .miniMap,
+      .miniMapC {
         user-select: none;
         position: absolute;
         top: 10px;
@@ -139,7 +159,6 @@
         z-index: 1;
         background-image: url("./assets/background.png");
       }
-
     </style>
   </head>
   <body
@@ -160,7 +179,12 @@
 
       <!-- MiniMap -->
       <canvas class="miniMapC" id="miniMapC"></canvas>
-      <img src="./assets/background.png" class="miniMap" id = "miniMap" alt="Map">
+      <img
+        src="./assets/background.png"
+        class="miniMap"
+        id="miniMap"
+        alt="Map"
+      />
 
       <!-- Small Leaderboard-->
       <div class="small-leaderboard">
@@ -172,8 +196,8 @@
         </div>
       </div>
       <!-- Big Leader Board -->
-      <div class="leaderBoard">
-        <div
+      <div class="leaderboard">
+        <!--<div
           style="
             background-image: linear-gradient(to right, #00d9ff, #0062ff);
             padding: 2%;
@@ -181,44 +205,47 @@
           "
         >
           <h1>Leaderboard</h1>
-        </div>
+        </div> -->
         <table class="leaderboard-table">
-        <thead>
-          <th>Class</th>
-          <th>Name</th>
-          <th>Kills</th>
-          <th>Gun</th>
-          <th>Accuracy</th>
-        </thead>
-      </table>
-        <table class="leaderboard-table" id="playerLabelsLead">
-          
-          <tr>
-            <td>Gunner</td>
-            <td>Gabe</td>
-            <td>555</td>
-            <td>Glock</td>
-            <td>55%</td>
-          </tr>
-          </tr>
+          <thead>
+            <tr id="leaderboard-header">
+              <th>Rank</th>
+              <th>Name</th>
+              <th>Kills</th>
+              <th>Class</th>
+            </tr>
+          </thead>
+          <tbody id="player-labels"></tbody>
         </table>
+
+        <div id="leaderboard-page-selector" class="pagination-footer">
+          <button id="prev-page" class="page-button">&lt</button>
+          <span id="page-number" class="page-number">1/1</span>
+          <button id="next-page" class="page-button">&gt</button>
+        </div>
+
         <!-- Big Leader Board End -->
       </div>
       <canvas></canvas>
-      
-      <div 
-      id="fpsCounter" 
-      style="
-        position:absolute; 
-        top:10px; left:170px; 
-        color:white; 
-        font-family:monospace;
-        z-index: 3">FPS: --</div>
+
+      <div
+        id="fpsCounter"
+        style="
+          position: absolute;
+          top: 10px;
+          left: 170px;
+          color: white;
+          font-family: monospace;
+          z-index: 3;
+        "
+      >
+        FPS: --
+      </div>
 
       <!-- Inventory slots -->
-      <div 
-        id = "inventoryArea"
-        style = "
+      <div
+        id="inventoryArea"
+        style="
           display: none;
           position: relative;
           flex-direction: column;
@@ -228,26 +255,23 @@
           height: 156px;
           bottom: 230px;
           left: 910px;
-          transform: translate(-50%, -50%);">
-        <div 
-          class = "itemBorder"
-          id = "inventorySlot1">
-          <div class = "numbers">1</div>
-          <div class = "weaponText" id = "inventorySlot1Text"></div>
+          transform: translate(-50%, -50%);
+        "
+      >
+        <div class="itemBorder" id="inventorySlot1">
+          <div class="numbers">1</div>
+          <div class="weaponText" id="inventorySlot1Text"></div>
         </div>
-        <div 
-          class = "itemBorder"
-          id = "inventorySlot2"
-          >
-          <div class = "numbers">2</div>
-          <div class = "weaponText" id = "inventorySlot2Text"></div>
+        <div class="itemBorder" id="inventorySlot2">
+          <div class="numbers">2</div>
+          <div class="weaponText" id="inventorySlot2Text"></div>
         </div>
       </div>
 
       <!-- Username and Class Selection Form -->
       <div
-        id = "menu"
-        style=" 
+        id="menu"
+        style="
           display: flex;
           position: absolute;
           flex-direction: column;
@@ -386,11 +410,12 @@
       referrerpolicy="no-referrer"
     ></script>
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+    <script src="./js/frontend.js"></script>
     <script src="./js/player/Player.js"></script>
     <script src="./js/FrontPowerUps/PowerUpDrawing.js"></script>
     <script src="./js/FrontWeaponStuff/WeaponDrawning.js"></script>
+    <script src="./js/FrontWeaponStuff/WeaponInteraction.js"></script>
     <script src="./js/FrontWeaponStuff/Projectile.js"></script>
-    <script src="./js/frontend.js"></script>
     <script src="./js/eventListeners.js"></script>
     <!-- Custom Cursor Script -->
     <script>

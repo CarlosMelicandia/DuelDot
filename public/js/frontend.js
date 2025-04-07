@@ -37,6 +37,14 @@ miniMap.width = 150
 miniMap.height = 150
 
 // ------------------------------
+// Big Leaderboard Page
+// ------------------------------
+const rowPerPage = 10;
+let globalPlayersArray = [];
+let currentPage = 1;
+let numberOfPage = 1;
+
+// ------------------------------
 // Possible Random Player Names
 // ------------------------------
 const playerNames = [
@@ -75,7 +83,6 @@ let frontEndPowerUps = {} // Object to track power-ups on the client
 let lastTime = performance.now()
 let frames = 0
 let fps = 0
-
 
 /**
  * ------------------------------
@@ -182,19 +189,6 @@ socket.on('updatePlayers', (backEndPlayers) => {
         })
       }
     }
-
-    /*
-     */
-    // Updates Player Waapon
-    // document.querySelector(
-    //   `tr[data-id="${id}weapon"]`
-    // ).innerHTML = `${backEndPlayer.equippedWeapon}`;
-    // Update Player Score to tabLeaderBoard
-    // document.querySelector(
-    //   `tr[data-id="${id}score"]`
-    // ).innerHTML = `${backEndPlayer.score}`;
-
-    // document.getElementById(id).style.color = color // breaks everything :(
   }
 
   // Remove any client-side players that no longer exist on the server
@@ -212,8 +206,10 @@ socket.on('updatePlayers', (backEndPlayers) => {
   }
 });
 
+// ------------------------------
 // Update LeaderBoard when ever new player joins, player dies, or player leaves
-socket.on("updateRanking", (topPlayers, backEndPlayers) => {
+// ------------------------------
+socket.on("updateRanking", (topPlayers, playersArray, backEndPlayers) => {
   // Check if the local player exist in the frontEndPlayers
   // If not, log a warning and return
   if (!frontEndPlayers[socket.id]) {
@@ -250,38 +246,64 @@ socket.on("updateRanking", (topPlayers, backEndPlayers) => {
     parentDiv.appendChild(div);
   });
 
+  // Assign playersArray to globalPlayersArray for pagination
+  // This is used for the pagniation of the big leaderboard
+  globalPlayersArray = playersArray;
+  updateLeaderboardPage(globalPlayersArray);
+});
+
+// Update the big leaderboard when the player dies
+function updateLeaderboardPage (players) {
   // If lag being cause, make this more efficient instead of clearing the big leaderboard everytime
-  const bigLeaderBoard = document.querySelector("#playerLabelsLead");
+  const bigLeaderBoard = document.querySelector("#player-labels");
   bigLeaderBoard.innerHTML = "";
 
-  // Loop through backEndPlayers and display them on the big leaderboard
-  for (const id in backEndPlayers) {
-    const backendPlayer = backEndPlayers[id];
-    document.querySelector("#playerLabelsLead").innerHTML += `
+  // Calculate the number of pages, start/end player of each page, and the players per page
+  numberOfPage = Math.ceil(players.length / rowPerPage);
+  let startIndex = (currentPage - 1) * rowPerPage;
+  let endIndex = startIndex + rowPerPage;
+  let playersPerPage = players.slice(startIndex, endIndex);
+
+  // Go through each of player inside the 10 players in playersPerPage and display them
+  // Display the local player in colored text
+  playersPerPage.forEach((entry, index) => {
+    let rankDisplay = index + 1;
+
+    const isLocalPlayer = entry.id === socket.id;
+    const rowColor = isLocalPlayer ?  `style="color: ${entry.color};"` : "";
+    document.querySelector("#player-labels").innerHTML += `
           <tr>
-            <td>${backendPlayer.class}</td>
-            <td>${backendPlayer.username}</td>
-            <td data-id="${id}score">${backendPlayer.score}</td>
-            <td data-id="${id}weapon">Nothing</td>
-            <td>55%</td>
+            <td ${rowColor}>${rankDisplay + startIndex}</td>
+            <td>${entry.username}</td>
+            <td data-id="${entry.id}score">${entry.score}</td>
+            <td data-id="${entry.id}class">${entry.class}</td>
           </tr>`;
+  });
+
+  // Update the number of page in the big leaderboard
+  document.getElementById("page-number").textContent = `${currentPage} / ${numberOfPage || 1}`;
+}
+
+// Update the big leaderboard page to previous page if have when click left arrow
+document.getElementById("prev-page").addEventListener("click", () => {
+  if (currentPage > 1) {
+    currentPage--;
+    updateLeaderboardPage(globalPlayersArray);
   }
 });
 
-// Waits for an updateWeapons from the back end to sync and spawn weapons
-socket.on('updateWeapons', (weaponData) =>{
-  if (weaponData.remove){ // if the weapon has been removed due to collision
-    delete frontEndWeapons[weaponData.id] // deletes weapon
-  }else{
-    if (!frontEndWeapons[weaponData.id]){ // Creates the weapon in the frontEnd if it doesn't exist
-      frontEndWeapons[weaponData.id] = new WeaponDrawing(weaponData) // Contains only x, y, type, radius, and color
-    }
+// Update the big leaderboard page to next page if have when click left arrow
+document.getElementById("next-page").addEventListener("click", () => {
+  if (currentPage < numberOfPage) {
+    currentPage++;
+    updateLeaderboardPage(globalPlayersArray);
   }
-})
+});
 
-socket.on('dropWeapon', (weaponData) => {
-  frontEndWeapons[weaponData.id] = new WeaponDrawing(weaponData)
-}) 
+// ------------------------------
+// Leaderboard End
+// ------------------------------
+
 
 socket.on('updatePowerUps', (backEndPowerUps, powerUpData) => {
   if (powerUpData.remove) { // If the power-up was collected, remove it
@@ -302,43 +324,12 @@ socket.on('powerupCollected', (powerupData) => {
 });
 
 
-// When a players joins it shows them the weapons that had spawned previously
-socket.on("updateWeaponsOnJoin", (backEndWeapons) => {
-  frontEndWeapons = {};
-
-  backEndWeapons.forEach((weapon) => {
-    frontEndWeapons[weapon.id] = new WeaponDrawing(weapon)
-  })
-})
-
 socket.on('updatePowerUpsOnJoin', (backEndPowerUps) => {
   frontEndPowerUps = {};
   backEndPowerUps.forEach((powerUp) => {
     frontEndPowerUps[powerUp.id] = new PowerUpDrawing(powerUp);
   });
 });
-
-
-// Waits for a weapon equip call from the server
-socket.on('equipWeapon', (slotIndex, player) => {
-  
-  if (player.inventory[0] != null  && player.inventory[1] == null){ // if the first inventory is open 
-    document.querySelector('#inventorySlot1Text').textContent = player.inventory[slotIndex].name // Show weapon in inventory
-  }
-  if(player.inventory[0] != null && player.inventory[1] != null){ // if the second inventory is open
-  document.querySelector('#inventorySlot2Text').textContent = player.inventory[slotIndex].name // Shows the weapon in the second slot
-  }
-})
-
-socket.on('removeWeapon', (player) => {
-  console.log(player.inventory) 
-  if (player.inventory[0] == null){ // if the first inventory is open 
-    document.querySelector('#inventorySlot1Text').textContent = " " // Show weapon in inventory
-  }
-  if(player.inventory[1] == null){ // if the second inventory is open
-  document.querySelector('#inventorySlot2Text').textContent = " " // Shows the weapon in the second slot
-  }
-})
 
 // ------------------------------
 // Animation Loop (Game Rendering)
