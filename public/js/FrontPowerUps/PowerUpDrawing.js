@@ -1,4 +1,4 @@
-class PowerUpDrawing {
+class PowerUpDrawing { // Everything was commented out for them
     constructor({ id, x, y, radius, type }) {
       this.id = id;
       this.x = x;

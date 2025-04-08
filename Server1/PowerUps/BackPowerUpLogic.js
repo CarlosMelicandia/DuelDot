@@ -86,6 +86,11 @@ function checkPowerUpCollision(backEndPowerUps, io, player, backEndPlayers) {
             const powerUpInstance = new PowerUpClass(player, powerUp.id);
             powerUpInstance.apply();
 
+            io.to(player.socketId).emit('powerupCollected', { 
+              type: powerUp.type, 
+              duration: powerUpInstance.duration 
+            });
+
             // Remove powerup from backend and notify frontend
             backEndPowerUps.splice(i, 1);
             io.emit("removePowerUp", { id: powerUp.id, remove: true });
