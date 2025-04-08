@@ -169,6 +169,22 @@ socket.on('updatePlayers', (backEndPlayers) => {
   }
 });
 
+socket.on("playerRespawn", (player) =>{
+  // Show respawn form
+  document.querySelector("#usernameForm").style.display = "block";
+  
+  const itemsToHide = document.querySelectorAll('.removeAfter')
+  itemsToHide.forEach((item) => {
+    item.style.display = 'flex' // Hides the whole menu
+  })
+  const itemsToShow = document.querySelectorAll('.displayAfter')
+  itemsToShow.forEach((item) => {
+    item.style.display = 'none'
+  })
+
+  gameStarted = false
+})
+
 // ------------------------------
 // Ping Checker
 // ------------------------------
@@ -220,7 +236,7 @@ function animate() {
 
   c.save();
 
-  if (gameStarted) {
+  if (gameStarted && frontEndPlayer) {
     cameraX = frontEndPlayer.x - canvas.width / (2 * devicePixelRatio)
     cameraY = frontEndPlayer.y - canvas.height / (2 * devicePixelRatio)
   } else {
@@ -306,7 +322,7 @@ let sequenceNumber = 0;
 setInterval(() => {
   // Ensure the local player exists before trying to move
   const player = frontEndPlayers[socket.id];
-  if (!gameStarted) return;
+  if (!gameStarted && !player) return;
 
   // Dynamically get the player's speed
   const SPEED = 5 * player.speed;

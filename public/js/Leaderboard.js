@@ -4,8 +4,10 @@
 socket.on("updateRanking", (topPlayers, playersArray, backEndPlayers) => {
   // Check if the local player exist in the frontEndPlayers
   // If not, log a warning and return
-  if (!frontEndPlayers[socket.id]) {
-    console.warn(`Player ${socket.id} not exist in frontEndPlayers`);
+  const frontEndPlayer = frontEndPlayers[socket.id]
+
+  if (!frontEndPlayer) {
+    console.warn(`Player ${socket.id} not exist in backEndPlayer`);
     return;
   }
 
@@ -13,9 +15,14 @@ socket.on("updateRanking", (topPlayers, playersArray, backEndPlayers) => {
   const localPlayerInTop = topPlayers.some((p) => p.id === socket.id);
 
   // If the local player is not in the top 10, mark them not rank and add them into the topPlayers array
-  if (!localPlayerInTop) {
-    frontEndPlayers[socket.id].notRanked = true;
-    frontEndPlayers[socket.id].score = backEndPlayers[socket.id].score; // Update frontEndPlayers[local player] score
+  if (!localPlayerInTop && frontEndPlayer) {
+    frontEndPlayer.notRanked = true;
+    if (backEndPlayers[socket.id]){
+      frontEndPlayer.score = backEndPlayers[socket.id].score; // Update frontEndPlayers[local player] score
+    } else {
+      frontEndPlayer.score = 0
+    }
+    
     topPlayers.push(frontEndPlayers[socket.id]);
   }
 

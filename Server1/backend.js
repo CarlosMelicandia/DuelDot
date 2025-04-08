@@ -56,7 +56,6 @@ const GAME_WIDTH = 5000; // Default width
 const GAME_HEIGHT = 5000; // Default height
 
 const projectileRadius = 5 // Radius of projectiles
-let projectileId = 0 // Unique ID counter for each projectile created
 
 const fist = new Fist() // initiates the fist
 
@@ -136,7 +135,7 @@ io.on("connection", (socket) => {
       case "Digit1":
         if (backEndPlayer.inventory[0]){
           backEndPlayer.equippedWeapon = backEndPlayer.inventory[0] // adds the weapon to their first slot in inventory
-        } else if (backEndPlayer.equippedWeapon != "Fist"){ // Goes back to fist if inventory slot is empty
+        } else if (backEndPlayer.equippedWeapon.name != "Fist"){ // Goes back to fist if inventory slot is empty
           backEndPlayer.equippedWeapon = fist
           backEndPlayer.canShoot = false
         }
@@ -215,7 +214,7 @@ spawnPowerUps(backEndPowerUps, io, backEndPlayers); // Function to spawn power-u
 setInterval(() => { 
   for (const playerId in backEndPlayers){
     const player = backEndPlayers[playerId]
-    checkPowerUpCollision(backEndPowerUps, io, player) // Power-up collision
+    checkPowerUpCollision(backEndPowerUps, io, player, backEndPlayers) // Power-up collision
   }
 
   playerProjectile(backEndProjectiles, backEndPlayers, io, GAME_WIDTH, GAME_HEIGHT, projectileRadius)

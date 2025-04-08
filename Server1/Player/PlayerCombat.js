@@ -85,7 +85,7 @@ function playerProjectile(backEndProjectiles, backEndPlayers, io, gameWidth, gam
       projectile.y - projectileRadius >= gameHeight ||
       projectile.y + projectileRadius <= 0
     ) {
-      delete projectile;
+      delete backEndProjectiles[id];
       continue;
     }
 
@@ -134,7 +134,7 @@ function playerProjectile(backEndProjectiles, backEndPlayers, io, gameWidth, gam
           if (shooter && equippedWeapon) {
             const totalDamage =
             equippedWeapon.damage * weaponMtp // Calculates the total damage based on multiplier
-            backEndPlayers[playerId].health -= totalDamage
+            backEndPlayer.health -= totalDamage
           } else {
           console.log(`Error: Shooter or equipped weapon is undefined.`)
         }
@@ -159,16 +159,20 @@ function playerProjectile(backEndProjectiles, backEndPlayers, io, gameWidth, gam
       }
 
         // If health reaches 0, remove the player and reward the shooter
-        if(backEndPlayer.health <= 0){ // Checks if this line is needed
-          if (backEndPlayers[playerId].health <= 0) {
-          backEndPlayers[projectile.playerId].score++;
-        }
-        delete backEndPlayers[playerId];
-        updateLeaderBoard(backEndPlayers, io); // Update the leaderboard when a player is eliminated
+        if(backEndPlayer.health <= 0){ 
+        
+          if (backEndPlayers[projectile.playerId]) {
+            backEndPlayers[projectile.playerId].score++;
+          }
+
+          io.to(playerId).emit("playerRespawn")
+
+          delete backEndPlayers[playerId];
+          updateLeaderBoard(backEndPlayers, io, playerId); // Update the leaderboard when a player is eliminated
       }
 
         // Remove the projectile
-        delete projectile;
+        delete backEndProjectiles[id];
         break;
       }
     }

@@ -18,7 +18,9 @@ class PowerUpDrawing {
         "multiShot": "../assets/powerups/MultishotPU.png",
         "health": "../assets/powerups/HealthPU.png",
         "damage": "../assets/powerups/DamagePU.png",
-        "shield": "../assets/powerups/ShieldPU.png"
+        "shield": "../assets/powerups/ShieldPU.png",
+        "rapid": "../assets/powerups/RapidFirePU.png",
+        "fire": "../assets/powerups/FirePU.png"
       };
   
       // Colors for the glow effect based on powerup type
@@ -28,6 +30,8 @@ class PowerUpDrawing {
         "health": "#00FF00", // Green
         "damage": "#FFA500", // Orange
         "shield": "#0000FF", // Blue
+        "rapid": "#000FF",
+        "fire": "#000FF"
       };
   
       this.image.src = powerUpImages[this.type];

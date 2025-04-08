@@ -15,7 +15,6 @@ socket.on('updatePowerUpsOnJoin', (backEndPowerUps) => {
     });
 });
 
-
 socket.on('updatePowerUps', (backEndPowerUps, powerUpData) => {
     if (powerUpData.remove) { // If the power-up was collected, remove it
       delete frontEndPowerUps[powerUpData.id];

@@ -28,7 +28,7 @@ function spawnPowerUps(backEndPowerUps, io, backEndPlayers) {
     if (!someoneIsPlaying) return
 
     // Stop spawning entirely if the limit is reached
-    if (backEndPowerUps.length >= 15) {
+    if (backEndPowerUps.length >= 20) {
         spawning = false;
         clearInterval(interval); // Stop setInterval
         return;
@@ -56,13 +56,13 @@ function spawnPowerUps(backEndPowerUps, io, backEndPlayers) {
 
     // Notify clients
     io.emit("updatePowerUps", backEndPowerUps, powerUpData);
-  }, 3000); // Slowing down spawn interval
+  }, 15000); // Slowing down spawn interval
 }
 
 // ------------------------------
 // Power-up Collision Logic
 // ------------------------------
-function checkPowerUpCollision(backEndPowerUps, io, player) {
+function checkPowerUpCollision(backEndPowerUps, io, player, backEndPlayers) {
   for (let i = backEndPowerUps.length - 1; i >= 0; i--) {
     let powerUp = backEndPowerUps[i];
     let dist = Math.hypot(player.x - powerUp.x, player.y - powerUp.y);
@@ -91,7 +91,7 @@ function checkPowerUpCollision(backEndPowerUps, io, player) {
             io.emit("removePowerUp", { id: powerUp.id, remove: true });
 
             // Check if spawning should restart
-            if (backEndPowerUps.length < 13 && !spawning) {
+            if (backEndPowerUps.length < 20 && !spawning) {
                 spawning = true;
                 spawnPowerUps(backEndPowerUps, io, backEndPlayers); // Restart spawning
             }
