@@ -153,6 +153,7 @@ socket.on('updatePlayers', (backEndPlayers) => {
         username: backEndPlayer.username,
         health: backEndPlayer.health,  
         speed: backEndPlayer.speed,
+        score: backEndPlayer.score,
       })
     } else {
       frontEndPlayer = frontEndPlayers[id]
@@ -170,6 +171,8 @@ socket.on('updatePlayers', (backEndPlayers) => {
       // Update player health in the frontend
       frontEndPlayer.health = backEndPlayer.health
 
+      // Update player score in the frontend
+      frontEndPlayer.score = backEndPlayer.score
       // Used for interpolation (moving the player closer to its new position)
       frontEndPlayer.target = {
         x: backEndPlayer.x,
@@ -223,6 +226,7 @@ socket.on("updateRanking", (topPlayers, playersArray, backEndPlayers) => {
   // If the local player is not in the top 10, mark them not rank and add them into the topPlayers array
   if (!localPlayerInTop) {
     frontEndPlayers[socket.id].notRanked = true;
+    frontEndPlayers[socket.id].score = backEndPlayers[socket.id].score; // Update frontEndPlayers[local player] score
     topPlayers.push(frontEndPlayers[socket.id]);
   }
 
@@ -260,6 +264,8 @@ function updateLeaderboardPage (players) {
 
   // Calculate the number of pages, start/end player of each page, and the players per page
   numberOfPage = Math.ceil(players.length / rowPerPage);
+  if (currentPage > numberOfPage) currentPage = numberOfPage; // Set currentPage to the last page if it exceeds the number of pages
+
   let startIndex = (currentPage - 1) * rowPerPage;
   let endIndex = startIndex + rowPerPage;
   let playersPerPage = players.slice(startIndex, endIndex);
@@ -615,25 +621,34 @@ function drawOnMiniMap(item, worldWidth = 5000, worldHeight = 5000) {
   const miniY = item.y * minimapScaleY
 
   if (item instanceof Player){
+    if (item === frontEndPlayers[socket.id]) {
+      miniMapCtx.beginPath();
+      miniMapCtx.arc(miniX, miniY, 4, 0, Math.PI * 2);
+      miniMapCtx.strokeStyle = "white";
+      miniMapCtx.lineWidth = 1;
+      miniMapCtx.stroke();
+      miniMapCtx.closePath();
+    }
+
     miniMapCtx.beginPath()
-    miniMapCtx.arc(miniX, miniY, 2, 0, Math.PI * 2)
-    miniMapCtx.fillStyle = item.color
-    miniMapCtx.fill()
-    miniMapCtx.closePath()
+    miniMapCtx.arc(miniX, miniY, 2, 0, Math.PI * 2);
+    miniMapCtx.fillStyle = item.color;
+    miniMapCtx.fill();
+    miniMapCtx.closePath();
   } else if (item instanceof WeaponDrawing){
-    miniMapCtx.beginPath()
-    miniMapCtx.rect(miniX, miniY, 4, 4)
+    miniMapCtx.beginPath();
+    miniMapCtx.rect(miniX, miniY, 4, 4);
     miniMapCtx.fillStyle = "yellow";
-    miniMapCtx.fill()
-    miniMapCtx.closePath()
+    miniMapCtx.fill();
+    miniMapCtx.closePath();
   } else if (item instanceof PowerUpDrawing){
     miniMapCtx.beginPath();
-    miniMapCtx.moveTo(miniX, miniY - 4)
-    miniMapCtx.lineTo(miniX - 4, miniY)
-    miniMapCtx.lineTo(miniX + 4, miniY)
-    miniMapCtx.fillStyle = "green"
-    miniMapCtx.fill()
-    miniMapCtx.closePath()
+    miniMapCtx.moveTo(miniX, miniY - 4);
+    miniMapCtx.lineTo(miniX - 4, miniY);
+    miniMapCtx.lineTo(miniX + 4, miniY);
+    miniMapCtx.fillStyle = "green";
+    miniMapCtx.fill();
+    miniMapCtx.closePath();
   }
 }
 
