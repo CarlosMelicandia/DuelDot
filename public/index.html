@@ -139,9 +139,8 @@
         border-top: 1px solid #444;
       }
 
-      
-
-      .miniMap, .miniMapC {
+      .miniMap,
+      .miniMapC {
         user-select: none;
         position: absolute;
         top: 10px;
@@ -160,7 +159,6 @@
         z-index: 1;
         background-image: url("./assets/background.png");
       }
-
     </style>
   </head>
   <body
@@ -181,7 +179,12 @@
 
       <!-- MiniMap -->
       <canvas class="miniMapC" id="miniMapC"></canvas>
-      <img src="./assets/background.png" class="miniMap" id = "miniMap" alt="Map">
+      <img
+        src="./assets/background.png"
+        class="miniMap"
+        id="miniMap"
+        alt="Map"
+      />
 
       <!-- Small Leaderboard-->
       <div class="small-leaderboard">
@@ -212,8 +215,7 @@
               <th>Class</th>
             </tr>
           </thead>
-          <tbody id="player-labels">
-          </tbody>
+          <tbody id="player-labels"></tbody>
         </table>
 
         <div id="leaderboard-page-selector" class="pagination-footer">
@@ -225,20 +227,25 @@
         <!-- Big Leader Board End -->
       </div>
       <canvas></canvas>
-      
-      <div 
-      id="fpsCounter" 
-      style="
-        position:absolute; 
-        top:10px; left:170px; 
-        color:white; 
-        font-family:monospace;
-        z-index: 3">FPS: --</div>
+
+      <div
+        id="fpsCounter"
+        style="
+          position: absolute;
+          top: 10px;
+          left: 170px;
+          color: white;
+          font-family: monospace;
+          z-index: 3;
+        "
+      >
+        FPS: --
+      </div>
 
       <!-- Inventory slots -->
-      <div 
-        id = "inventoryArea"
-        style = "
+      <div
+        id="inventoryArea"
+        style="
           display: none;
           position: relative;
           flex-direction: column;
@@ -248,26 +255,23 @@
           height: 156px;
           bottom: 230px;
           left: 910px;
-          transform: translate(-50%, -50%);">
-        <div 
-          class = "itemBorder"
-          id = "inventorySlot1">
-          <div class = "numbers">1</div>
-          <div class = "weaponText" id = "inventorySlot1Text"></div>
+          transform: translate(-50%, -50%);
+        "
+      >
+        <div class="itemBorder" id="inventorySlot1">
+          <div class="numbers">1</div>
+          <div class="weaponText" id="inventorySlot1Text"></div>
         </div>
-        <div 
-          class = "itemBorder"
-          id = "inventorySlot2"
-          >
-          <div class = "numbers">2</div>
-          <div class = "weaponText" id = "inventorySlot2Text"></div>
+        <div class="itemBorder" id="inventorySlot2">
+          <div class="numbers">2</div>
+          <div class="weaponText" id="inventorySlot2Text"></div>
         </div>
       </div>
 
       <!-- Username and Class Selection Form -->
       <div
-        id = "menu"
-        style=" 
+        id="menu"
+        style="
           display: flex;
           position: absolute;
           flex-direction: column;
