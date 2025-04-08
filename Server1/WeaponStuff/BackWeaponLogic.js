@@ -7,12 +7,12 @@ let deletedWeaponIds = []
 let weaponId = 0
 
 function spawnWeapons(backEndWeapons, io) {
-  const maxX = GAME_WIDTH - 50
-  const maxY = GAME_HEIGHT - 50
-  const min = 50
+  const maxX = GAME_WIDTH - 100
+  const maxY = GAME_HEIGHT - 100
+  const min = 100
 
   setInterval(() => {
-    if (backEndWeapons.length > 10 ) return
+    if (backEndWeapons.length > 50 ) return
     let spawnX = Math.random() * (maxX - min) + min 
     let spawnY = Math.random() * (maxY - min) + min
 
@@ -40,7 +40,7 @@ function spawnWeapons(backEndWeapons, io) {
     backEndWeapons.push(weaponData)
 
     io.emit("updateWeapons", weaponData)
-  }, 5000) // Sets the time rate at which weapons spawn (Default = 7500)
+  }, 5000) // Sets the time rate at which weapons spawn (Default = 2000)
 }
 
 function weaponDrop(weapon, x, y, io, backEndWeapons){
@@ -65,7 +65,7 @@ function checkCollision(backEndWeapons, io, player) {
     let weapon = backEndWeapons[i]
     let dist = Math.hypot(player.x - weapon.x, player.y - weapon.y)
 
-    if (dist < player.radius + weapon.radius) {
+    if (dist < player.radius + weapon.radius + 10) {
       const slotIndex = player.inventory.findIndex(slot => slot === null)
       if (player.inventory[0] != null && player.inventory[1] != null) return
 

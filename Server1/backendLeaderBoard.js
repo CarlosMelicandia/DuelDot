@@ -8,7 +8,8 @@ function updateLeaderBoard(backEndPlayers, io) {
     id,
     username: player.username,
     score: player.score,
-    color: player.color
+    color: player.color,
+    class: player.class
   }));
 
   // Sort the array from highest to lowest
@@ -16,7 +17,7 @@ function updateLeaderBoard(backEndPlayers, io) {
 
   let topPlayers = playersArray.slice(0, 10);   
 
-  io.emit("updateRanking", topPlayers, backEndPlayers);
+  io.emit("updateRanking", topPlayers, playersArray, backEndPlayers);
 }
 
 module.exports = { updateLeaderBoard };

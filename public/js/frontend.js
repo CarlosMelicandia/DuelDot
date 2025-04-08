@@ -29,6 +29,22 @@ const backgroundImage = new Image();
 backgroundImage.src = "../assets/background.png";
 
 // ------------------------------
+// Minimap canvas and context
+// ------------------------------
+const miniMap = document.querySelector("#miniMapC")
+const miniMapCtx = miniMap.getContext("2d")
+miniMap.width = 150
+miniMap.height = 150
+
+// ------------------------------
+// Big Leaderboard Page
+// ------------------------------
+const rowPerPage = 10;
+let globalPlayersArray = [];
+let currentPage = 1;
+let numberOfPage = 1;
+
+// ------------------------------
 // Possible Random Player Names
 // ------------------------------
 const playerNames = [
@@ -67,7 +83,6 @@ let frontEndPowerUps = {} // Object to track power-ups on the client
 let lastTime = performance.now()
 let frames = 0
 let fps = 0
-
 
 /**
  * ------------------------------
@@ -138,6 +153,7 @@ socket.on('updatePlayers', (backEndPlayers) => {
         username: backEndPlayer.username,
         health: backEndPlayer.health,  
         speed: backEndPlayer.speed,
+        score: backEndPlayer.score,
       })
     } else {
       frontEndPlayer = frontEndPlayers[id]
@@ -155,6 +171,8 @@ socket.on('updatePlayers', (backEndPlayers) => {
       // Update player health in the frontend
       frontEndPlayer.health = backEndPlayer.health
 
+      // Update player score in the frontend
+      frontEndPlayer.score = backEndPlayer.score
       // Used for interpolation (moving the player closer to its new position)
       frontEndPlayer.target = {
         x: backEndPlayer.x,
@@ -174,26 +192,13 @@ socket.on('updatePlayers', (backEndPlayers) => {
         })
       }
     }
-
-    /*
-     */
-    // Updates Player Waapon
-    // document.querySelector(
-    //   `tr[data-id="${id}weapon"]`
-    // ).innerHTML = `${backEndPlayer.equippedWeapon}`;
-    // Update Player Score to tabLeaderBoard
-    // document.querySelector(
-    //   `tr[data-id="${id}score"]`
-    // ).innerHTML = `${backEndPlayer.score}`;
-
-    // document.getElementById(id).style.color = color // breaks everything :(
   }
 
   // Remove any client-side players that no longer exist on the server
   for (const id in frontEndPlayers) {
     if (!backEndPlayers[id]) {
       const divToDelete = document.querySelector(`div[data-id="${id}"]`);
-      divToDelete.parentNode.removeChild(divToDelete);
+      //divToDelete.parentNode.removeChild(divToDelete);
 
       // If the local player has been removed, show the username form again
       if (id === socket.id) {
@@ -204,8 +209,10 @@ socket.on('updatePlayers', (backEndPlayers) => {
   }
 });
 
+// ------------------------------
 // Update LeaderBoard when ever new player joins, player dies, or player leaves
-socket.on("updateRanking", (topPlayers, backEndPlayers) => {
+// ------------------------------
+socket.on("updateRanking", (topPlayers, playersArray, backEndPlayers) => {
   // Check if the local player exist in the frontEndPlayers
   // If not, log a warning and return
   if (!frontEndPlayers[socket.id]) {
@@ -219,6 +226,7 @@ socket.on("updateRanking", (topPlayers, backEndPlayers) => {
   // If the local player is not in the top 10, mark them not rank and add them into the topPlayers array
   if (!localPlayerInTop) {
     frontEndPlayers[socket.id].notRanked = true;
+    frontEndPlayers[socket.id].score = backEndPlayers[socket.id].score; // Update frontEndPlayers[local player] score
     topPlayers.push(frontEndPlayers[socket.id]);
   }
 
@@ -242,38 +250,66 @@ socket.on("updateRanking", (topPlayers, backEndPlayers) => {
     parentDiv.appendChild(div);
   });
 
+  // Assign playersArray to globalPlayersArray for pagination
+  // This is used for the pagniation of the big leaderboard
+  globalPlayersArray = playersArray;
+  updateLeaderboardPage(globalPlayersArray);
+});
+
+// Update the big leaderboard when the player dies
+function updateLeaderboardPage (players) {
   // If lag being cause, make this more efficient instead of clearing the big leaderboard everytime
-  const bigLeaderBoard = document.querySelector("#playerLabelsLead");
+  const bigLeaderBoard = document.querySelector("#player-labels");
   bigLeaderBoard.innerHTML = "";
 
-  // Loop through backEndPlayers and display them on the big leaderboard
-  for (const id in backEndPlayers) {
-    const backendPlayer = backEndPlayers[id];
-    document.querySelector("#playerLabelsLead").innerHTML += `
+  // Calculate the number of pages, start/end player of each page, and the players per page
+  numberOfPage = Math.ceil(players.length / rowPerPage);
+  if (currentPage > numberOfPage) currentPage = numberOfPage; // Set currentPage to the last page if it exceeds the number of pages
+
+  let startIndex = (currentPage - 1) * rowPerPage;
+  let endIndex = startIndex + rowPerPage;
+  let playersPerPage = players.slice(startIndex, endIndex);
+
+  // Go through each of player inside the 10 players in playersPerPage and display them
+  // Display the local player in colored text
+  playersPerPage.forEach((entry, index) => {
+    let rankDisplay = index + 1;
+
+    const isLocalPlayer = entry.id === socket.id;
+    const rowColor = isLocalPlayer ?  `style="color: ${entry.color};"` : "";
+    document.querySelector("#player-labels").innerHTML += `
           <tr>
-            <td>${backendPlayer.class}</td>
-            <td>${backendPlayer.username}</td>
-            <td data-id="${id}score">${backendPlayer.score}</td>
-            <td data-id="${id}weapon">Nothing</td>
-            <td>55%</td>
+            <td ${rowColor}>${rankDisplay + startIndex}</td>
+            <td>${entry.username}</td>
+            <td data-id="${entry.id}score">${entry.score}</td>
+            <td data-id="${entry.id}class">${entry.class}</td>
           </tr>`;
+  });
+
+  // Update the number of page in the big leaderboard
+  document.getElementById("page-number").textContent = `${currentPage} / ${numberOfPage || 1}`;
+}
+
+// Update the big leaderboard page to previous page if have when click left arrow
+document.getElementById("prev-page").addEventListener("click", () => {
+  if (currentPage > 1) {
+    currentPage--;
+    updateLeaderboardPage(globalPlayersArray);
   }
 });
 
-// Waits for an updateWeapons from the back end to sync and spawn weapons
-socket.on('updateWeapons', (weaponData) =>{
-  if (weaponData.remove){ // if the weapon has been removed due to collision
-    delete frontEndWeapons[weaponData.id] // deletes weapon
-  }else{
-    if (!frontEndWeapons[weaponData.id]){ // Creates the weapon in the frontEnd if it doesn't exist
-      frontEndWeapons[weaponData.id] = new WeaponDrawing(weaponData) // Contains only x, y, type, radius, and color
-    }
+// Update the big leaderboard page to next page if have when click left arrow
+document.getElementById("next-page").addEventListener("click", () => {
+  if (currentPage < numberOfPage) {
+    currentPage++;
+    updateLeaderboardPage(globalPlayersArray);
   }
-})
+});
 
-socket.on('dropWeapon', (weaponData) => {
-  frontEndWeapons[weaponData.id] = new WeaponDrawing(weaponData)
-}) 
+// ------------------------------
+// Leaderboard End
+// ------------------------------
+
 
 socket.on("removePowerUp", (powerUp) => {
   delete frontEndPowerUps[powerUp.id]; // Remove from frontend state
@@ -299,43 +335,12 @@ socket.on('powerupCollected', (powerupData) => {
 });
 
 
-// When a players joins it shows them the weapons that had spawned previously
-socket.on("updateWeaponsOnJoin", (backEndWeapons) => {
-  frontEndWeapons = {};
-
-  backEndWeapons.forEach((weapon) => {
-    frontEndWeapons[weapon.id] = new WeaponDrawing(weapon)
-  })
-})
-
 socket.on('updatePowerUpsOnJoin', (backEndPowerUps) => {
   frontEndPowerUps = {};
   backEndPowerUps.forEach((powerUp) => {
     frontEndPowerUps[powerUp.id] = new PowerUps(powerUp);
   });
 });
-
-
-// Waits for a weapon equip call from the server
-socket.on('equipWeapon', (slotIndex, player) => {
-  
-  if (player.inventory[0] != null  && player.inventory[1] == null){ // if the first inventory is open 
-    document.querySelector('#inventorySlot1Text').textContent = player.inventory[slotIndex].name // Show weapon in inventory
-  }
-  if(player.inventory[0] != null && player.inventory[1] != null){ // if the second inventory is open
-  document.querySelector('#inventorySlot2Text').textContent = player.inventory[slotIndex].name // Shows the weapon in the second slot
-  }
-})
-
-socket.on('removeWeapon', (player) => {
-  console.log(player.inventory) 
-  if (player.inventory[0] == null){ // if the first inventory is open 
-    document.querySelector('#inventorySlot1Text').textContent = " " // Show weapon in inventory
-  }
-  if(player.inventory[1] == null){ // if the second inventory is open
-  document.querySelector('#inventorySlot2Text').textContent = " " // Shows the weapon in the second slot
-  }
-})
 
 // ------------------------------
 // Animation Loop (Game Rendering)
@@ -361,25 +366,28 @@ function animate() {
 
     document.querySelector('#fpsCounter').textContent = `FPS: ${fps}`
   }
+  
+  const localPlayer = frontEndPlayers[socket.id]
 
+  if (!localPlayer) return
 
-  const localPlayer = frontEndPlayers[socket.id];
   let cameraX = 0,
     cameraY = 0;
   let pixelNumber = 2 * devicePixelRatio;
-
-  if (localPlayer) {
-    cameraX = localPlayer.x - canvas.width / pixelNumber;
-    cameraY = localPlayer.y - canvas.height / pixelNumber;
-  }
+  
+  cameraX = localPlayer.x - canvas.width / pixelNumber;
+  cameraY = localPlayer.y - canvas.height / pixelNumber;
 
   c.save();
   c.translate(-cameraX, -cameraY);
   c.drawImage(backgroundImage, 0, 0, 5000, 5000);
 
+  miniMapCtx.clearRect(0, 0, miniMap.width, miniMap.height)
   // Interpolate and draw each player
   for (const id in frontEndPlayers) {
     const frontEndPlayer = frontEndPlayers[id];
+
+    drawOnMiniMap(frontEndPlayer)
 
     // linear interpolation (move the player closer to its target)
     if (frontEndPlayer.target) {
@@ -394,12 +402,14 @@ function animate() {
   for (const weapon in frontEndWeapons) {
     const frontEndWeapon = frontEndWeapons[weapon];
     frontEndWeapon.draw();
+    drawOnMiniMap(frontEndWeapon)
   }
 
   // Draw the PowerUps
   for (const powerUp in frontEndPowerUps) {
     const frontEndPowerUp = frontEndPowerUps[powerUp];
     frontEndPowerUp.draw();
+    drawOnMiniMap(frontEndPowerUp)
   }
 
   // Draw each projectile
@@ -606,6 +616,48 @@ window.addEventListener("keyup", (event) => {
 });
 
 // ------------------------------
+// Mini Map
+// ------------------------------
+function drawOnMiniMap(item, worldWidth = 5000, worldHeight = 5000) {
+  const minimapScaleX = miniMap.width / worldWidth
+  const minimapScaleY = miniMap.height / worldHeight
+
+  const miniX = item.x * minimapScaleX
+  const miniY = item.y * minimapScaleY
+
+  if (item instanceof Player){
+    if (item === frontEndPlayers[socket.id]) {
+      miniMapCtx.beginPath();
+      miniMapCtx.arc(miniX, miniY, 4, 0, Math.PI * 2);
+      miniMapCtx.strokeStyle = "white";
+      miniMapCtx.lineWidth = 1;
+      miniMapCtx.stroke();
+      miniMapCtx.closePath();
+    }
+
+    miniMapCtx.beginPath()
+    miniMapCtx.arc(miniX, miniY, 2, 0, Math.PI * 2);
+    miniMapCtx.fillStyle = item.color;
+    miniMapCtx.fill();
+    miniMapCtx.closePath();
+  } else if (item instanceof WeaponDrawing){
+    miniMapCtx.beginPath();
+    miniMapCtx.rect(miniX, miniY, 4, 4);
+    miniMapCtx.fillStyle = "yellow";
+    miniMapCtx.fill();
+    miniMapCtx.closePath();
+  } else if (item instanceof PowerUpDrawing){
+    miniMapCtx.beginPath();
+    miniMapCtx.moveTo(miniX, miniY - 4);
+    miniMapCtx.lineTo(miniX - 4, miniY);
+    miniMapCtx.lineTo(miniX + 4, miniY);
+    miniMapCtx.fillStyle = "green";
+    miniMapCtx.fill();
+    miniMapCtx.closePath();
+  }
+}
+
+// ------------------------------
 // Class Selection Handling
 // ------------------------------
 const classSelectors = ["Tank", "Rogue", "Mage", "Gunner"]; // Possible classes
@@ -712,6 +764,3 @@ document.addEventListener("keyup", function (event) {
   }
 });
 
-// ------------------------------
-// MiniMap Handler
-// ------------------------------
