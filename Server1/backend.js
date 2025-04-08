@@ -9,19 +9,12 @@ const Tank = require("./UserClasses/Tank.js");
 const Mage = require("./UserClasses/Mage.js");
 const Rogue = require("./UserClasses/Rogue.js");
 const Gunner = require("./UserClasses/Gunner.js");
-const {
-  Weapon,
-  Pistol,
-  SubmachineGun,
-  Sniper,
-  Shuriken, Fist,
-} = require("./WeaponStuff/Weapons.js");
-const {
-  spawnWeapons,
-  checkCollision, weaponDrop,
-} = require("./WeaponStuff/BackWeaponLogic.js");
-const { updateLeaderBoard } = require("./backendLeaderBoard.js");
+const { Fist } = require("./WeaponStuff/Weapons.js");
+const { spawnWeapons, checkCollision, weaponDrop } = require("./WeaponStuff/BackWeaponLogic.js");
+const { updateLeaderBoard } = require("./backendLeaderBoard.js")
 const { spawnPowerUps, checkPowerUpCollision } = require('./PowerUps/BackPowerUpLogic.js')
+const { playerMovement } = require("./Player/PlayerMovement.js")
+const { playerPunch, playerShoot, playerProjectile } = require("./Player/PlayerCombat.js")
 
 // ------------------------------
 // Socket.IO Setup
@@ -62,10 +55,10 @@ const backEndPowerUps = [] // List of power-ups references server-side
 const GAME_WIDTH = 5000; // Default width
 const GAME_HEIGHT = 5000; // Default height
 
-const PROJECTILE_RADIUS = 5 // Radius of projectiles
+const projectileRadius = 5 // Radius of projectiles
 let projectileId = 0 // Unique ID counter for each projectile created
 
-const FIST = new Fist() // initiates the fist
+const fist = new Fist() // initiates the fist
 
 // ------------------------------
 // Socket.IO Connection and Event Handlers
@@ -75,57 +68,6 @@ io.on("connection", (socket) => {
   console.log("A user connected"); // Logs that a player has connected
 
   io.emit("updatePlayers", backEndPlayers); // Send the current list of players to all connected clients
-
-  /**
-   * When the client emits a 'shoot' event, a new projectile is created.
-   */
-  socket.on('shoot', ({ x, y, angle }) => { 
-    const player = backEndPlayers[socket.id]
-    if (!player || player.equippedWeapon.type == "melee")return // checks that the player is alive and doesn't have a melee
-    
-    if (player.canShoot) { 
-      let fireRate = 0;
-      if (!player.hasRapidFire) {
-        fireRate = backEndPlayers[socket.id].equippedWeapon.fireRate * 1000
-      } else {
-        fireRate = backEndPlayers[socket.id].equippedWeapon.fireRate * 1000 / 10
-      }
-
-      const createProjectile = (projectileAngle) => {
-      projectileId++ // Increment the projectile ID
-
-      // Calculate the velocity of the projectile based on the angle provided by the client
-      const velocity = {
-        x: Math.cos(projectileAngle) * 5,  //Weapon Velocity 
-        y: Math.sin(projectileAngle) * 5   // Weapon Velocity
-      }
-
-      // Create a new server-side projectile
-      backEndProjectiles[projectileId] = {
-        x,
-        y,
-        velocity,
-        playerId: socket.id
-      }
-    }
-
-    createProjectile(angle)
-
-    // If multi-shot is active, create additional projectiles
-    if (player.hasMultiShot) {
-      const spreadAngle = 30 * (Math.PI / 180) // 15 degrees in radians
-      createProjectile(angle - spreadAngle) // Left shot
-      createProjectile(angle + spreadAngle) // Right shot
-      
-    }
-
-      // Delay Calculation 
-      backEndPlayers[socket.id].canShoot = false
-      setTimeout(() => {
-        backEndPlayers[socket.id].canShoot = true
-      }, fireRate)
-    }
-  })
 
   /**
    * Listens for an 'initGame' event from the client to create a new player.
@@ -147,11 +89,12 @@ io.on("connection", (socket) => {
       username: username,
       x: x,
       y: y,
-      equippedWeapon: FIST,
+      equippedWeapon: fist,
       score: 0,
       sequenceNumber: 0
     })
     
+    newPlayer.isPlaying = true
     backEndPlayers[socket.id] = newPlayer
     newPlayer.socketId = socket.id // Adds the player ID to their player profile
 
@@ -194,7 +137,7 @@ io.on("connection", (socket) => {
         if (backEndPlayer.inventory[0]){
           backEndPlayer.equippedWeapon = backEndPlayer.inventory[0] // adds the weapon to their first slot in inventory
         } else if (backEndPlayer.equippedWeapon != "Fist"){ // Goes back to fist if inventory slot is empty
-          backEndPlayer.equippedWeapon = FIST
+          backEndPlayer.equippedWeapon = fist
           backEndPlayer.canShoot = false
         }
         break
@@ -202,7 +145,7 @@ io.on("connection", (socket) => {
        if (backEndPlayer.inventory[1]){
           backEndPlayer.equippedWeapon = backEndPlayer.inventory[1] // adds the weapon to their second slot in inventory
         } else if (backEndPlayer.equippedWeapon.name != "Fist"){ // Goes back to fist if inventory slot is empty
-          backEndPlayer.equippedWeapon = FIST
+          backEndPlayer.equippedWeapon = fist
           backEndPlayer.canShoot = false
         }
         break
@@ -224,7 +167,7 @@ io.on("connection", (socket) => {
       backEndPlayer.inventory[slotIndex] = null // Set the slot to null instead of removing
     }
 
-    backEndPlayer.equippedWeapon = FIST
+    backEndPlayer.equippedWeapon = fist
 
     console.log("Inventory:", backEndPlayer.inventory) // Test
     
@@ -243,24 +186,11 @@ io.on("connection", (socket) => {
   })
 
   /**
-   * When client emits a punch event, a punch is made
+   * When client emits a ping check event, it sends the signal back
    */
-  socket.on('punch', () => {
-    // This may require a separate io.emit that just focuses on this punch and remove  -----------------
-    // This is due to some delay may happen since its every 15ms update, would not need to change .handX 
-    // or anything and this would be done in the frontEnd with a socket.on "punch" or something
-    const backEndPlayer = backEndPlayers[socket.id]
-
-    if (!backEndPlayer || !backEndPlayer.canPunch) return
-
-    backEndPlayer.canPunch = false
-
-    backEndPlayer.handX += .2
-    setTimeout (() => {
-      backEndPlayer.handX = 1.5
-      backEndPlayer.canPunch = true
-    }, 1000)
-  })
+  socket.on("pingCheck", () => {
+    socket.emit("pongCheck");
+  });
 
   socket.on('updateHands', (angle) => {
     const backEndPlayer = backEndPlayers[socket.id]
@@ -269,53 +199,14 @@ io.on("connection", (socket) => {
 
     backEndPlayer.aimAngle = angle
   })  
+  
+  playerPunch(socket, backEndPlayers)
+  playerShoot(socket, backEndPlayers, backEndProjectiles)
+  playerMovement(socket, backEndPlayers, GAME_WIDTH, GAME_HEIGHT)
+})
 
-  /**
-   * Handles player movement via key presses.
-   */
-  socket.on("keydown", ({ keycode, sequenceNumber }) => {
-    const backEndPlayer = backEndPlayers[socket.id]; // Assigns backEndPlayer with the player's current info
-
-    if (!backEndPlayer) return; // Ensure player exists before proceeding
-
-    backEndPlayer.sequenceNumber = sequenceNumber; // Sync the sequence number from the client
-
-    // Move the player based on the key pressed
-    switch (keycode) {
-      case "KeyW":
-        backEndPlayers[socket.id].y -= 5 * backEndPlayer.speed;
-        break;
-      case "KeyA":
-        backEndPlayers[socket.id].x -= 5 * backEndPlayer.speed;
-        break;
-      case "KeyS":
-        backEndPlayers[socket.id].y += 5 * backEndPlayer.speed;
-        break;
-      case "KeyD":
-        backEndPlayers[socket.id].x += 5 * backEndPlayer.speed;
-        break;
-    }
-
-    // Prevent the player from moving out of bounds
-    const playerSides = {
-      left: backEndPlayer.x - backEndPlayer.radius,
-      right: backEndPlayer.x + backEndPlayer.radius,
-      top: backEndPlayer.y - backEndPlayer.radius,
-      bottom: backEndPlayer.y + backEndPlayer.radius,
-    };
-
-    if (playerSides.left < 0)
-      backEndPlayers[socket.id].x = backEndPlayer.radius;
-    if (playerSides.right > GAME_WIDTH)
-      backEndPlayers[socket.id].x = GAME_WIDTH - backEndPlayer.radius;
-    if (playerSides.top < 0) backEndPlayers[socket.id].y = backEndPlayer.radius;
-    if (playerSides.bottom > GAME_HEIGHT)
-      backEndPlayers[socket.id].y = GAME_HEIGHT - backEndPlayer.radius;
-  });
-});
-
-spawnWeapons(backEndWeapons, io); // Function to spawn weapons
-spawnPowerUps(backEndPowerUps, io); // Function to spawn power-ups
+spawnWeapons(backEndWeapons, io, backEndPlayers); // Function to spawn weapons
+spawnPowerUps(backEndPowerUps, io, backEndPlayers); // Function to spawn power-ups
 
 
 // ------------------------------
@@ -327,111 +218,8 @@ setInterval(() => {
     checkPowerUpCollision(backEndPowerUps, io, player) // Power-up collision
   }
 
-  
-  // Update projectile positions
-  for (const id in backEndProjectiles) {
-    backEndProjectiles[id].x += backEndProjectiles[id].velocity.x;
-    backEndProjectiles[id].y += backEndProjectiles[id].velocity.y;
+  playerProjectile(backEndProjectiles, backEndPlayers, io, GAME_WIDTH, GAME_HEIGHT, projectileRadius)
 
-    // Remove projectiles that go out of bounds
-    if (
-      backEndProjectiles[id].x - PROJECTILE_RADIUS >= GAME_WIDTH ||
-      backEndProjectiles[id].x + PROJECTILE_RADIUS <= 0 ||
-      backEndProjectiles[id].y - PROJECTILE_RADIUS >= GAME_HEIGHT ||
-      backEndProjectiles[id].y + PROJECTILE_RADIUS <= 0
-    ) {
-      delete backEndProjectiles[id];
-      continue;
-    }
-
-    // Detect projectile collisions with players
-    for (const playerId in backEndPlayers) {
-      const backEndPlayer = backEndPlayers[playerId];
-      // Calculate the distance between the player and the projectile
-      const DISTANCE = Math.hypot(
-        backEndProjectiles[id].x - backEndPlayer.x,
-        backEndProjectiles[id].y - backEndPlayer.y
-      );
-
-      // Check if a collision occurred
-      if (
-        DISTANCE < PROJECTILE_RADIUS + backEndPlayer.radius &&
-        backEndProjectiles[id].playerId !== playerId
-      ) {
-          // Find the shooter (who fired the projectile)
-        const shooter = backEndPlayers[backEndProjectiles[id].playerId];
-        if(shooter){
-        const equippedWeapon = shooter.equippedWeapon
-
-        const weaponMtps = { // List of all possible weapon multipliers
-          light: shooter.lightWpnMtp,
-          heavy: shooter.heavyWpnMtp,
-          magic: shooter.MagicWpnMtp
-        }
-        const weaponMtp = weaponMtps[equippedWeapon.type] // Obtains the specific weapon multiplier based on th weapons type
-        const damageMultiplier = shooter.damageMultiplier 
-
-        let totalDamage = equippedWeapon.damage * weaponMtp * damageMultiplier
-
-        // Check if the target has a shield
-        if (backEndPlayer.shieldAmount > 0) {
-          if (totalDamage <= backEndPlayer.shieldAmount) {
-            // Shield absorbs all damage
-            backEndPlayer.shieldAmount -= totalDamage
-            totalDamage = 0
-          } else {
-            // Shield absorbs part of the damage
-            totalDamage -= backEndPlayer.shieldAmount
-            backEndPlayer.shieldAmount = 0
-          }
-        }
-
-          if (shooter && equippedWeapon) {
-            const totalDamage =
-            equippedWeapon.damage * weaponMtp // Calculates the total damage based on multiplier
-            backEndPlayers[playerId].health -= totalDamage
-          } else {
-          console.log(`Error: Shooter or equipped weapon is undefined.`)
-        }
-
-        // Apply remaining damage to health
-        if (totalDamage > 0) { // Checks if this line is needed
-          backEndPlayer.health -= totalDamage
-        }
-
-        if (shooter.hasFire) { 
-          // Fire effect is active, so we start applying periodic damage
-      
-          const fireInterval = setInterval(() => {
-              
-              backEndPlayer.health -= 35;
-          }, 3000); // Damage occurs in 3-second intervals
-      
-          // Stop the fire effect after 5 seconds
-          setTimeout(() => {
-              clearInterval(fireInterval); // Clears the interval so damage stops
-          }, 5000);
-      }
-
-      
-      }
-
-        // If health reaches 0, remove the player and reward the shooter
-        if(backEndPlayer.health <= 0){ // Checks if this line is needed
-          if (backEndPlayers[playerId].health <= 0) {
-          backEndPlayers[backEndProjectiles[id].playerId].score++;
-        }
-        delete backEndPlayers[playerId];
-        updateLeaderBoard(backEndPlayers, io); // Update the leaderboard when a player is eliminated
-      }
-
-        // Remove the projectile
-        delete backEndProjectiles[id];
-        break;
-      }
-    }
-  }
-  io.emit("updateProjectiles", backEndProjectiles) // Send an updated list of projectiles to all clients
   io.emit('updatePowerUps', backEndPowerUps, {remove: false})
   io.emit("updatePlayers", backEndPlayers) // Send an updated list of players to all clients
 }, 15);
