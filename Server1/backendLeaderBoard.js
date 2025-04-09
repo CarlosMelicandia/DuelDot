@@ -20,4 +20,14 @@ function updateLeaderBoard(backEndPlayers, io) {
   io.emit("updateRanking", topPlayers, playersArray, backEndPlayers);
 }
 
-module.exports = { updateLeaderBoard };
+function updateKillFeed(backEndPlayers, backEndProjectiles, playerId, id, io){
+  const victimName = backEndPlayers[playerId].username;
+  const killerName = backEndPlayers[backEndProjectiles[id].playerId].username;
+  console.log(killerName + " killed " + victimName );
+  
+  io.emit("updateKillFeed", { killerName: killerName, victimName: victimName });
+}
+
+module.exports = {
+  updateKillFeed,
+  updateLeaderBoard};

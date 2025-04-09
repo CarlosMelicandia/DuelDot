@@ -159,6 +159,41 @@
         z-index: 1;
         background-image: url("./assets/background.png");
       }
+      /* Killfeed container */
+      #killFeed {
+        position: absolute;
+        bottom: 10px;
+        left: 20px;
+        width: 250px;
+        font-family: 'VT323', monospace;
+        color: #fff;
+        pointer-events: none;
+        user-select: none;
+      }
+
+      /* Individual kill messages */
+      .kill-message {
+        background-color: rgba(0, 0, 0, 0.6);
+        padding: 6px 10px;
+        margin-bottom: 5px;
+        border-radius: 6px;
+        opacity: 1;
+        animation: fadeOut 4s forwards;
+      }
+
+      /* Fade out animation */
+      @keyframes fadeOut {
+        0% {
+          opacity: 1;
+        }
+        70% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+          transform: translateX(20px);
+        }
+      }
     </style>
   </head>
   <body
@@ -267,6 +302,13 @@
           <div class="weaponText" id="inventorySlot2Text"></div>
         </div>
       </div>
+
+      <!-- Kill Feed -->
+      <div
+        class = "killFeed"
+        id="killFeed"
+      >
+    </div>
 
       <!-- Username and Class Selection Form -->
       <div

@@ -20,7 +20,7 @@ const {
   spawnWeapons,
   checkCollision, weaponDrop,
 } = require("./WeaponStuff/BackWeaponLogic.js");
-const { updateLeaderBoard } = require("./backendLeaderBoard.js");
+const { updateLeaderBoard, updateKillFeed} = require("./backendLeaderBoard.js");
 const { spawnPowerUps, checkPowerUpCollision } = require('./PowerUps/BackPowerUpLogic.js')
 
 // ------------------------------
@@ -421,6 +421,8 @@ setInterval(() => {
           if (backEndPlayers[playerId].health <= 0) {
           backEndPlayers[backEndProjectiles[id].playerId].score++;
         }
+        updateKillFeed(backEndPlayers, backEndProjectiles, playerId, id, io);// Update the Kill Feed when a player is eliminated
+        
         delete backEndPlayers[playerId];
         updateLeaderBoard(backEndPlayers, io); // Update the leaderboard when a player is eliminated
       }

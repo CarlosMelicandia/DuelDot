@@ -764,3 +764,18 @@ document.addEventListener("keyup", function (event) {
   }
 });
 
+
+// ------------------------------
+// Kill Feed Handler
+// ------------------------------
+socket.on("updateKillFeed", ({ killerName, victimName }) => {
+  const msg = document.createElement('div');
+  msg.classList.add('kill-message');
+  msg.innerHTML = `<strong>${killerName}</strong> killed <strong>${victimName}</strong>`;
+  killFeed.prepend(msg); // newest messages at top
+  
+  // Automatically remove after animation completes
+  setTimeout(() => {
+    msg.remove();
+  }, 4000); // same duration as animation
+});
