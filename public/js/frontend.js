@@ -1,4 +1,3 @@
-
 // ------------------------------
 // Canvas and Context Setup
 // ------------------------------
@@ -31,10 +30,10 @@ backgroundImage.src = "../assets/background.png";
 // ------------------------------
 // Minimap canvas and context
 // ------------------------------
-const miniMap = document.querySelector("#miniMapC")
-const miniMapCtx = miniMap.getContext("2d")
-miniMap.width = 150
-miniMap.height = 150
+const miniMap = document.querySelector("#miniMapC");
+const miniMapCtx = miniMap.getContext("2d");
+miniMap.width = 150;
+miniMap.height = 150;
 
 // ------------------------------
 // Big Leaderboard Page
@@ -48,41 +47,59 @@ let numberOfPage = 1;
 // Possible Random Player Names
 // ------------------------------
 const playerNames = [
-  "Shadow","Raven",
-  "Phoenix","Blaze",
-  "Viper","Maverick",
-  "Rogue","Hunter",
-  "Nova","Zephyr",
-  "Falcon","Titan",
-  "Specter","Cyclone",
-  "Inferno","Reaper",
-  "Stalker","Venom",
-  "Glitch","Banshee",
-  "Shadowstrike","Onyx",
-  "Rebel","Fury",
-  "Apex","Crimson",
-  "Nightfall","Saber",
-  "Tempest","Lightning",
-  "Bullet","Vortex",
-  "Echo","Blitz",
-  "Rift","BOB",
+  "Shadow",
+  "Raven",
+  "Phoenix",
+  "Blaze",
+  "Viper",
+  "Maverick",
+  "Rogue",
+  "Hunter",
+  "Nova",
+  "Zephyr",
+  "Falcon",
+  "Titan",
+  "Specter",
+  "Cyclone",
+  "Inferno",
+  "Reaper",
+  "Stalker",
+  "Venom",
+  "Glitch",
+  "Banshee",
+  "Shadowstrike",
+  "Onyx",
+  "Rebel",
+  "Fury",
+  "Apex",
+  "Crimson",
+  "Nightfall",
+  "Saber",
+  "Tempest",
+  "Lightning",
+  "Bullet",
+  "Vortex",
+  "Echo",
+  "Blitz",
+  "Rift",
+  "BOB",
 ];
 
 // ------------------------------
 // Data Structures for Game Objects
 // ------------------------------
-const frontEndPlayers = {} // Object to keep track of all player objects on the client
-const frontEndProjectiles = {} // Object to keep track of all projectile objects on the client
-let frontEndWeapons = {} // Object to keep track of all weapons objects on the client
-let frontEndPowerUps = {} // Object to track power-ups on the client
+const frontEndPlayers = {}; // Object to keep track of all player objects on the client
+const frontEndProjectiles = {}; // Object to keep track of all projectile objects on the client
+let frontEndWeapons = {}; // Object to keep track of all weapons objects on the client
+let frontEndPowerUps = {}; // Object to track power-ups on the client
 
 // ------------------------------
 // FPS ticker
-// ------------------------------ 
+// ------------------------------
 
-let lastTime = performance.now()
-let frames = 0
-let fps = 0
+let lastTime = performance.now();
+let frames = 0;
+let fps = 0;
 
 /**
  * ------------------------------
@@ -135,9 +152,10 @@ socket.on("updateProjectiles", (backEndProjectiles) => {
  * Keeps the front end (client side) players in sync with the back end (server).
  * When the server emits 'updatePlayers', update or create player objects as needed.
  */
-socket.on('updatePlayers', (backEndPlayers) => {
-  for (const id in backEndPlayers) { // displays the same info as if using socket.id, might want to remove the for loop
-    const backEndPlayer = backEndPlayers[id]
+socket.on("updatePlayers", (backEndPlayers) => {
+  for (const id in backEndPlayers) {
+    // displays the same info as if using socket.id, might want to remove the for loop
+    const backEndPlayer = backEndPlayers[id];
 
     /**
      * If a player with this id does not exist on the client,
@@ -151,33 +169,33 @@ socket.on('updatePlayers', (backEndPlayers) => {
         radius: backEndPlayer.radius,
         color: backEndPlayer.color,
         username: backEndPlayer.username,
-        health: backEndPlayer.health,  
+        health: backEndPlayer.health,
         speed: backEndPlayer.speed,
         score: backEndPlayer.score,
-      })
+      });
     } else {
-      frontEndPlayer = frontEndPlayers[id]
+      frontEndPlayer = frontEndPlayers[id];
       // Updates the player equipped weapon in the front end
-      frontEndPlayer.equippedWeapon = backEndPlayer.equippedWeapon
+      frontEndPlayer.equippedWeapon = backEndPlayer.equippedWeapon;
 
       // Updates whether the player can shoot in the front end
-      frontEndPlayer.canShoot = backEndPlayer.canShoot
+      frontEndPlayer.canShoot = backEndPlayer.canShoot;
 
       // Updates about the punching
-      frontEndPlayer.aimAngle = backEndPlayer.aimAngle
-      frontEndPlayer.handXMove = backEndPlayer.handX // TEST
-      frontEndPlayer.canPunch = backEndPlayer.canPunch
+      frontEndPlayer.aimAngle = backEndPlayer.aimAngle;
+      frontEndPlayer.handXMove = backEndPlayer.handX; // TEST
+      frontEndPlayer.canPunch = backEndPlayer.canPunch;
 
       // Update player health in the frontend
-      frontEndPlayer.health = backEndPlayer.health
+      frontEndPlayer.health = backEndPlayer.health;
 
       // Update player score in the frontend
-      frontEndPlayer.score = backEndPlayer.score
+      frontEndPlayer.score = backEndPlayer.score;
       // Used for interpolation (moving the player closer to its new position)
       frontEndPlayer.target = {
         x: backEndPlayer.x,
-        y: backEndPlayer.y
-      }
+        y: backEndPlayer.y,
+      };
 
       if (id === socket.id) {
         const lastBackendInputIndex = playerInputs.findIndex((input) => {
@@ -187,9 +205,9 @@ socket.on('updatePlayers', (backEndPlayers) => {
           playerInputs.splice(0, lastBackendInputIndex + 1);
         }
         playerInputs.forEach((input) => {
-          frontEndPlayer.target.x += input.dx
-          frontEndPlayer.target.y += input.dy
-        })
+          frontEndPlayer.target.x += input.dx;
+          frontEndPlayer.target.y += input.dy;
+        });
       }
     }
   }
@@ -257,7 +275,7 @@ socket.on("updateRanking", (topPlayers, playersArray, backEndPlayers) => {
 });
 
 // Update the big leaderboard when the player dies
-function updateLeaderboardPage (players) {
+function updateLeaderboardPage(players) {
   // If lag being cause, make this more efficient instead of clearing the big leaderboard everytime
   const bigLeaderBoard = document.querySelector("#player-labels");
   bigLeaderBoard.innerHTML = "";
@@ -276,7 +294,7 @@ function updateLeaderboardPage (players) {
     let rankDisplay = index + 1;
 
     const isLocalPlayer = entry.id === socket.id;
-    const rowColor = isLocalPlayer ?  `style="color: ${entry.color};"` : "";
+    const rowColor = isLocalPlayer ? `style="color: ${entry.color};"` : "";
     document.querySelector("#player-labels").innerHTML += `
           <tr>
             <td ${rowColor}>${rankDisplay + startIndex}</td>
@@ -287,7 +305,9 @@ function updateLeaderboardPage (players) {
   });
 
   // Update the number of page in the big leaderboard
-  document.getElementById("page-number").textContent = `${currentPage} / ${numberOfPage || 1}`;
+  document.getElementById("page-number").textContent = `${currentPage} / ${
+    numberOfPage || 1
+  }`;
 }
 
 // Update the big leaderboard page to previous page if have when click left arrow
@@ -310,23 +330,23 @@ document.getElementById("next-page").addEventListener("click", () => {
 // Leaderboard End
 // ------------------------------
 
-
 socket.on("removePowerUp", (powerUp) => {
   delete frontEndPowerUps[powerUp.id]; // Remove from frontend state
-})
+});
 
-socket.on('updatePowerUps', (backEndPowerUps, powerUpData) => {
-  if (powerUpData.remove) { // If the power-up was collected, remove it
+socket.on("updatePowerUps", (backEndPowerUps, powerUpData) => {
+  if (powerUpData.remove) {
+    // If the power-up was collected, remove it
     delete frontEndPowerUps[powerUpData.id];
   } else {
-    if (!frontEndPowerUps[powerUpData.id]) { // Create the power-up if it doesn't exist
+    if (!frontEndPowerUps[powerUpData.id]) {
+      // Create the power-up if it doesn't exist
       frontEndPowerUps[powerUpData.id] = new PowerUpDrawing(powerUpData); // Stores the power-up data
     }
   }
 });
 
-
-socket.on('powerupCollected', (powerupData) => {
+socket.on("powerupCollected", (powerupData) => {
   const player = frontEndPlayers[socket.id];
   if (!player) return;
 
@@ -334,8 +354,7 @@ socket.on('powerupCollected', (powerupData) => {
   player.applyPowerup(powerupData.type, powerupData.duration);
 });
 
-
-socket.on('updatePowerUpsOnJoin', (backEndPowerUps) => {
+socket.on("updatePowerUpsOnJoin", (backEndPowerUps) => {
   frontEndPowerUps = {};
   backEndPowerUps.forEach((powerUp) => {
     frontEndPowerUps[powerUp.id] = new PowerUps(powerUp);
@@ -357,24 +376,24 @@ function animate() {
   // c.fillStyle = 'rgba(0, 0, 0, 0.1)' // Optional "ghosting" effect if needed
   c.clearRect(0, 0, canvas.width, canvas.height); // Clears the entire canvas
 
-  const now = performance.now()
-  frames++
+  const now = performance.now();
+  frames++;
   if (now - lastTime >= 1000) {
-    fps = frames
-    frames = 0
-    lastTime = now
+    fps = frames;
+    frames = 0;
+    lastTime = now;
 
-    document.querySelector('#fpsCounter').textContent = `FPS: ${fps}`
+    document.querySelector("#fpsCounter").textContent = `FPS: ${fps}`;
   }
-  
-  const localPlayer = frontEndPlayers[socket.id]
 
-  if (!localPlayer) return
+  const localPlayer = frontEndPlayers[socket.id];
+
+  if (!localPlayer) return;
 
   let cameraX = 0,
     cameraY = 0;
   let pixelNumber = 2 * devicePixelRatio;
-  
+
   cameraX = localPlayer.x - canvas.width / pixelNumber;
   cameraY = localPlayer.y - canvas.height / pixelNumber;
 
@@ -382,12 +401,12 @@ function animate() {
   c.translate(-cameraX, -cameraY);
   c.drawImage(backgroundImage, 0, 0, 5000, 5000);
 
-  miniMapCtx.clearRect(0, 0, miniMap.width, miniMap.height)
+  miniMapCtx.clearRect(0, 0, miniMap.width, miniMap.height);
   // Interpolate and draw each player
   for (const id in frontEndPlayers) {
     const frontEndPlayer = frontEndPlayers[id];
 
-    drawOnMiniMap(frontEndPlayer)
+    drawOnMiniMap(frontEndPlayer);
 
     // linear interpolation (move the player closer to its target)
     if (frontEndPlayer.target) {
@@ -396,20 +415,23 @@ function animate() {
       frontEndPlayers[id].y +=
         (frontEndPlayers[id].target.y - frontEndPlayers[id].y) * 0.5;
     }
-    frontEndPlayer.draw({ xPosition: frontEndPlayer.handXMove, angle: frontEndPlayer.aimAngle })
+    frontEndPlayer.draw({
+      xPosition: frontEndPlayer.handXMove,
+      angle: frontEndPlayer.aimAngle,
+    });
   }
 
   for (const weapon in frontEndWeapons) {
     const frontEndWeapon = frontEndWeapons[weapon];
     frontEndWeapon.draw();
-    drawOnMiniMap(frontEndWeapon)
+    drawOnMiniMap(frontEndWeapon);
   }
 
   // Draw the PowerUps
   for (const powerUp in frontEndPowerUps) {
     const frontEndPowerUp = frontEndPowerUps[powerUp];
     frontEndPowerUp.draw();
-    drawOnMiniMap(frontEndPowerUp)
+    drawOnMiniMap(frontEndPowerUp);
   }
 
   // Draw each projectile
@@ -486,25 +508,25 @@ setInterval(() => {
 
   if (keys.d.pressed) {
     sequenceNumber++;
-    playerInputs.push({ sequenceNumber, dx: SPEED, dy: 0 })
-    socket.emit("keydown", { keycode: "KeyD", sequenceNumber })
+    playerInputs.push({ sequenceNumber, dx: SPEED, dy: 0 });
+    socket.emit("keydown", { keycode: "KeyD", sequenceNumber });
   }
 
   /**
    * Interact with Weapons
    */
 
-    if (keys.q.pressed){
-      sequenceNumber++
-      playerInputs.push({ sequenceNumber, dx: 0, dy: 0 })
-      socket.emit('weaponDrop', { keycode: 'KeyD', sequenceNumber })
-    }
+  if (keys.q.pressed) {
+    sequenceNumber++;
+    playerInputs.push({ sequenceNumber, dx: 0, dy: 0 });
+    socket.emit("weaponDrop", { keycode: "KeyD", sequenceNumber });
+  }
 
-    if (keys.f.pressed){
-      sequenceNumber++
-      playerInputs.push({ sequenceNumber, dx: 0, dy: 0 })
-      socket.emit('pickUpWeapon', { keycode: 'KeyF', sequenceNumber })
-    }
+  if (keys.f.pressed) {
+    sequenceNumber++;
+    playerInputs.push({ sequenceNumber, dx: 0, dy: 0 });
+    socket.emit("pickUpWeapon", { keycode: "KeyF", sequenceNumber });
+  }
 
   /**
    * Inventory
@@ -548,31 +570,31 @@ window.addEventListener("keydown", (event) => {
 
   switch (event.code) {
     case "KeyW":
-      keys.w.pressed = true
+      keys.w.pressed = true;
       break;
     case "KeyA":
-      keys.a.pressed = true
+      keys.a.pressed = true;
       break;
     case "KeyS":
-      keys.s.pressed = true
+      keys.s.pressed = true;
       break;
     case "KeyD":
-      keys.d.pressed = true
+      keys.d.pressed = true;
       break;
-    case 'KeyQ':
-      keys.q.pressed = true
-      break
-    case 'KeyF':
-      keys.f.pressed = true
-      break
+    case "KeyQ":
+      keys.q.pressed = true;
+      break;
+    case "KeyF":
+      keys.f.pressed = true;
+      break;
     case "Tab":
-      keys.tab.pressed = true
+      keys.tab.pressed = true;
       break;
     case "Digit1":
-      keys.num1.pressed = true
+      keys.num1.pressed = true;
       break;
     case "Digit2":
-      keys.num2.pressed = true
+      keys.num2.pressed = true;
       break;
   }
 });
@@ -585,33 +607,33 @@ window.addEventListener("keyup", (event) => {
 
   switch (event.code) {
     case "KeyW":
-      keys.w.pressed = false
-      break
+      keys.w.pressed = false;
+      break;
     case "KeyA":
-      keys.a.pressed = false
+      keys.a.pressed = false;
       break;
     case "KeyS":
-      keys.s.pressed = false
-      break
+      keys.s.pressed = false;
+      break;
     case "KeyD":
-      keys.d.pressed = false
-      break
-    case 'KeyQ':
-      keys.q.pressed = false
-      break
-    case 'KeyF':
-      keys.f.pressed = false
-      break
+      keys.d.pressed = false;
+      break;
+    case "KeyQ":
+      keys.q.pressed = false;
+      break;
+    case "KeyF":
+      keys.f.pressed = false;
+      break;
     case "Tab":
-      keys.tab.pressed = false
+      keys.tab.pressed = false;
       // console.log("Tab up")
-      break
+      break;
     case "Digit1":
-      keys.num1.pressed = false
-      break
+      keys.num1.pressed = false;
+      break;
     case "Digit2":
-      keys.num2.pressed = false
-      break
+      keys.num2.pressed = false;
+      break;
   }
 });
 
@@ -619,13 +641,13 @@ window.addEventListener("keyup", (event) => {
 // Mini Map
 // ------------------------------
 function drawOnMiniMap(item, worldWidth = 5000, worldHeight = 5000) {
-  const minimapScaleX = miniMap.width / worldWidth
-  const minimapScaleY = miniMap.height / worldHeight
+  const minimapScaleX = miniMap.width / worldWidth;
+  const minimapScaleY = miniMap.height / worldHeight;
 
-  const miniX = item.x * minimapScaleX
-  const miniY = item.y * minimapScaleY
+  const miniX = item.x * minimapScaleX;
+  const miniY = item.y * minimapScaleY;
 
-  if (item instanceof Player){
+  if (item instanceof Player) {
     if (item === frontEndPlayers[socket.id]) {
       miniMapCtx.beginPath();
       miniMapCtx.arc(miniX, miniY, 4, 0, Math.PI * 2);
@@ -635,18 +657,18 @@ function drawOnMiniMap(item, worldWidth = 5000, worldHeight = 5000) {
       miniMapCtx.closePath();
     }
 
-    miniMapCtx.beginPath()
+    miniMapCtx.beginPath();
     miniMapCtx.arc(miniX, miniY, 2, 0, Math.PI * 2);
     miniMapCtx.fillStyle = item.color;
     miniMapCtx.fill();
     miniMapCtx.closePath();
-  } else if (item instanceof WeaponDrawing){
+  } else if (item instanceof WeaponDrawing) {
     miniMapCtx.beginPath();
     miniMapCtx.rect(miniX, miniY, 4, 4);
     miniMapCtx.fillStyle = "yellow";
     miniMapCtx.fill();
     miniMapCtx.closePath();
-  } else if (item instanceof PowerUpDrawing){
+  } else if (item instanceof PowerUpDrawing) {
     miniMapCtx.beginPath();
     miniMapCtx.moveTo(miniX, miniY - 4);
     miniMapCtx.lineTo(miniX - 4, miniY);
@@ -734,10 +756,10 @@ document.querySelector("#randomNameBtn").addEventListener("click", () => {
  * - Hide the username form
  * - Emit an 'initGame' event to the server with our chosen data
  */
-document.querySelector('#usernameForm').addEventListener('submit', (event) => {
-  event.preventDefault() // Prevents the form from refreshing
-  document.querySelector('#usernameForm').style.display = 'none' // Hides the username form
-  document.querySelector('#inventoryArea').style.display = 'flex'
+document.querySelector("#usernameForm").addEventListener("submit", (event) => {
+  event.preventDefault(); // Prevents the form from refreshing
+  document.querySelector("#usernameForm").style.display = "none"; // Hides the username form
+  document.querySelector("#inventoryArea").style.display = "flex";
   // Send data to the server to initialize the player
   socket.emit("initGame", {
     width: canvas.width,
@@ -764,16 +786,15 @@ document.addEventListener("keyup", function (event) {
   }
 });
 
-
 // ------------------------------
 // Kill Feed Handler
 // ------------------------------
-socket.on("updateKillFeed", ({ killerName, victimName }) => {
-  const msg = document.createElement('div');
-  msg.classList.add('kill-message');
-  msg.innerHTML = `<strong>${killerName}</strong> killed <strong>${victimName}</strong>`;
+socket.on("updateKillFeed", ({ killerName, victimName, weapon }) => {
+  const msg = document.createElement("div");
+  msg.classList.add("kill-message");
+  msg.innerHTML = `<strong style="color: green;">${killerName}</strong> used <strong>${weapon}<strong> kill <strong style="color: red;">${victimName}</strong>`;
   killFeed.prepend(msg); // newest messages at top
-  
+
   // Automatically remove after animation completes
   setTimeout(() => {
     msg.remove();
