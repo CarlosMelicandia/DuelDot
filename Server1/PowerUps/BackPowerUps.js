@@ -10,8 +10,6 @@ class PowerUp {
         this.player = player; // The player who picked up the powerup
         this.activePowerups = {}; // Store active powerups
         this.id = id; // Unique ID for tracking
-
-        console.log(`PowerUp created: ID=${this.id}, Type=${this.type}, Duration=${this.duration}`);
     }
 }
 

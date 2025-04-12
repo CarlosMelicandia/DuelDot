@@ -38,6 +38,9 @@ let globalPlayersArray = [];
 let currentPage = 1;
 let numberOfPage = 1;
 
+let cameraX = 0;
+let cameraY = 0;
+
 // ------------------------------
 // Possible Random Player Names
 // ------------------------------
@@ -61,6 +64,7 @@ const playerNames = [
   "Echo","Blitz",
   "Rift","BOB",
 ];
+let usedNames = [];
 
 // ------------------------------
 // Data Structures for Game Objects
@@ -112,11 +116,18 @@ socket.on('updatePlayers', (backEndPlayers) => {
     } else {
       frontEndPlayer = frontEndPlayers[id]
       // Updates the player equipped weapon in the front end
-      frontEndPlayer.equippedWeapon = backEndPlayer.equippedWeapon
+      const originalWeapon = backEndPlayer.equippedWeapon
+      frontEndPlayer.equippedWeapon = new WeaponDrawing({
+        x: frontEndPlayer.x,
+        y: frontEndPlayer.y,
+        name: originalWeapon.name,
+        type: originalWeapon.type,
+        isReloaded: originalWeapon.isReloaded
+      })
 
-      if (backEndPlayer.equippedWeapon.imagePath) {
+      if (frontEndPlayer.equippedWeapon.imagePath) {
         const weaponImg = new Image();
-        weaponImg.src = backEndPlayer.equippedWeapon.imagePath;
+        weaponImg.src = frontEndPlayer.equippedWeapon.imagePath;
         frontEndPlayer.equippedWeapon.image = weaponImg;
       }
 
@@ -214,6 +225,7 @@ function animate() {
   animationId = requestAnimationFrame(animate); // Tells the browser we want to perform an animation
   // c.fillStyle = 'rgba(0, 0, 0, 0.1)' // Optional "ghosting" effect if needed
   const frontEndPlayer = frontEndPlayers[socket.id]
+  
   c.clearRect(0, 0, canvas.width, canvas.height); // Clears the entire canvas
 
   const now = performance.now()
@@ -225,13 +237,11 @@ function animate() {
 
     document.querySelector('#fpsCounter').textContent = `FPS: ${fps}`
   }
-
-  let cameraX = 0;
-  let cameraY = 0;
+  
   const zoomOut = 3
 
   c.save();
-
+  
   if (gameStarted && frontEndPlayer) {
     cameraX = frontEndPlayer.x - canvas.width / (2 * devicePixelRatio)
     cameraY = frontEndPlayer.y - canvas.height / (2 * devicePixelRatio)
@@ -245,7 +255,8 @@ function animate() {
   c.drawImage(backgroundImage, 0, 0, 5000, 5000);
 
   if (gameStarted) miniMapCtx.clearRect(0, 0, miniMap.width, miniMap.height)
-
+    
+  
   // Interpolate and draw each player
   for (const id in frontEndPlayers) {
     const frontEndPlayer = frontEndPlayers[id];
@@ -282,6 +293,10 @@ function animate() {
   }
 
   c.restore();
+
+  // if (frontEndPlayer) {
+  //   frontEndPlayer.equippedWeapon.drawReloadTimer()
+  // }
 }
 
 animate();
@@ -442,24 +457,32 @@ document.querySelector("#classSelectorLeft").addEventListener("click", () => {
  * Generate a random name that isn't already in use by another player on the client.
  * If the generated name is taken, recurse until a unique name is found.
  */
+
 function selectName() {
   let playerNameNumber = Math.floor(Math.random() * playerNames.length);
   let name = playerNames[playerNameNumber];
-  for (const id in frontEndPlayers) {
-    if (frontEndPlayers[id].username === name) {
-      // If name is already taken by a current player, try again
-      return selectName();
+  
+  if (usedNames.length >= playerNames.length) {
+    return "Player" + Math.floor(Math.random() * 1000)
+  }  
+
+  for (const id in frontEndPlayers){
+    if (frontEndPlayers[id].username === name){
+      return selectName()
     }
   }
-  return name;
-}
 
-let playerName = selectName();
-document.querySelector("#selectedRandomName").textContent = playerName;
+  return name
+}
+  
+playerName = selectName()
+document.querySelector("#selectedRandomName").textContent = "Select Name :)"
+
 
 document.querySelector("#randomNameBtn").addEventListener("click", () => {
   // Generate a new random name when clicked
-  playerName = selectName();
+  playerName = selectName()
+
   document.querySelector("#selectedRandomName").textContent = playerName;
 });
 

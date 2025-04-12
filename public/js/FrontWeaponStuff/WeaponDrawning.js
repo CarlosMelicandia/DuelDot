@@ -1,12 +1,14 @@
 class WeaponDrawing {
-    constructor({id, x, y, radius, color, name}) {
+    constructor({id, x, y, radius, name, type, isReloaded}) {
         this.id = id
         this.x = x
         this.y = y
         this.radius = radius
-        this.color = color // Keep as fallback
         this.name = name
+        this.type = type
+        this.isReloaded = isReloaded
         this.image = new Image()
+        this.topImage = new Image()
 
 
         // Define image paths for each weapon type
@@ -14,11 +16,20 @@ class WeaponDrawing {
             "pistol": "../assets/weapons/GravityGun.png",
             "submachineGun": "../assets/weapons/FirePistol.png",
             "sniper": "../assets/weapons/Sniper.png",
-            "shuriken": "../assets/weapons/Shuriken.png"
+            "shuriken": "../assets/weapons/Shuriken.png",
+            "fist": ""
         };
+
+        const topWeaponImages = {
+            "pistol": "../assets/topDownWeapons/pistolTop.png",
+            "submachineGun": "../assets/topDownWeapons/subgunTop.png",
+            "sniper": "../assets/topDownWeapons/sniperTop.png",
+            "shuriken": "../assets/topDownWeapons/shurikenTop.png",
+            "fist": ""
+        }
         
         // Define size multipliers for each weapon type
-        this.sizeMultipliers = {
+        const sizeMultipliers = {
             "pistol": 2.5,
             "submachineGun": 2.0,
             "sniper": 2.8,
@@ -26,14 +37,17 @@ class WeaponDrawing {
         };
         
         // Changes size of icons when spawning in
-        this.sizeMultiplier = this.sizeMultipliers[this.type] || 2;
+        this.sizeMultiplier = sizeMultipliers[this.name] || 2;
         
         // Set the image source based on weapon type
-        this.image.src = weaponImages[this.name]
+        this.image.src = weaponImages[this.name] // || "../assets/weapons/default.png"
+        this.topImage.src = topWeaponImages[this.name] // || "../assets/weapons/default.png"
+        this.topImageLength = 0
         
         // Flag to track if image loaded successfully
         this.imageLoaded = false;
         this.image.onload = () => {
+            this.topImageLength = this.topImage.width * .10
             this.imageLoaded = true;
         }
     }
@@ -64,7 +78,6 @@ class WeaponDrawing {
             // Fallback to original circle drawing if image isn't loaded
             c.beginPath();
             c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-            c.fillStyle = this.color;
             c.fill();
             c.closePath();
         }
@@ -72,7 +85,6 @@ class WeaponDrawing {
 
     drawReloadTimer(){
         const now = performance.now()
-        console.log(now)
     }
 }
 

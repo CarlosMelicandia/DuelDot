@@ -90,8 +90,6 @@ function checkCollision(backEndWeapons, io, player) {
       const weaponEquipped = new weapons[weapon.name]() // Creates a weapon object when a player picks it up
       
       player.inventory[slotIndex] = weaponEquipped
-
-      console.log("AFter pickup Inventory:", player.inventory) // Test
       
       io.to(player.socketId).emit('equipWeapon', slotIndex, player)
 

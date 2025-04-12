@@ -6,18 +6,19 @@
 const canvasRect = canvas.getBoundingClientRect(); // Gets the top and left position of the canvas relative to the viewport
 
 // Get the camera offsets as used in animate()
-let cameraX = 0, cameraY = 0;
 let pixelNumber = 2 * devicePixelRatio;
 
 window.addEventListener("click", (event) => {
   const player = frontEndPlayers[socket.id]
-  const equippedWeapon = player.equippedWeapon
+  
   
   // Ensure the local player exists before proceeding
   if (!player) return;
 
-  if (equippedWeapon.type == "melee" && player.canPunch) {
-    socket.emit('punch')// Test------------------------------------
+  const equippedWeapon = player.equippedWeapon
+
+  if (equippedWeapon.name == "fist" && player.canPunch) {
+    socket.emit('punch')
   } else{
     if (!equippedWeapon.isReloaded) return // Checks to see if the frontEnd should even do the calculations
   }
@@ -38,25 +39,41 @@ window.addEventListener("click", (event) => {
   const worldMouseX = mouseX + cameraX;
   const worldMouseY = mouseY + cameraY;
 
-    // Calculates the angle between the player's position to world mouse click location.
-    const angle = Math.atan2(
-      worldMouseY - playerPosition.y,
-      worldMouseX - playerPosition.x
-    );
+  // Calculates the angle between the player's position to world mouse click location.
+  const angle = Math.atan2(
+    worldMouseY - playerPosition.y,
+    worldMouseX - playerPosition.x
+  );
 
-    /**
-     * Sends a "shoot" event to the server.
-     * This informs the server that the player has fired a shot.
-     *
-     * Data sent:
-     * - `x, y`: Player’s current position.
-     * - `angle`: The angle at which the projectile should be fired.
-     */
-    socket.emit("shoot", {
-    x: playerPosition.x,
-    y: playerPosition.y,
-    angle
-    })
+  // Define the distance from the center of the player to the muzzle
+  console.log(equippedWeapon.topImageLength)
+  const muzzleOffset = equippedWeapon.topImageLength
+  const sideOffset = 10;
+
+  // Use trigonometry to calculate the muzzle coordinates
+  const spawnX = 
+    playerPosition.x +
+    Math.cos(angle) * muzzleOffset +
+    Math.cos(angle + Math.PI / 2) * sideOffset
+    
+  const spawnY = 
+  playerPosition.y +
+  Math.sin(angle) * muzzleOffset +
+  Math.sin(angle + Math.PI / 2) * sideOffset
+
+  /**
+   * Sends a "shoot" event to the server.
+   * This informs the server that the player has fired a shot.
+   *
+   * Data sent:
+   * - `x, y`: Player’s current position.
+   * - `angle`: The angle at which the projectile should be fired.
+   */
+  socket.emit("shoot", {
+  x: spawnX,
+  y: spawnY,
+  angle: angle
+  })
 })
 
 window.addEventListener('mousemove', (event) => {
@@ -150,7 +167,6 @@ window.addEventListener("keyup", (event) => {
       break
     case "Tab":
       keys.tab.pressed = false
-      // console.log("Tab up")
       break
     case "Digit1":
       keys.num1.pressed = false
