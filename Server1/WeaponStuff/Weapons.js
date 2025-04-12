@@ -6,7 +6,7 @@ class Weapon{
         this.fireRate = fireRate
         this.velocity = velocity
         this.imagePath = imagePath
-        this.isDropped = false
+        this.isReloaded = true
     }
 }
 
@@ -67,6 +67,7 @@ class Fist extends Weapon{
             damage: 40,
             fireRate: 0.3,
             velocity: 5});
+            this.isReloaded = false
     }
 }
 

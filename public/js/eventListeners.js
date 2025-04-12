@@ -11,14 +11,15 @@ let pixelNumber = 2 * devicePixelRatio;
 
 window.addEventListener("click", (event) => {
   const player = frontEndPlayers[socket.id]
+  const equippedWeapon = player.equippedWeapon
   
   // Ensure the local player exists before proceeding
   if (!player) return;
 
-  if (player.equippedWeapon.type == "melee" && player.canPunch) {
+  if (equippedWeapon.type == "melee" && player.canPunch) {
     socket.emit('punch')// Test------------------------------------
   } else{
-    if (!player.canShoot) return // Checks to see if the frontEnd should even do the calculations
+    if (!equippedWeapon.isReloaded) return // Checks to see if the frontEnd should even do the calculations
   }
 
   const mouseX = event.clientX - canvasRect.left; // Get the mouse x cordinate relative to the canvas
@@ -39,7 +40,7 @@ window.addEventListener("click", (event) => {
 
     // Calculates the angle between the player's position to world mouse click location.
     const angle = Math.atan2(
-      worldMouseY- playerPosition.y,
+      worldMouseY - playerPosition.y,
       worldMouseX - playerPosition.x
     );
 

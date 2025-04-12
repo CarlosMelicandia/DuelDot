@@ -69,5 +69,10 @@ class WeaponDrawing {
             c.closePath();
         }
     }
+
+    drawReloadTimer(){
+        const now = performance.now()
+        console.log(now)
+    }
 }
 

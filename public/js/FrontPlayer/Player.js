@@ -16,7 +16,7 @@ class Player {
    * @param {number} health - The player's initial health.
    * @param {number} speed - The player's movement speed.
    */
-  constructor({ x, y, radius, color, username, health, speed, canShoot, equippedWeapon }) {
+  constructor({ x, y, radius, color, username, health, speed, equippedWeapon }) {
     this.x = x
     this.y = y
     this.radius = radius
@@ -25,7 +25,6 @@ class Player {
     this.health = health // Initialize health 
     this.maxHealth = health // Store max health for calculations 
     this.speed = speed // Movement speed 
-    this.canShoot = canShoot
     this.equippedWeapon = equippedWeapon
 
     this.aimAngle = 0

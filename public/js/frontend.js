@@ -110,9 +110,6 @@ socket.on('updatePlayers', (backEndPlayers) => {
         weaponImg.src = backEndPlayer.equippedWeapon.imagePath;
         frontEndPlayer.equippedWeapon.image = weaponImg;
       }
-      
-      // Updates whether the player can shoot in the front end
-      frontEndPlayer.canShoot = backEndPlayer.canShoot
 
       // Updates about the punching
       frontEndPlayer.aimAngle = backEndPlayer.aimAngle
@@ -189,6 +186,7 @@ let animationId;
 function animate() {
   animationId = requestAnimationFrame(animate); // Tells the browser we want to perform an animation
   // c.fillStyle = 'rgba(0, 0, 0, 0.1)' // Optional "ghosting" effect if needed
+  const frontEndPlayer = frontEndPlayers[socket.id]
   c.clearRect(0, 0, canvas.width, canvas.height); // Clears the entire canvas
 
   const now = performance.now()
@@ -200,8 +198,6 @@ function animate() {
 
     document.querySelector('#fpsCounter').textContent = `FPS: ${fps}`
   }
-  
-  const frontEndPlayer = frontEndPlayers[socket.id]
 
   let cameraX = 0;
   let cameraY = 0;
@@ -213,15 +209,16 @@ function animate() {
     cameraX = (gameWidth / 2) - (canvas.width / 2 * devicePixelRatio * zoomOut) // this needs fixing IDK WTF ITS HAPPENING AND WHY ITS NOT CENTERED
     cameraY = (gameHeight / 2) - (canvas.height / 2 * devicePixelRatio * zoomOut)
     c.scale(1 / zoomOut, 1 / zoomOut)
-
   } else {
     cameraX = frontEndPlayer.x - canvas.width / (2 * devicePixelRatio)
     cameraY = frontEndPlayer.y - canvas.height / (2 * devicePixelRatio)
   }
-
+  
   c.translate(-cameraX, -cameraY);
   c.drawImage(backgroundImage, 0, 0, 5000, 5000);
+
   if (gameStarted) miniMapCtx.clearRect(0, 0, miniMap.width, miniMap.height)
+
   // Interpolate and draw each player
   for (const id in frontEndPlayers) {
     const frontEndPlayer = frontEndPlayers[id];

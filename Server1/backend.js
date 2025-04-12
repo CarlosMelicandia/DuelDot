@@ -136,7 +136,6 @@ io.on("connection", (socket) => {
           backEndPlayer.equippedWeapon = backEndPlayer.inventory[0] // adds the weapon to their first slot in inventory
         } else if (backEndPlayer.equippedWeapon != "Fist"){ // Goes back to fist if inventory slot is empty
           backEndPlayer.equippedWeapon = fist
-          backEndPlayer.canShoot = false
         }
         break
       case "Digit2":       
@@ -144,7 +143,6 @@ io.on("connection", (socket) => {
           backEndPlayer.equippedWeapon = backEndPlayer.inventory[1] // adds the weapon to their second slot in inventory
         } else if (backEndPlayer.equippedWeapon.name != "Fist"){ // Goes back to fist if inventory slot is empty
           backEndPlayer.equippedWeapon = fist
-          backEndPlayer.canShoot = false
         }
         break
     }
