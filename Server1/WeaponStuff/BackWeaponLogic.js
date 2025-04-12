@@ -22,7 +22,8 @@ function spawnWeapons(backEndWeapons, io, backEndPlayers) {
 
     if (!someoneIsPlaying) return
 
-    if (backEndWeapons.length > 50 ) return
+    if (backEndWeapons.length > 25 ) return
+    
     let spawnX = Math.random() * (maxX - min) + min 
     let spawnY = Math.random() * (maxY - min) + min
 

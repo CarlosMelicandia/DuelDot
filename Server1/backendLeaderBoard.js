@@ -1,5 +1,5 @@
 
-function updateLeaderBoard(backEndPlayers, io) {
+function updateLeaderBoard(backEndPlayers, io, excludeId = null) {
   /**
    * Turn backEndPlayers into an array of players
    * Each element will be a map of id (key) and player (value)
@@ -8,15 +8,15 @@ function updateLeaderBoard(backEndPlayers, io) {
     id,
     username: player.username,
     score: player.score,
-    color: player.color
+    color: player.color,
+    class: player.class
   }));
 
   // Sort the array from highest to lowest
   playersArray.sort((a, b) => b.score - a.score);
 
   let topPlayers = playersArray.slice(0, 10);   
-
-  io.emit("updateRanking", topPlayers, backEndPlayers);
+  io.emit("updateRanking", topPlayers, playersArray, backEndPlayers);  
 }
 
 module.exports = { updateLeaderBoard };

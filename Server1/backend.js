@@ -12,7 +12,7 @@ const Gunner = require("./UserClasses/Gunner.js");
 const { Fist } = require("./WeaponStuff/Weapons.js");
 const { spawnWeapons, checkCollision, weaponDrop } = require("./WeaponStuff/BackWeaponLogic.js");
 const { updateLeaderBoard } = require("./backendLeaderBoard.js")
-const { spawnPowerUps, checkPowerUpCollision } = require('./PowerUps/BackEndPowerUps.js')
+const { spawnPowerUps, checkPowerUpCollision } = require('./PowerUps/BackPowerUpLogic.js')
 const { playerMovement } = require("./Player/PlayerMovement.js")
 const { playerPunch, playerShoot, playerProjectile } = require("./Player/PlayerCombat.js")
 
@@ -22,6 +22,7 @@ const { playerPunch, playerShoot, playerProjectile } = require("./Player/PlayerC
 const http = require("http"); // Import Node's built-in HTTP module
 const server = http.createServer(app); // Create an HTTP server using the Express app
 const { Server } = require("socket.io"); // Import the Socket.IO Server class
+const { PowerUp } = require('./PowerUps/BackPowerUps.js')
 
 /**
  * Creates a Socket.io server instance
@@ -134,7 +135,7 @@ io.on("connection", (socket) => {
       case "Digit1":
         if (backEndPlayer.inventory[0]){
           backEndPlayer.equippedWeapon = backEndPlayer.inventory[0] // adds the weapon to their first slot in inventory
-        } else if (backEndPlayer.equippedWeapon != "Fist"){ // Goes back to fist if inventory slot is empty
+        } else if (backEndPlayer.equippedWeapon.name != "Fist"){ // Goes back to fist if inventory slot is empty
           backEndPlayer.equippedWeapon = fist
         }
         break
@@ -202,7 +203,7 @@ io.on("connection", (socket) => {
 })
 
 spawnWeapons(backEndWeapons, io, backEndPlayers); // Function to spawn weapons
-spawnPowerUps(backEndPowerUps, io,backEndPlayers); // Function to spawn power-ups
+spawnPowerUps(backEndPowerUps, io, backEndPlayers); // Function to spawn power-ups
 
 
 // ------------------------------
@@ -211,7 +212,7 @@ spawnPowerUps(backEndPowerUps, io,backEndPlayers); // Function to spawn power-up
 setInterval(() => { 
   for (const playerId in backEndPlayers){
     const player = backEndPlayers[playerId]
-    checkPowerUpCollision(backEndPowerUps, io, player) // Power-up collision
+    checkPowerUpCollision(backEndPowerUps, io, player, backEndPlayers) // Power-up collision
   }
 
   playerProjectile(backEndProjectiles, backEndPlayers, io, GAME_WIDTH, GAME_HEIGHT, projectileRadius)

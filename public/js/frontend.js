@@ -31,6 +31,14 @@ const gameWidth = backgroundImage.width
 const gameHeight = backgroundImage.height
 
 // ------------------------------
+// Big Leaderboard Page
+// ------------------------------
+const rowPerPage = 10;
+let globalPlayersArray = [];
+let currentPage = 1;
+let numberOfPage = 1;
+
+// ------------------------------
 // Possible Random Player Names
 // ------------------------------
 const playerNames = [
@@ -99,6 +107,7 @@ socket.on('updatePlayers', (backEndPlayers) => {
         username: backEndPlayer.username,
         health: backEndPlayer.health,  
         speed: backEndPlayer.speed,
+        score: backEndPlayer.score,
       })
     } else {
       frontEndPlayer = frontEndPlayers[id]
@@ -119,6 +128,8 @@ socket.on('updatePlayers', (backEndPlayers) => {
       // Update player health in the frontend
       frontEndPlayer.health = backEndPlayer.health
 
+      // Update player score in the frontend
+      frontEndPlayer.score = backEndPlayer.score
       // Used for interpolation (moving the player closer to its new position)
       frontEndPlayer.target = {
         x: backEndPlayer.x,
@@ -154,6 +165,22 @@ socket.on('updatePlayers', (backEndPlayers) => {
     }
   }
 });
+
+socket.on("playerRespawn", (player) =>{
+  // Show respawn form
+  document.querySelector("#usernameForm").style.display = "block";
+  
+  const itemsToHide = document.querySelectorAll('.removeAfter')
+  itemsToHide.forEach((item) => {
+    item.style.display = 'flex' // Hides the whole menu
+  })
+  const itemsToShow = document.querySelectorAll('.displayAfter')
+  itemsToShow.forEach((item) => {
+    item.style.display = 'none'
+  })
+
+  gameStarted = false
+})
 
 // ------------------------------
 // Ping Checker
@@ -205,13 +232,13 @@ function animate() {
 
   c.save();
 
-  if (!gameStarted) {
+  if (gameStarted && frontEndPlayer) {
+    cameraX = frontEndPlayer.x - canvas.width / (2 * devicePixelRatio)
+    cameraY = frontEndPlayer.y - canvas.height / (2 * devicePixelRatio)
+  } else {
     cameraX = (gameWidth / 2) - (canvas.width / 2 * devicePixelRatio * zoomOut) // this needs fixing IDK WTF ITS HAPPENING AND WHY ITS NOT CENTERED
     cameraY = (gameHeight / 2) - (canvas.height / 2 * devicePixelRatio * zoomOut)
     c.scale(1 / zoomOut, 1 / zoomOut)
-  } else {
-    cameraX = frontEndPlayer.x - canvas.width / (2 * devicePixelRatio)
-    cameraY = frontEndPlayer.y - canvas.height / (2 * devicePixelRatio)
   }
   
   c.translate(-cameraX, -cameraY);
@@ -241,7 +268,7 @@ function animate() {
     drawOnMiniMap(frontEndWeapon)
   }
 
-  //Draw the PowerUps
+  // Draw the PowerUps
   for (const powerUp in frontEndPowerUps) {
     const frontEndPowerUp = frontEndPowerUps[powerUp];
     frontEndPowerUp.draw();
@@ -293,7 +320,7 @@ let sequenceNumber = 0;
 setInterval(() => {
   // Ensure the local player exists before trying to move
   const player = frontEndPlayers[socket.id];
-  if (!gameStarted) return;
+  if (!gameStarted && !player) return;
 
   // Dynamically get the player's speed
   const SPEED = 5 * player.speed;
@@ -367,7 +394,6 @@ setInterval(() => {
     }
   }
 }, 15); // (default: 15)
-
 
 // ------------------------------
 // Class Selection Handling
