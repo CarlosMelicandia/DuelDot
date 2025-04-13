@@ -226,6 +226,7 @@ class Rapid extends PowerUp {
 
     removalEffect() {
         if (this.player.activePowerups && this.player.activePowerups.rapidFire) {
+            this.player.hasRapidFire = false;
             this.player.activePowerups.rapidFire.active = false;
         }
     }
