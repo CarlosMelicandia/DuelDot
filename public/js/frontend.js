@@ -791,8 +791,25 @@ document.addEventListener("keyup", function (event) {
 // ------------------------------
 socket.on("updateKillFeed", ({ killerName, victimName, weapon }) => {
   const msg = document.createElement("div");
+  let image = "./assets/FirePistol.png";
   msg.classList.add("kill-message");
-  msg.innerHTML = `<strong style="color: green;">${killerName}</strong> used <strong>${weapon}<strong> kill <strong style="color: red;">${victimName}</strong>`;
+  switch (weapon) {
+    case "pistol":
+      image = "./assets/FirePistol.png";
+      break;
+    case "submachineGun":
+      image = "./assets/ShotGun.png";
+      break;
+    case "sniper":
+      image = "./assets/sniper.png";
+      break;
+    case "shuriken":
+      image = "./assets/shuriken.png";
+      break;
+  }
+  msg.innerHTML = `<strong style="color: green;">${killerName}</strong>  
+  used  <img src=${image}>  to end  
+  <strong style="color: red;">${victimName}</strong>`;
   killFeed.prepend(msg); // newest messages at top
 
   // Automatically remove after animation completes
