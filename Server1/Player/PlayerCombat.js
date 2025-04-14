@@ -45,10 +45,10 @@ function playerShoot(socket, backEndPlayers, backEndProjectiles){
 
         // Delay Calculation 
         weapon.isReloaded = false
-        if (!player.equippedWeapon.isReloaded){
+        
           setTimeout(() => {
             weapon.isReloaded = true
-          }, fireRate)}
+          }, fireRate)
         }
     })
 }

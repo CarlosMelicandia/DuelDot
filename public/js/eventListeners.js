@@ -7,6 +7,7 @@ const canvasRect = canvas.getBoundingClientRect(); // Gets the top and left posi
 
 // Get the camera offsets as used in animate()
 let pixelNumber = 2 * devicePixelRatio;
+let lastPressedKey = -1
 
 window.addEventListener("click", (event) => {
   const player = frontEndPlayers[socket.id]
@@ -19,8 +20,9 @@ window.addEventListener("click", (event) => {
 
   if (equippedWeapon.name == "fist" && player.canPunch) {
     socket.emit('punch')
+    return
   } else{
-    if (!equippedWeapon.isReloaded) return // Checks to see if the frontEnd should even do the calculations
+    if (!equippedWeapon.isReloaded || equippedWeapon.name == "fist") return // Checks to see if the frontEnd should even do the calculations
   }
 
   const mouseX = event.clientX - canvasRect.left; // Get the mouse x cordinate relative to the canvas
@@ -46,7 +48,6 @@ window.addEventListener("click", (event) => {
   );
 
   // Define the distance from the center of the player to the muzzle
-  console.log(equippedWeapon.topImageLength)
   const muzzleOffset = equippedWeapon.topImageLength
   const sideOffset = 10;
 
@@ -102,12 +103,21 @@ window.addEventListener('mousemove', (event) => {
  * Listen for keydown events and mark the corresponding key as pressed.
  * This allows for continuous movement while the key is held.
  */
+let isRepeated = false
 window.addEventListener("keydown", (event) => {
   // If the local player's data is not yet available, ignore input events
-  if (!frontEndPlayers[socket.id]) return;
+  const frontEndPlayer = frontEndPlayers[socket.id]
+  if (!frontEndPlayer) return;
 
-  if ((event.code === "Digit1" || event.code === "Digit2") && event.repeat)
-    return;
+  // if ((event.code === "Digit1" || event.code === "Digit2") && event.repeat) return
+
+  if (lastPressedKey == "Digit1"){
+    console.log("Test")
+    isRepeated = true
+  }else {
+    isRepeated = false
+  }
+  lastPressedKey = event.code
 
   switch (event.code) {
     case "KeyW":
@@ -132,9 +142,11 @@ window.addEventListener("keydown", (event) => {
       keys.tab.pressed = true
       break;
     case "Digit1":
+      frontEndPlayer.inventorySlotSelected = 1
       keys.num1.pressed = true
       break;
     case "Digit2":
+      frontEndPlayer.inventorySlotSelected = 2
       keys.num2.pressed = true
       break;
   }

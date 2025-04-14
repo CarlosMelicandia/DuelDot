@@ -22,22 +22,28 @@ socket.on('dropWeapon', (weaponData) => {
     frontEndWeapons[weaponData.id] = new WeaponDrawing(weaponData)
 }) 
 
-socket.on('removeWeapon', (player) => { 
+socket.on('removeWeapon', (player) => { // Clears the inventory slot on join
     if (player.inventory[0] == null){ // if the first inventory is open 
-        document.querySelector('#inventorySlot1Text').textContent = " " // Show weapon in inventory
+        document.querySelector('#inventorySlot1Text').src = " " // Show weapon in inventory
     }
     if(player.inventory[1] == null){ // if the second inventory is open
-    document.querySelector('#inventorySlot2Text').textContent = " " // Shows the weapon in the second slot
+    document.querySelector('#inventorySlot2Text').src = " " // Shows the weapon in the second slot
     }
 })
 
 // Waits for a weapon equip call from the server
 socket.on('equipWeapon', (slotIndex, player) => {
-    if (player.inventory[0] != null  && player.inventory[1] == null){ // if the first inventory is open 
-      document.querySelector('#inventorySlot1Text').textContent = player.inventory[slotIndex].name // Show weapon in inventory
+    const nameOfWeapon = player.inventory[slotIndex].name
+    const weaponImages = {
+      pistol: "../assets/weapons/Pistol.png",
+      submachineGun: "../assets/weapons/SubmachineGun.png",
+      shuriken: "../assets/weapons/Shuriken.png",
+      sniper: "../assets/weapons/Sniper.png"
     }
-    if(player.inventory[0] != null && player.inventory[1] != null){ // if the second inventory is open
-        document.querySelector('#inventorySlot2Text').textContent = player.inventory[slotIndex].name // Shows the weapon in the second slot
+    if (slotIndex == 0){ // if the first inventory is open 
+      document.querySelector('#inventorySlot1Text').src = weaponImages[nameOfWeapon] // Show weapon in inventory
+    }else if(slotIndex == 1){ // if the second inventory is open
+        document.querySelector('#inventorySlot2Text').src = weaponImages[nameOfWeapon] // Shows the weapon in the second slot
     }   
 })
 

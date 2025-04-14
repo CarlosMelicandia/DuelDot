@@ -117,13 +117,26 @@ socket.on('updatePlayers', (backEndPlayers) => {
       frontEndPlayer = frontEndPlayers[id]
       // Updates the player equipped weapon in the front end
       const originalWeapon = backEndPlayer.equippedWeapon
-      frontEndPlayer.equippedWeapon = new WeaponDrawing({
-        x: frontEndPlayer.x,
-        y: frontEndPlayer.y,
-        name: originalWeapon.name,
-        type: originalWeapon.type,
-        isReloaded: originalWeapon.isReloaded
-      })
+      if (!frontEndPlayer.equippedWeapon ||
+        frontEndPlayer.equippedWeapon.name !== originalWeapon.name) {
+        frontEndPlayer.equippedWeapon = new WeaponDrawing({
+          x: frontEndPlayer.x,
+          y: frontEndPlayer.y,
+          name: originalWeapon.name,
+          type: originalWeapon.type,
+          isReloaded: originalWeapon.isReloaded,
+          fireRate: originalWeapon.fireRate,
+        })
+      } else {
+        frontEndPlayer.equippedWeapon.isReloaded = originalWeapon.isReloaded
+      }
+
+      if (!frontEndPlayer.equippedWeapon.isReloaded) {
+        if (frontEndPlayer.equippedWeapon.reloadStartTime == 0) {
+          frontEndPlayer.equippedWeapon.reloadStartTime = performance.now()
+        }
+      } else frontEndPlayer.equippedWeapon.reloadStartTime = 0
+      
 
       if (frontEndPlayer.equippedWeapon.imagePath) {
         const weaponImg = new Image();
@@ -225,7 +238,7 @@ function animate() {
   animationId = requestAnimationFrame(animate); // Tells the browser we want to perform an animation
   // c.fillStyle = 'rgba(0, 0, 0, 0.1)' // Optional "ghosting" effect if needed
   const frontEndPlayer = frontEndPlayers[socket.id]
-  
+
   c.clearRect(0, 0, canvas.width, canvas.height); // Clears the entire canvas
 
   const now = performance.now()
@@ -256,7 +269,15 @@ function animate() {
 
   if (gameStarted) miniMapCtx.clearRect(0, 0, miniMap.width, miniMap.height)
     
-  
+  if (frontEndPlayer ){
+    equippedWeapon = frontEndPlayer.equippedWeapon
+    if (equippedWeapon) {
+      if(!equippedWeapon.isReloaded){
+        equippedWeapon.drawReloadTimer()
+      }
+    }
+  }
+
   // Interpolate and draw each player
   for (const id in frontEndPlayers) {
     const frontEndPlayer = frontEndPlayers[id];
@@ -334,11 +355,11 @@ let sequenceNumber = 0;
  */
 setInterval(() => {
   // Ensure the local player exists before trying to move
-  const player = frontEndPlayers[socket.id];
-  if (!gameStarted && !player) return;
+  const frontEndPlayer = frontEndPlayers[socket.id];
+  if (!gameStarted && !frontEndPlayer) return;
 
   // Dynamically get the player's speed
-  const SPEED = 5 * player.speed;
+  const SPEED = 5 * frontEndPlayer.speed;
 
   /**
    * Player movement
@@ -388,22 +409,32 @@ setInterval(() => {
    * Inventory
    */
   if (keys.num1.pressed) {
-    sequenceNumber++;
-    playerInputs.push({ sequenceNumber, dx: 0, dy: 0 });
-    document.querySelector("#inventorySlot1").style.borderColor = "blue"; // Highlights the first Inventory Slot
-    socket.emit("weaponSelected", { keycode: "Digit1", sequenceNumber }); // Emits the information back to the server
-  } else {
+    if (lastPressedKey = 1 && isRepeated){
+      document.querySelector("#inventorySlot1").style.borderColor = "white"
+      frontEndPlayer.inventorySlotSelected = -1
+    }else{
+      sequenceNumber++;
+      playerInputs.push({ sequenceNumber, dx: 0, dy: 0 });
+      document.querySelector("#inventorySlot1").style.borderColor = "blue"; // Highlights the first Inventory Slot
+      socket.emit("weaponSelected", { keycode: "Digit1", sequenceNumber }); // Emits the information back to the server
+      }
+    } else {
     if (!keys.num1.pressed && keys.num2.pressed) {
       document.querySelector("#inventorySlot1").style.borderColor = "white"; // Turns the inventory back to original color
     }
   }
 
   if (keys.num2.pressed) {
-    sequenceNumber++;
-    playerInputs.push({ sequenceNumber, dx: 0, dy: 0 });
-    document.querySelector("#inventorySlot2").style.borderColor = "blue"; // Highlights the second Inventory Slot
-    socket.emit("weaponSelected", { keycode: "Digit2", sequenceNumber }); // Emits the information back to the server
-  } else {
+    if (lastPressedKey = 2 && isRepeated){
+      document.querySelector("#inventorySlot1").style.borderColor = "white"
+      frontEndPlayer.inventorySlotSelected = -1
+    } else {
+      sequenceNumber++;
+      playerInputs.push({ sequenceNumber, dx: 0, dy: 0 });
+      document.querySelector("#inventorySlot2").style.borderColor = "blue"; // Highlights the second Inventory Slot
+      socket.emit("weaponSelected", { keycode: "Digit2", sequenceNumber }); // Emits the information back to the server
+      }
+    } else {
     if (keys.num1.pressed && !keys.num2.pressed) {
       document.querySelector("#inventorySlot2").style.borderColor = "white"; // Turns the inventory back to original color
     }
@@ -456,7 +487,7 @@ document.querySelector("#classSelectorLeft").addEventListener("click", () => {
 /**
  * Generate a random name that isn't already in use by another player on the client.
  * If the generated name is taken, recurse until a unique name is found.
- */
+ */ 
 
 function selectName() {
   let playerNameNumber = Math.floor(Math.random() * playerNames.length);
@@ -482,7 +513,7 @@ document.querySelector("#selectedRandomName").textContent = "Select Name :)"
 document.querySelector("#randomNameBtn").addEventListener("click", () => {
   // Generate a new random name when clicked
   playerName = selectName()
-
+ if (document.querySelector("#selectedRandomName").style.color = "red") document.querySelector("#selectedRandomName").style.color = "#cbd5e1"
   document.querySelector("#selectedRandomName").textContent = playerName;
 });
 
@@ -497,6 +528,12 @@ document.querySelector("#randomNameBtn").addEventListener("click", () => {
  */
 document.querySelector('#usernameForm').addEventListener('submit', (event) => {
   event.preventDefault() // Prevents the form from refreshing
+  if (document.querySelector("#selectedRandomName").textContent === "Select Name :)") {
+    document.querySelector("#selectedRandomName").textContent = "Click Random Name"
+    document.querySelector("#selectedRandomName").style.color = "red"
+    return
+  }
+
   const itemsToHide = document.querySelectorAll('.removeAfter')
   itemsToHide.forEach((item) => {
     item.style.display = 'none' // Hides the whole menu

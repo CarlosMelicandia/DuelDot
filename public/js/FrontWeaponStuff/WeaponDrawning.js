@@ -1,5 +1,5 @@
 class WeaponDrawing {
-    constructor({id, x, y, radius, name, type, isReloaded}) {
+    constructor({id, x, y, radius, name, type, isReloaded, fireRate}) {
         this.id = id
         this.x = x
         this.y = y
@@ -7,14 +7,15 @@ class WeaponDrawing {
         this.name = name
         this.type = type
         this.isReloaded = isReloaded
+        this.fireRate = fireRate * 1000
         this.image = new Image()
         this.topImage = new Image()
-
+        this.reloadStartTime = 0
 
         // Define image paths for each weapon type
         const weaponImages = {
-            "pistol": "../assets/weapons/GravityGun.png",
-            "submachineGun": "../assets/weapons/FirePistol.png",
+            "pistol": "../assets/weapons/Pistol.png",
+            "submachineGun": "../assets/weapons/SubmachineGun.png",
             "sniper": "../assets/weapons/Sniper.png",
             "shuriken": "../assets/weapons/Shuriken.png",
             "fist": ""
@@ -60,10 +61,10 @@ class WeaponDrawing {
             // Draw the weapon image if it's loaded (larger than the hit box)
             c.drawImage(
                 this.image, 
-                this.x - displayRadius, 
-                this.y - displayRadius, 
-                displayRadius * 2, 
-                displayRadius * 2
+                this.x - this.radius, 
+                this.y - this.radius, 
+                displayRadius, 
+                displayRadius 
             );
             
             // Uncomment this to see the actual collision radius (for debugging)
@@ -83,9 +84,28 @@ class WeaponDrawing {
         }
     }
 
-    drawReloadTimer(){
+    drawReloadTimer() {
+        if (this.reloadStartTime === null) return;
         const now = performance.now()
-    }
+        const elapsed = now - this.reloadStartTime
+        const progress = Math.min(elapsed / this.fireRate, 1)
+       
+        const rect1 = document.getElementById('inventorySlot1').getBoundingClientRect()
+        const inventory1Width = rect1.width
+        const inventory1Height = rect1.height
+        const inventory1X = rect1.left;   
+        const inventory1Y = rect1.top;
+        
+        const rect2 = document.getElementById('inventorySlot2').getBoundingClientRect()
+        const inventory2Width = rect2.width
+        const inventory2Height = rect2.height
+        const inventory2X = rect2.left;   
+        const inventory2Y = rect2.top;
+
+        c.fillStyle = "red"
+        
+      }
+      
 }
 
 

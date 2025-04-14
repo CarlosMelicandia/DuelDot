@@ -62,7 +62,6 @@ class Fist extends Weapon{
             damage: 40,
             fireRate: 0.3,
             velocity: 5});
-            this.isReloaded = false
     }
 }
 

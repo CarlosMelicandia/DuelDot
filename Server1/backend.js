@@ -136,7 +136,6 @@ io.on("connection", (socket) => {
       case "Digit1":
         if (backEndPlayer.inventory[0]){
           backEndPlayer.equippedWeapon = backEndPlayer.inventory[0] // adds the weapon to their first slot in inventory
-          console.log(backEndPlayer.inventory[0])
         } else if (backEndPlayer.equippedWeapon.name != "Fist"){ // Goes back to fist if inventory slot is empty
           backEndPlayer.equippedWeapon = fist
         }
