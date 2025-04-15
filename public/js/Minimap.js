@@ -18,6 +18,13 @@ function drawOnMiniMap(item, worldWidth = 5000, worldHeight = 5000) {
     const miniY = item.y * minimapScaleY
   
     if (item instanceof Player){
+      if (item === frontEndPlayers[socket.id]) {
+        miniMapCtx.beginPath();
+        miniMapCtx.arc(miniX, miniY, 4, 0, Math.PI * 2);
+        miniMapCtx.strokeStyle = "white";
+        miniMapCtx.stroke();
+        miniMapCtx.closePath();
+      }
       miniMapCtx.beginPath()
       miniMapCtx.arc(miniX, miniY, 2, 0, Math.PI * 2)
       miniMapCtx.fillStyle = item.color

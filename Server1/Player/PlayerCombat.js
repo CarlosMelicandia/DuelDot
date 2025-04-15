@@ -4,7 +4,7 @@
 
 let projectileId = 0 // Unique ID counter for each projectile create
 
-const { updateLeaderBoard } = require("../backendLeaderBoard.js");
+const { updateLeaderBoard, updateKillFeed } = require("../backendLeaderBoard.js");
 
 function playerShoot(socket, backEndPlayers, backEndProjectiles){
     socket.on('shoot', ({ x, y, angle }) => { 
@@ -164,7 +164,7 @@ function playerProjectile(backEndProjectiles, backEndPlayers, io, gameWidth, gam
           if (backEndPlayers[projectile.playerId]) {
             backEndPlayers[projectile.playerId].score++;
           }
-
+          updateKillFeed(backEndPlayers, backEndProjectiles, playerId, id, io);// Update the Kill Feed when a player is eliminated
           io.to(playerId).emit("playerRespawn")
 
           delete backEndPlayers[playerId];

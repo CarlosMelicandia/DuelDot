@@ -34,12 +34,12 @@ class Player {
     this.handXMove = 0
 
     this.activeEffects = {}; // Object to track active power-up effects
-  this.lightningPoints = []; // For speed effect
-  this.shieldPulse = 0; // For shield effect
-  this.shieldPulseDir = 1;
-  this.rotation = 0; // For rotating effects
-  this.flameHeight = 0; // For fire effect
-  this.effectParticles = []; // For all effect particles
+    this.lightningPoints = []; // For speed effect
+    this.shieldPulse = 0; // For shield effect
+    this.shieldPulseDir = 1;
+    this.rotation = 0; // For rotating effects
+    this.flameHeight = 0; // For fire effect
+    this.effectParticles = []; // For all effect particles
 }
 
 // Add this method to your Player class:

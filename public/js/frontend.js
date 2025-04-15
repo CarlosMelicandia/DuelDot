@@ -1,4 +1,3 @@
-
 // ------------------------------
 // Canvas and Context Setup
 // ------------------------------
@@ -65,17 +64,17 @@ const playerNames = [
 // ------------------------------
 // Data Structures for Game Objects
 // ------------------------------
-const frontEndPlayers = {} // Object to keep track of all player objects on the client
-const frontEndProjectiles = {} // Object to keep track of all projectile objects on the client
-let frontEndWeapons = {} // Object to keep track of all weapons objects on the client
-let frontEndPowerUps = {} // Object to track power-ups on the client
+const frontEndPlayers = {}; // Object to keep track of all player objects on the client
+const frontEndProjectiles = {}; // Object to keep track of all projectile objects on the client
+let frontEndWeapons = {}; // Object to keep track of all weapons objects on the client
+let frontEndPowerUps = {}; // Object to track power-ups on the client
 
 // ------------------------------
 // FPS ticker & Ping
-// ------------------------------ 
-let lastTime = performance.now()
-let frames = 0
-let fps = 0
+// ------------------------------
+let lastTime = performance.now();
+let frames = 0;
+let fps = 0;
 
 let lastPingTime = 0;
 let ping = 0;
@@ -95,9 +94,10 @@ let keyDownWeapon = -1; // Variable to track the key pressed for the weapon
  * Keeps the front end (client side) players in sync with the back end (server).
  * When the server emits 'updatePlayers', update or create player objects as needed.
  */
-socket.on('updatePlayers', (backEndPlayers) => {
-  for (const id in backEndPlayers) { // displays the same info as if using socket.id, might want to remove the for loop
-    const backEndPlayer = backEndPlayers[id]
+socket.on("updatePlayers", (backEndPlayers) => {
+  for (const id in backEndPlayers) {
+    // displays the same info as if using socket.id, might want to remove the for loop
+    const backEndPlayer = backEndPlayers[id];
 
     /**
      * If a player with this id does not exist on the client,
@@ -111,12 +111,12 @@ socket.on('updatePlayers', (backEndPlayers) => {
         radius: backEndPlayer.radius,
         color: backEndPlayer.color,
         username: backEndPlayer.username,
-        health: backEndPlayer.health,  
+        health: backEndPlayer.health,
         speed: backEndPlayer.speed,
         score: backEndPlayer.score,
-      })
+      });
     } else {
-      frontEndPlayer = frontEndPlayers[id]
+      frontEndPlayer = frontEndPlayers[id];
       // Updates the player equipped weapon in the front end
       frontEndPlayer.equippedWeapon = backEndPlayer.equippedWeapon
 
@@ -127,23 +127,23 @@ socket.on('updatePlayers', (backEndPlayers) => {
       }
       
       // Updates whether the player can shoot in the front end
-      frontEndPlayer.canShoot = backEndPlayer.canShoot
+      frontEndPlayer.canShoot = backEndPlayer.canShoot;
 
       // Updates about the punching
-      frontEndPlayer.aimAngle = backEndPlayer.aimAngle
-      frontEndPlayer.handXMove = backEndPlayer.handX // TEST
-      frontEndPlayer.canPunch = backEndPlayer.canPunch
+      frontEndPlayer.aimAngle = backEndPlayer.aimAngle;
+      frontEndPlayer.handXMove = backEndPlayer.handX; // TEST
+      frontEndPlayer.canPunch = backEndPlayer.canPunch;
 
       // Update player health in the frontend
-      frontEndPlayer.health = backEndPlayer.health
+      frontEndPlayer.health = backEndPlayer.health;
 
       // Update player score in the frontend
-      frontEndPlayer.score = backEndPlayer.score
+      frontEndPlayer.score = backEndPlayer.score;
       // Used for interpolation (moving the player closer to its new position)
       frontEndPlayer.target = {
         x: backEndPlayer.x,
-        y: backEndPlayer.y
-      }
+        y: backEndPlayer.y,
+      };
 
       if (id === socket.id) {
         const lastBackendInputIndex = playerInputs.findIndex((input) => {
@@ -153,9 +153,9 @@ socket.on('updatePlayers', (backEndPlayers) => {
           playerInputs.splice(0, lastBackendInputIndex + 1);
         }
         playerInputs.forEach((input) => {
-          frontEndPlayer.target.x += input.dx
-          frontEndPlayer.target.y += input.dy
-        })
+          frontEndPlayer.target.x += input.dx;
+          frontEndPlayer.target.y += input.dy;
+        });
       }
     }
   }
@@ -194,6 +194,7 @@ socket.on("playerRespawn", (player) =>{
 // ------------------------------
 // Ping Checker
 // ------------------------------
+
 // Send ping to server every 2 seconds
 setInterval(() => {
   lastPingTime = performance.now() // Timestamp
@@ -224,14 +225,14 @@ function animate() {
   // c.fillStyle = 'rgba(0, 0, 0, 0.1)' // Optional "ghosting" effect if needed
   c.clearRect(0, 0, canvas.width, canvas.height); // Clears the entire canvas
 
-  const now = performance.now()
-  frames++
+  const now = performance.now();
+  frames++;
   if (now - lastTime >= 1000) {
-    fps = frames
-    frames = 0
-    lastTime = now
+    fps = frames;
+    frames = 0;
+    lastTime = now;
 
-    document.querySelector('#fpsCounter').textContent = `FPS: ${fps}`
+    document.querySelector("#fpsCounter").textContent = `FPS: ${fps}`;
   }
   
   const frontEndPlayer = frontEndPlayers[socket.id]
@@ -258,7 +259,7 @@ function animate() {
   for (const id in frontEndPlayers) {
     const frontEndPlayer = frontEndPlayers[id];
 
-    drawOnMiniMap(frontEndPlayer)
+    drawOnMiniMap(frontEndPlayer);
 
     // linear interpolation (move the player closer to its target)
     if (frontEndPlayer.target) {
@@ -267,20 +268,23 @@ function animate() {
       frontEndPlayers[id].y +=
         (frontEndPlayers[id].target.y - frontEndPlayers[id].y) * 0.5;
     }
-    frontEndPlayer.draw({ xPosition: frontEndPlayer.handXMove, angle: frontEndPlayer.aimAngle })
+    frontEndPlayer.draw({
+      xPosition: frontEndPlayer.handXMove,
+      angle: frontEndPlayer.aimAngle,
+    });
   }
 
   for (const weapon in frontEndWeapons) {
     const frontEndWeapon = frontEndWeapons[weapon];
     frontEndWeapon.draw();
-    drawOnMiniMap(frontEndWeapon)
+    drawOnMiniMap(frontEndWeapon);
   }
 
   // Draw the PowerUps
   for (const powerUp in frontEndPowerUps) {
     const frontEndPowerUp = frontEndPowerUps[powerUp];
     frontEndPowerUp.draw();
-    drawOnMiniMap(frontEndPowerUp)
+    drawOnMiniMap(frontEndPowerUp);
   }
 
   // Draw each projectile
@@ -357,25 +361,25 @@ setInterval(() => {
 
   if (keys.d.pressed) {
     sequenceNumber++;
-    playerInputs.push({ sequenceNumber, dx: SPEED, dy: 0 })
-    socket.emit("keydown", { keycode: "KeyD", sequenceNumber })
+    playerInputs.push({ sequenceNumber, dx: SPEED, dy: 0 });
+    socket.emit("keydown", { keycode: "KeyD", sequenceNumber });
   }
 
   /**
    * Interact with Weapons
    */
 
-    if (keys.q.pressed){
-      sequenceNumber++
-      playerInputs.push({ sequenceNumber, dx: 0, dy: 0 })
-      socket.emit('weaponDrop', { keycode: 'KeyD', sequenceNumber })
-    }
+  if (keys.q.pressed) {
+    sequenceNumber++;
+    playerInputs.push({ sequenceNumber, dx: 0, dy: 0 });
+    socket.emit("weaponDrop", { keycode: "KeyD", sequenceNumber });
+  }
 
-    if (keys.f.pressed){
-      sequenceNumber++
-      playerInputs.push({ sequenceNumber, dx: 0, dy: 0 })
-      socket.emit('pickUpWeapon', { keycode: 'KeyF', sequenceNumber })
-    }
+  if (keys.f.pressed) {
+    sequenceNumber++;
+    playerInputs.push({ sequenceNumber, dx: 0, dy: 0 });
+    socket.emit("pickUpWeapon", { keycode: "KeyF", sequenceNumber });
+  }
 
   /**
    * Inventory
@@ -524,3 +528,38 @@ document.addEventListener("keyup", function (event) {
   }
 });
 
+// ------------------------------
+// Kill Feed Handler
+// ------------------------------
+socket.on("updateKillFeed", ({ victemId, killerId, killerName, victimName, weapon }) => {
+  const msg = document.createElement("div");
+  let image = "";
+  msg.classList.add("kill-message");
+  switch (weapon) {
+    case "pistol":
+      image = "./assets/weapons/FirePistol.png";
+      break;
+    case "submachineGun":
+      image = "./assets/weapons/ShotGun.png";
+      break;
+    case "sniper":
+      image = "./assets/weapons/Sniper.png";
+      break;
+    case "shuriken":
+      image = "./assets/weapons/Shuriken.png";
+      break;
+  }
+
+  if (socket.id === victemId || socket.id === killerId) {
+    msg.innerHTML = `<span style="color: green;">${killerName}</span> <img src=${image} style="width: 30px; height: 30px;"> <span style="color: red;">${victimName}</span>`;
+    killFeed.prepend(msg); // newest messages at top
+  }else {
+    msg.innerHTML = `${killerName} <img src=${image} style="width: 30px; height: 30px;"> ${victimName}`;
+    killFeed.prepend(msg); // newest messages at top
+  }
+
+  // Automatically remove after animation completes
+  setTimeout(() => {
+    msg.remove();
+  }, 5000); // same duration as animation
+});
