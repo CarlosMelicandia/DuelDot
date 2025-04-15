@@ -789,9 +789,9 @@ document.addEventListener("keyup", function (event) {
 // ------------------------------
 // Kill Feed Handler
 // ------------------------------
-socket.on("updateKillFeed", ({ killerName, victimName, weapon }) => {
+socket.on("updateKillFeed", ({ victemId, killerId, killerName, victimName, weapon }) => {
   const msg = document.createElement("div");
-  let image = "./assets/FirePistol.png";
+  let image = "";
   msg.classList.add("kill-message");
   switch (weapon) {
     case "pistol":
@@ -807,13 +807,17 @@ socket.on("updateKillFeed", ({ killerName, victimName, weapon }) => {
       image = "./assets/shuriken.png";
       break;
   }
-  msg.innerHTML = `<strong style="color: green;">${killerName}</strong>  
-  used  <img src=${image}>  to end  
-  <strong style="color: red;">${victimName}</strong>`;
-  killFeed.prepend(msg); // newest messages at top
+
+  if (socket.id === victemId || socket.id === killerId) {
+    msg.innerHTML = `<span style="color: green;">${killerName}</span> <img src=${image} style="width: 30px; height: 30px;"> <span style="color: red;">${victimName}</span>`;
+    killFeed.prepend(msg); // newest messages at top
+  }else {
+    msg.innerHTML = `${killerName} <img src=${image} style="width: 30px; height: 30px;"> ${victimName}`;
+    killFeed.prepend(msg); // newest messages at top
+  }
 
   // Automatically remove after animation completes
   setTimeout(() => {
     msg.remove();
-  }, 4000); // same duration as animation
+  }, 5000); // same duration as animation
 });

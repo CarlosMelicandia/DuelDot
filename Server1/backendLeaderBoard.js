@@ -27,6 +27,8 @@ function updateKillFeed(backEndPlayers, backEndProjectiles, playerId, id, io) {
   console.log(killerName + " killed " + victimName);
 
   io.emit("updateKillFeed", {
+    victimId: playerId,
+    killerId: backEndProjectiles[id].playerId,
     killerName: killerName,
     victimName: victimName,
     weapon: weapon,
