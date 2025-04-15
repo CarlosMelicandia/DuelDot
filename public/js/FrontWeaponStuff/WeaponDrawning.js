@@ -11,10 +11,10 @@ class WeaponDrawing {
 
         // Define image paths for each weapon type
         const weaponImages = {
-            "pistol": "../assets/FirePistol.png",
-            "submachineGun": "../assets/ShotGun.png",
-            "sniper": "../assets/sniper.png",
-            "shuriken": "../assets/shuriken.png"
+            "pistol": "../assets/weapons/GravityGun.png",
+            "submachineGun": "../assets/weapons/FirePistol.png",
+            "sniper": "../assets/weapons/Sniper.png",
+            "shuriken": "../assets/weapons/Shuriken.png"
         };
         
         // Define size multipliers for each weapon type

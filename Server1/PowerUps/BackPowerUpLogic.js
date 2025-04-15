@@ -11,48 +11,58 @@ let powerUpId = 0; // Unique ID counter for power-ups
 
 let spawning = true; // Use a global flag to control spawning
 
-function spawnPowerUps(backEndPowerUps, io) {
-    const maxX = GAME_WIDTH - 50;
-    const maxY = GAME_HEIGHT - 50;
-    const min = 50;
+function spawnPowerUps(backEndPowerUps, io, backEndPlayers) {
+    const maxX = GAME_WIDTH - 100;
+    const maxY = GAME_HEIGHT - 100;
+    const min = 100;
 
     const interval = setInterval(() => {
-        // Stop spawning entirely if the limit is reached
-        if (backEndPowerUps.length >= 15) {
-            spawning = false;
-            clearInterval(interval); // Stop setInterval
-            return;
-        }
+    let someoneIsPlaying = false;
+    for (const id in backEndPlayers){
+      if (backEndPlayers[id].isPlaying) {
+        someoneIsPlaying = true
+        break
+      }
+    }
 
-        // Spawning logic when allowed
-        let spawnX = Math.random() * (maxX - min) + min;
-        let spawnY = Math.random() * (maxY - min) + min;
+    if (!someoneIsPlaying) return
 
-        const powerUpTypes = ["speed", "multiShot", "health", "damage", "shield","rapid","fire"];
-        let powerUpType = powerUpTypes[Math.floor(Math.random() * powerUpTypes.length)];
+    // Stop spawning entirely if the limit is reached
+    if (backEndPowerUps.length >= 20) {
+        spawning = false;
+        clearInterval(interval); // Stop setInterval
+        return;
+    }
 
-        let newPowerUpId = powerUpId++; // Generate unique ID
+    // Spawning logic when allowed
+    let spawnX = Math.random() * (maxX - min) + min;
+    let spawnY = Math.random() * (maxY - min) + min;
 
-        let powerUpData = {
-            id: newPowerUpId,
-            x: spawnX,
-            y: spawnY,
-            radius: 22,
-            type: powerUpType,
-        };
+    const powerUpTypes = ["speed", "multiShot", "health", "damage", "shield","rapid","fire"];
+    let powerUpType = powerUpTypes[Math.floor(Math.random() * powerUpTypes.length)];
 
-        // Add new powerup
-        backEndPowerUps.push(powerUpData);
+    let newPowerUpId = powerUpId++; // Generate unique ID
 
-        // Notify clients
-        io.emit("updatePowerUps", backEndPowerUps, powerUpData);
-    }, 3000); // Slowing down spawn interval
+    let powerUpData = {
+        id: newPowerUpId,
+        x: spawnX,
+        y: spawnY,
+        radius: 22,
+        type: powerUpType,
+    };
+
+    // Add new powerup
+    backEndPowerUps.push(powerUpData);
+
+    // Notify clients
+    io.emit("updatePowerUps", backEndPowerUps, powerUpData);
+  }, 15000); // Slowing down spawn interval
 }
 
 // ------------------------------
 // Power-up Collision Logic
 // ------------------------------
-function checkPowerUpCollision(backEndPowerUps, io, player) {
+function checkPowerUpCollision(backEndPowerUps, io, player, backEndPlayers) {
   for (let i = backEndPowerUps.length - 1; i >= 0; i--) {
     let powerUp = backEndPowerUps[i];
     let dist = Math.hypot(player.x - powerUp.x, player.y - powerUp.y);
@@ -76,14 +86,19 @@ function checkPowerUpCollision(backEndPowerUps, io, player) {
             const powerUpInstance = new PowerUpClass(player, powerUp.id);
             powerUpInstance.apply();
 
+            io.to(player.socketId).emit('powerupCollected', { 
+              type: powerUp.type, 
+              duration: powerUpInstance.duration 
+            });
+
             // Remove powerup from backend and notify frontend
             backEndPowerUps.splice(i, 1);
             io.emit("removePowerUp", { id: powerUp.id, remove: true });
 
             // Check if spawning should restart
-            if (backEndPowerUps.length < 13 && !spawning) {
+            if (backEndPowerUps.length < 20 && !spawning) {
                 spawning = true;
-                spawnPowerUps(backEndPowerUps, io); // Restart spawning
+                spawnPowerUps(backEndPowerUps, io, backEndPlayers); // Restart spawning
             }
         }
     }

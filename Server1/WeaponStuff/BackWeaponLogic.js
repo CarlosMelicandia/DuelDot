@@ -6,13 +6,24 @@ let deletedWeaponIds = []
 
 let weaponId = 0
 
-function spawnWeapons(backEndWeapons, io) {
+function spawnWeapons(backEndWeapons, io, backEndPlayers) {
   const maxX = GAME_WIDTH - 100
   const maxY = GAME_HEIGHT - 100
   const min = 100
 
   setInterval(() => {
-    if (backEndWeapons.length > 50 ) return
+    let someoneIsPlaying = false;
+    for (const id in backEndPlayers){
+      if (backEndPlayers[id].isPlaying) {
+        someoneIsPlaying = true
+        break
+      }
+    }
+
+    if (!someoneIsPlaying) return
+
+    if (backEndWeapons.length > 25 ) return
+    
     let spawnX = Math.random() * (maxX - min) + min 
     let spawnY = Math.random() * (maxY - min) + min
 

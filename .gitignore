@@ -2,3 +2,4 @@ node_modules/
 .history
 docs
 .qodo
+.DS_Store

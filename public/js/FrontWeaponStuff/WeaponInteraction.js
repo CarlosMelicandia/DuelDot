@@ -40,3 +40,47 @@ socket.on('equipWeapon', (slotIndex, player) => {
         document.querySelector('#inventorySlot2Text').textContent = player.inventory[slotIndex].name // Shows the weapon in the second slot
     }   
 })
+
+/**
+ * ------------------------------
+ * Handling Server Updates for Projectiles
+ * ------------------------------
+ */
+/**
+ * Keeps the front end (client-side) projectiles in sync with the back end (server).
+ * When the server emits 'updateProjectiles', iterate over each projectile and
+ * create or update them locally.
+ */
+socket.on("updateProjectiles", (backEndProjectiles) => {
+  // Loop over each projectile from the server (each has a unique id)
+  for (const id in backEndProjectiles) {
+    const backEndProjectile = backEndProjectiles[id];
+
+    /**
+     * If a projectile with this id doesn't exist on the client,
+     * create a new Projectile object using the server's data.
+     */
+    if (!frontEndProjectiles[id]) {
+      frontEndProjectiles[id] = new Projectile({
+        x: backEndProjectile.x,
+        y: backEndProjectile.y,
+        radius: 5,
+        color: frontEndPlayers[backEndProjectile.playerId]?.color, // Checks if client Player with server projectiles id exists and assigns color if it does
+        velocity: backEndProjectile.velocity,
+      });
+    } else {
+      // Update the client projectile’s position based on the server’s velocity
+      frontEndProjectiles[id].x += backEndProjectiles[id].velocity.x;
+      frontEndProjectiles[id].y += backEndProjectiles[id].velocity.y;
+    }
+  }
+
+  /**
+   * Remove any client-side projectiles that are no longer present on the server.
+   */
+  for (const frontEndProjectileId in frontEndProjectiles) {
+    if (!backEndProjectiles[frontEndProjectileId]) {
+      delete frontEndProjectiles[frontEndProjectileId];
+    }
+  }
+});

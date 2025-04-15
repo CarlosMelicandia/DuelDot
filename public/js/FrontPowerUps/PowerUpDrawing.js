@@ -1,4 +1,4 @@
-class PowerUpDrawing {
+class PowerUpDrawing { // Everything was commented out for them
     constructor({ id, x, y, radius, type }) {
       this.id = id;
       this.x = x;
@@ -14,11 +14,13 @@ class PowerUpDrawing {
   
       // Assign different PNGs based on power-up type
       const powerUpImages = {
-        "speed": "../assets/speed.png", 
-        "multiShot": "../assets/MultishotPU.png",
-        "health": "../assets/HealthPU.png",
-        "damage": "../assets/DamagePU.png",
-        "shield": "../assets/ShieldPU.png"
+        "speed": "../assets/powerups/SpeedPU.png",
+        "multiShot": "../assets/powerups/MultishotPU.png",
+        "health": "../assets/powerups/HealthPU.png",
+        "damage": "../assets/powerups/DamagePU.png",
+        "shield": "../assets/powerups/ShieldPU.png",
+        "rapid": "../assets/powerups/RapidFirePU.png",
+        "fire": "../assets/powerups/FirePU.png"
       };
   
       // Colors for the glow effect based on powerup type
@@ -28,31 +30,40 @@ class PowerUpDrawing {
         "health": "#00FF00", // Green
         "damage": "#FFA500", // Orange
         "shield": "#0000FF", // Blue
+        "rapid": "#000FF",
+        "fire": "#000FF"
       };
   
-      this.image.src = powerUpImages[this.type] || "../assets/speed.png";
-  
+      this.image.src = powerUpImages[this.type];
+
+      // Flag to track if image loaded successfully
+      this.imageLoaded = false;
+      this.image.onload = () => {
+          this.imageLoaded = true;
+      }
     }
   
     draw() {
-      // Update the pulse animation
-      this.pulseSize += this.pulseDirection * this.pulseSpeed;
-      if (this.pulseSize >= this.maxPulseSize) {
-        this.pulseDirection = -1;
-      } else if (this.pulseSize <= 0) {
-        this.pulseDirection = 1;
+      if (this.imageLoaded){
+        // Update the pulse animation
+        this.pulseSize += this.pulseDirection * this.pulseSpeed;
+        if (this.pulseSize >= this.maxPulseSize) {
+          this.pulseDirection = -1;
+        } else if (this.pulseSize <= 0) {
+          this.pulseDirection = 1;
+        }
+    
+        // Draw the glow/pulse effect
+        c.save();
+        c.beginPath();
+        c.arc(this.x, this.y, this.radius + this.pulseSize, 0, Math.PI * 2);
+        c.fillStyle = this.glowColors[this.type] || "#FFFF00";
+        c.globalAlpha = 0.3; // Make the glow semi-transparent
+        c.fill();
+        c.closePath();
+        c.restore();
+    
+        c.drawImage(this.image, this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
       }
-  
-      // Draw the glow/pulse effect
-      c.save();
-      c.beginPath();
-      c.arc(this.x, this.y, this.radius + this.pulseSize, 0, Math.PI * 2);
-      c.fillStyle = this.glowColors[this.type] || "#FFFF00";
-      c.globalAlpha = 0.3; // Make the glow semi-transparent
-      c.fill();
-      c.closePath();
-      c.restore();
-  
-      c.drawImage(this.image, this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
     }
   }

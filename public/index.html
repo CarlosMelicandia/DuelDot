@@ -159,6 +159,26 @@
         z-index: 1;
         background-image: url("./assets/background.png");
       }
+
+      .displayAfter {
+        display: none;
+      }
+
+      .removeAfter {
+        display: flex;
+      }
+
+      h1 {
+        margin-top: 0;
+        margin-bottom: 15px;
+      }
+      p{
+        margin-bottom: 2px;
+      }
+      h1, p {
+        letter-spacing: 2px;
+      }
+
       /* Killfeed container */
       #killFeed {
         position: absolute;
@@ -212,19 +232,17 @@
       justify-content: center;
       height: 100vh;
       background: black;
-      font-family: 'VT323', monospace;
-    "
-  >
+      font-family: 'VT323', monospace;">
     <!-- Game Container -->
     <div style="position: relative; width: 1024px; height: 576px">
       <!-- The Game Canvas -->
       <canvas class="canvas" id="canvas"></canvas>
 
       <!-- MiniMap -->
-      <canvas class="miniMapC" id="miniMapC"></canvas>
+      <canvas class="miniMapC displayAfter" id="miniMapC"></canvas>
       <img
         src="./assets/background.png"
-        class="miniMap"
+        class="miniMap displayAfter"
         id="miniMap"
         alt="Map"
       />
@@ -238,15 +256,14 @@
           <div id="update-sleaderboard"></div>
         </div>
       </div>
+
       <!-- Big Leader Board -->
       <div class="leaderboard">
         <!--<div
           style="
             background-image: linear-gradient(to right, #00d9ff, #0062ff);
             padding: 2%;
-            border-radius: 1cap;
-          "
-        >
+            border-radius: 1cap;">
           <h1>Leaderboard</h1>
         </div> -->
         <table class="leaderboard-table">
@@ -275,21 +292,28 @@
         id="fpsCounter"
         style="
           position: absolute;
-          top: 10px;
+          top: 10px; 
           left: 170px;
           color: white;
           font-family: monospace;
-          z-index: 3;
-        "
-      >
-        FPS: --
-      </div>
+          z-index: 3;">FPS: --
+        </div>
+
+        <div 
+        id="pingDisplay" 
+        style="
+        position:absolute; 
+        top:30px; 
+        left:170px; 
+        color:white; 
+        font-family:monospace;
+        z-index: 2;">Ping: --</div>
 
       <!-- Inventory slots -->
       <div
+        class = "displayAfter"
         id="inventoryArea"
         style="
-          display: none;
           position: relative;
           flex-direction: column;
           align-items: center;
@@ -314,11 +338,40 @@
       <!-- Kill Feed -->
       <div class="killFeed" id="killFeed"></div>
 
+      <!-- Instruction Menu -->
+       <div 
+       class = "removeAfter"
+       id = "instructions"
+       style = "
+        display: flex;
+        position: absolute;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        height: 260px;
+        width: 200px;
+        top: 50%;
+        left: 270px;
+        transform: translate(-50%, -50%);
+        background-image: linear-gradient(to right, rgba(6, 182, 212, 0.5), rgba(59, 130, 246, 0.5));
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 10px;
+        color: white;">
+        <h1>How To Play</h1>
+        <p>W,A,S,D: Movement</p>
+        <p>F: Pick up guns</p>
+        <p>Q: Drop Weapons</p>
+        <p>1: Item Slot 1</p>
+        <p>2: Item Slot 2</p>
+        <p>Left-Click: Shoot/Punch</p>
+      </div>
+
       <!-- Username and Class Selection Form -->
       <div
-        id="menu"
-        style="
-          display: flex;
+        class = "removeAfter"
+        id = "menu"
+        style=" 
           position: absolute;
           flex-direction: column;
           align-items: center;
@@ -327,9 +380,8 @@
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
-          text-align: center;
-        "
-      >
+          text-align: center;">
+
         <!-- Shows the username -->
         <form id="usernameForm">
           <div
@@ -457,8 +509,11 @@
     ></script>
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
     <script src="./js/frontend.js"></script>
-    <script src="./js/player/Player.js"></script>
+    <script src="./js/Leaderboard.js"></script>
+    <script src="./js/Minimap.js"></script>
+    <script src="./js/FrontPlayer/Player.js"></script>
     <script src="./js/FrontPowerUps/PowerUpDrawing.js"></script>
+    <script src="./js/FrontPowerUps/PowerUpInteractions.js"></script>
     <script src="./js/FrontWeaponStuff/WeaponDrawning.js"></script>
     <script src="./js/FrontWeaponStuff/WeaponInteraction.js"></script>
     <script src="./js/FrontWeaponStuff/Projectile.js"></script>
