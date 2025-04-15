@@ -9,6 +9,10 @@ const canvasRect = canvas.getBoundingClientRect(); // Gets the top and left posi
 let cameraX = 0, cameraY = 0;
 let pixelNumber = 2 * devicePixelRatio;
 
+// 1 means slot 1 is selected, 2 means slot 2 is selected, -1 means no slot is selected
+// Track the currently pressed key for weapon selection
+let keyDown = -1;
+
 window.addEventListener("click", (event) => {
   const player = frontEndPlayers[socket.id]
   
@@ -114,11 +118,35 @@ window.addEventListener("keydown", (event) => {
       keys.tab.pressed = true
       break;
     case "Digit1":
-      keys.num1.pressed = true
-      break;
+      if (keyDown == -1) {
+        keys.num1.pressed = true;
+        keyDown = 1;
+        break;
+      }else if (keyDown == 2) {
+        keys.num1.pressed = true;
+        keys.num2.pressed = false;
+        keyDown = 1;
+        break;
+      }else {
+        keys.num1.pressed = false;
+        keyDown = -1;
+        break;
+      }
     case "Digit2":
-      keys.num2.pressed = true
-      break;
+      if (keyDown == -1) {
+        keys.num2.pressed = true;
+        keyDown = 2;
+        break;
+      }else if (keyDown == 1) {
+        keys.num2.pressed = true;
+        keys.num1.pressed = false;
+        keyDown = 2;
+        break;
+      }else {
+        keys.num2.pressed = false;
+        keyDown = -1;
+        break;
+      }
   }
 });
 
@@ -151,11 +179,11 @@ window.addEventListener("keyup", (event) => {
       keys.tab.pressed = false
       // console.log("Tab up")
       break
-    case "Digit1":
+    /*case "Digit1":
       keys.num1.pressed = false
       break
     case "Digit2":
       keys.num2.pressed = false
-      break
+      break*/
   }
 });

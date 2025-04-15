@@ -82,6 +82,12 @@ let ping = 0;
 
 let gameStarted = false;
 
+// ------------------------------
+// Slot Inventory
+// ------------------------------
+// 1 means slot 1 is selected, 2 means slot 2 is selected, -1 means no slot is selected
+let keyDownWeapon = -1; // Variable to track the key pressed for the weapon
+
 //------------------------------
 // Handling Server Updates for Players
 // ------------------------------
@@ -374,26 +380,32 @@ setInterval(() => {
   /**
    * Inventory
    */
-  if (keys.num1.pressed) {
+  if (keys.num1.pressed && !keys.num2.pressed && keyDownWeapon < 0) {
     sequenceNumber++;
     playerInputs.push({ sequenceNumber, dx: 0, dy: 0 });
     document.querySelector("#inventorySlot1").style.borderColor = "blue"; // Highlights the first Inventory Slot
-    socket.emit("weaponSelected", { keycode: "Digit1", sequenceNumber }); // Emits the information back to the server
-  } else {
-    if (!keys.num1.pressed && keys.num2.pressed) {
-      document.querySelector("#inventorySlot1").style.borderColor = "white"; // Turns the inventory back to original color
-    }
+    socket.emit("weaponSelected", { keycode: "Digit1", sequenceNumber, keyDownWeapon}); // Emits the information back to the server
+    keyDownWeapon = 1;
+  }else if (!keys.num1.pressed && keyDownWeapon === 1){
+    sequenceNumber++;
+    playerInputs.push({ sequenceNumber, dx: 0, dy: 0 });
+    document.querySelector("#inventorySlot1").style.borderColor = "white"; // Highlights the first Inventory Slot
+    socket.emit("weaponSelected", { keycode: "Digit1", sequenceNumber, keyDownWeapon}); // Emits the information back to the server
+    keyDownWeapon = -1;
   }
 
-  if (keys.num2.pressed) {
+  if (keys.num2.pressed && !keys.num1.pressed && keyDownWeapon < 0) {
     sequenceNumber++;
     playerInputs.push({ sequenceNumber, dx: 0, dy: 0 });
     document.querySelector("#inventorySlot2").style.borderColor = "blue"; // Highlights the second Inventory Slot
-    socket.emit("weaponSelected", { keycode: "Digit2", sequenceNumber }); // Emits the information back to the server
-  } else {
-    if (keys.num1.pressed && !keys.num2.pressed) {
-      document.querySelector("#inventorySlot2").style.borderColor = "white"; // Turns the inventory back to original color
-    }
+    socket.emit("weaponSelected", { keycode: "Digit2", sequenceNumber, keyDownWeapon }); // Emits the information back to the server
+    keyDownWeapon = 2;
+  }else if (!keys.num2.pressed && keyDownWeapon === 2) {
+    sequenceNumber++;
+    playerInputs.push({ sequenceNumber, dx: 0, dy: 0 });
+    document.querySelector("#inventorySlot2").style.borderColor = "white"; // Highlights the second Inventory Slot
+    socket.emit("weaponSelected", { keycode: "Digit2", sequenceNumber, keyDownWeapon }); // Emits the information back to the server
+    keyDownWeapon = -1;  
   }
 }, 15); // (default: 15)
 
