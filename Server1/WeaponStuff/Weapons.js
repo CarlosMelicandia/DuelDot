@@ -12,7 +12,7 @@ class Weapon{
 class Pistol extends Weapon{
     constructor(){
         super({
-            name: "Pistol", 
+            name: "pistol", 
             type: "light",
             damage: 20,
             fireRate: 1,
@@ -24,7 +24,7 @@ class SubmachineGun extends Weapon{
     constructor(){
         super({
             name:
-            "Submachine Gun",
+            "submachineGun",
             type: "light",
             damage: 10,
             fireRate: .5,
@@ -35,7 +35,7 @@ class SubmachineGun extends Weapon{
 class Sniper extends Weapon{
     constructor(){
         super({
-            name:"Sniper",
+            name:"sniper",
             type: "heavy",
             damage: 50,
             fireRate: 4,
@@ -46,7 +46,7 @@ class Sniper extends Weapon{
 class Shuriken extends Weapon{
     constructor(){
         super({
-            name: "Shuriken",
+            name: "shuriken",
             type: "light",
             damage: 25,
             fireRate: 1.2,
@@ -57,7 +57,7 @@ class Shuriken extends Weapon{
 class Fist extends Weapon{
     constructor(){
         super({
-            name: "Fist",
+            name: "fist",
             type: "melee",
             damage: 40,
             fireRate: 0.3,
@@ -73,3 +73,7 @@ module.exports = {
     Shuriken,
     Fist
 }
+
+
+
+
