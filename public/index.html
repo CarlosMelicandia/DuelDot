@@ -1,5 +1,6 @@
 <html>
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link
       href="https://fonts.googleapis.com/css2?family=VT323&display=swap"
       rel="stylesheet"
@@ -19,6 +20,69 @@
       input::placeholder {
         color: #94a3b8;
       }
+
+      /* Name and Class Selection Screen */
+      #name-page {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('./assets/MainMenu.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        z-index: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 2vh;
+      }
+
+      .name-display {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2vh; 
+        font-family: 'VT323', monospace;
+      }
+
+      #name-box {
+        width: 60vw;
+        max-width: 400px;
+        height: 6vh;
+        font-size: 28px;
+        color: white;
+        background-color: rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        border-radius: 20px;
+        border: 2px solid white;
+      }
+
+      .button-row {
+        display: flex;
+        justify-content: center;
+        gap: 2vw;
+      }
+
+      .button-row button {
+        padding: 1vh 2vw;
+        font-size: 24px;
+        background-color: rgba(255, 255, 255, 0);
+        border: 2px solid white;
+        border-radius: 20px;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .button-row button:hover {
+        background-color: rgb(3, 23, 41);
+      }
+      /* End */
 
       .canvas {
         width: 1024px;
@@ -77,21 +141,16 @@
       /* Leaderboard Container */
       .leaderboard {
         display: none;
-        /* align-items: center; */
         justify-content: center;
         position: absolute;
         top: 0;
         right: 0;
-        /* bottom: 0; */
         left: 0;
         width: 80%;
         max-width: 600px;
         margin: 20px auto;
-        /* background: rgba(0, 0, 0, 0.288); */
         border-radius: 12px;
         padding: 15px;
-        /*box-shadow: 0 8px 16px rgba(95, 89, 89, 0.507);*/
-        /*color: rgb(255, 255, 255);*/
         z-index: 1;
       }
 
@@ -102,9 +161,6 @@
         border-collapse: collapse;
         background: rgba(95, 89, 89, 0.507);
       }
-      /*.leaderboard-table thead {
-        background: #5d5d69;
-      }*/
 
       #leaderboard-header th {
         font-size: 20px;
@@ -224,6 +280,7 @@
       }
     </style>
   </head>
+  
   <body
     style="
       margin: 0;
@@ -233,16 +290,27 @@
       height: 100vh;
       background: black;
       font-family: 'VT323', monospace;">
+      
+    <!--Name Selection Screen-->
+    <div class = "removeAfter" id="name-page">
+      <div class="name-display">
+        <div id="name-box"></div>
+        <div class="button-row name-box">
+          <button id="random-btn">Random</button>
+          <button id="submit-btn">Submit</button>
+        </div>
+      </div>
+    </div>
+    
     <!-- Game Container -->
-    <div style="position: relative; width: 1024px; height: 576px">
+    <div class="displayAfter"  style="position: relative; width: 1024px; height: 576px">
       <!-- The Game Canvas -->
       <canvas class="canvas" id="canvas"></canvas>
-
       <!-- MiniMap -->
-      <canvas class="miniMapC displayAfter" id="miniMapC"></canvas>
+      <canvas class="miniMapC" id="miniMapC"></canvas>
       <img
         src="./assets/background.png"
-        class="miniMap displayAfter"
+        class="miniMap"
         id="miniMap"
         alt="Map"
       />
@@ -311,7 +379,6 @@
 
       <!-- Inventory slots -->
       <div
-        class = "displayAfter"
         id="inventoryArea"
         style="
           position: relative;
@@ -325,6 +392,7 @@
           transform: translate(-50%, -50%);
         "
       >
+
         <div class="itemBorder" id="inventorySlot1">
           <div class="numbers">1</div>
           <div class="weaponText" id="inventorySlot1Text"></div>
@@ -337,168 +405,6 @@
 
       <!-- Kill Feed -->
       <div class="killFeed" id="killFeed"></div>
-
-      <!-- Instruction Menu -->
-       <div 
-       class = "removeAfter"
-       id = "instructions"
-       style = "
-        display: flex;
-        position: absolute;
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: center;
-        height: 260px;
-        width: 200px;
-        top: 50%;
-        left: 270px;
-        transform: translate(-50%, -50%);
-        background-image: linear-gradient(to right, rgba(6, 182, 212, 0.5), rgba(59, 130, 246, 0.5));
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        padding: 10px;
-        color: white;">
-        <h1>How To Play</h1>
-        <p>W,A,S,D: Movement</p>
-        <p>F: Pick up guns</p>
-        <p>Q: Drop Weapons</p>
-        <p>1: Item Slot 1</p>
-        <p>2: Item Slot 2</p>
-        <p>Left-Click: Shoot/Punch</p>
-      </div>
-
-      <!-- Username and Class Selection Form -->
-      <div
-        class = "removeAfter"
-        id = "menu"
-        style=" 
-          position: absolute;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          text-align: center;">
-
-        <!-- Shows the username -->
-        <form id="usernameForm">
-          <div
-            id="selectedRandomName"
-            type="text"
-            style="
-              width: 227px;
-              padding: 10px;
-              box-sizing: border-box;
-              border-radius: 5px;
-              border: none;
-              background: #475569;
-              color: #cbd5e1;
-              text-align: center;
-            "
-          ></div>
-
-          <!-- Class Selector Buttons-->
-          <div
-            style="
-              margin-top: 8px;
-              display: flex;
-              align-items: center;
-              gap: 10px;
-            "
-          >
-            <!-- Left Button Class -->
-            <button
-              type="button"
-              id="classSelectorLeft"
-              style="
-                padding: 10px;
-                border-radius: 5px;
-                border: none;
-                background-image: linear-gradient(to right, #06b6d4, #3b82f6);
-                color: white;
-                cursor: pointer;
-              "
-            >
-              ←
-            </button>
-
-            <!-- Shows Selected Class -->
-            <button
-              type="button"
-              id="showClass"
-              style="
-                width: 140px;
-                padding: 10px;
-                border-radius: 5px;
-                box-sizing: border-box;
-                border: none;
-                background: linear-gradient(to right, #06b6d4, #3b82f6);
-                color: white;
-                font-weight: bold;
-                text-transform: uppercase;
-                cursor: default;
-              "
-            ></button>
-
-            <!-- Right Button Class -->
-            <button
-              type="button"
-              id="classSelectorRight"
-              style="
-                padding: 10px;
-                border-radius: 5px;
-                border: none;
-                background-image: linear-gradient(to right, #06b6d4, #3b82f6);
-                color: white;
-                cursor: pointer;
-              "
-            >
-              →
-            </button>
-          </div>
-
-          <!-- Action Buttons -->
-          <div style="margin-top: 8px; display: flex; gap: 8px">
-            <!-- Start Button -->
-            <button
-              type="submit"
-              style="
-                padding: 8px 20px;
-                border-radius: 5px;
-                border: none;
-                background: linear-gradient(to right, #06b6d4, #3b82f6);
-                color: white;
-                font-weight: bold;
-                text-transform: uppercase;
-                cursor: pointer;
-              "
-            >
-              Start!
-            </button>
-
-            <!-- Random Name Button -->
-            <button
-              type="button"
-              id="randomNameBtn"
-              style="
-                padding: 8px 15px;
-                border-radius: 5px;
-                border: none;
-                background: linear-gradient(to right, #06b6d4, #3b82f6);
-                color: white;
-                font-weight: bold;
-                text-transform: uppercase;
-                cursor: pointer;
-              "
-            >
-              Random Name
-            </button>
-          </div>
-        </form>
-      </div>
-      <!-- username input end -->
     </div>
 
     <script
@@ -509,6 +415,7 @@
     ></script>
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
     <script src="./js/frontend.js"></script>
+    <script src="./js/Pages/NameSelection.js"></script>
     <script src="./js/Leaderboard.js"></script>
     <script src="./js/Minimap.js"></script>
     <script src="./js/FrontPlayer/Player.js"></script>

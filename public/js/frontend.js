@@ -37,29 +37,6 @@ let globalPlayersArray = [];
 let currentPage = 1;
 let numberOfPage = 1;
 
-// ------------------------------
-// Possible Random Player Names
-// ------------------------------
-const playerNames = [
-  "Shadow","Raven",
-  "Phoenix","Blaze",
-  "Viper","Maverick",
-  "Rogue","Hunter",
-  "Nova","Zephyr",
-  "Falcon","Titan",
-  "Specter","Cyclone",
-  "Inferno","Reaper",
-  "Stalker","Venom",
-  "Glitch","Banshee",
-  "Shadowstrike","Onyx",
-  "Rebel","Fury",
-  "Apex","Crimson",
-  "Nightfall","Saber",
-  "Tempest","Lightning",
-  "Bullet","Vortex",
-  "Echo","Blitz",
-  "Rift","BOB",
-];
 
 // ------------------------------
 // Data Structures for Game Objects
@@ -95,6 +72,7 @@ let keyDownWeapon = -1; // Variable to track the key pressed for the weapon
  * When the server emits 'updatePlayers', update or create player objects as needed.
  */
 socket.on("updatePlayers", (backEndPlayers) => {
+  if (!gameStarted) return
   for (const id in backEndPlayers) {
     // displays the same info as if using socket.id, might want to remove the for loop
     const backEndPlayer = backEndPlayers[id];
@@ -221,6 +199,7 @@ socket.on("pongCheck", () => {
  */
 let animationId;
 function animate() {
+  if (!gameStarted) return
   animationId = requestAnimationFrame(animate); // Tells the browser we want to perform an animation
   // c.fillStyle = 'rgba(0, 0, 0, 0.1)' // Optional "ghosting" effect if needed
   c.clearRect(0, 0, canvas.width, canvas.height); // Clears the entire canvas
@@ -295,8 +274,6 @@ function animate() {
 
   c.restore();
 }
-
-animate();
 
 // ------------------------------
 // Player Input Handling
@@ -416,101 +393,42 @@ setInterval(() => {
 // ------------------------------
 // Class Selection Handling
 // ------------------------------
-const classSelectors = ["Tank", "Rogue", "Mage", "Gunner"]; // Possible classes
-let classSelection = 0; // Starts in Tank
-let className = classSelectors[classSelection]; // Selects the class
+// const classSelectors = ["Tank", "Rogue", "Mage", "Gunner"]; // Possible classes
+// let classSelection = 0; // Starts in Tank
+// let className = classSelectors[classSelection]; // Selects the class
 
-/**
- * Cycles forward in the array
- * @returns the selected class
- */
-function nextClass() {
-  classSelection = (classSelection + 1) % classSelectors.length;
-  return classSelectors[classSelection];
-}
+// /**
+//  * Cycles forward in the array
+//  * @returns the selected class
+//  */
+// function nextClass() {
+//   classSelection = (classSelection + 1) % classSelectors.length;
+//   return classSelectors[classSelection];
+// }
 
-/**
- * Cycles Backwards in the array
- * @returns the selected class
- */
-function previousClass() {
-  classSelection =
-    (classSelection - 1 + classSelectors.length) % classSelectors.length;
-  return classSelectors[classSelection];
-}
+// /**
+//  * Cycles Backwards in the array
+//  * @returns the selected class
+//  */
+// function previousClass() {
+//   classSelection =
+//     (classSelection - 1 + classSelectors.length) % classSelectors.length;
+//   return classSelectors[classSelection];
+// }
 
-document.querySelector("#showClass").textContent = "Class: " + className; // Displays the first class
+// document.querySelector("#showClass").textContent = "Class: " + className; // Displays the first class
 
-// When the user clicks the -> arrow it goes to the next class
-document.querySelector("#classSelectorRight").addEventListener("click", () => {
-  className = nextClass();
-  document.querySelector("#showClass").textContent = "Class: " + className;
-});
+// // When the user clicks the -> arrow it goes to the next class
+// document.querySelector("#classSelectorRight").addEventListener("click", () => {
+//   className = nextClass();
+//   document.querySelector("#showClass").textContent = "Class: " + className;
+// });
 
-// When the user clicks the <- arrow it goes to the previous class
-document.querySelector("#classSelectorLeft").addEventListener("click", () => {
-  className = previousClass();
-  document.querySelector("#showClass").textContent = "Class: " + className;
-});
-
-// ------------------------------
-// Random Username Handling
-// ------------------------------
-/**
- * Generate a random name that isn't already in use by another player on the client.
- * If the generated name is taken, recurse until a unique name is found.
- */
-function selectName() {
-  let playerNameNumber = Math.floor(Math.random() * playerNames.length);
-  let name = playerNames[playerNameNumber];
-  for (const id in frontEndPlayers) {
-    if (frontEndPlayers[id].username === name) {
-      // If name is already taken by a current player, try again
-      return selectName();
-    }
-  }
-  return name;
-}
-
-let playerName = selectName();
-document.querySelector("#selectedRandomName").textContent = playerName;
-
-document.querySelector("#randomNameBtn").addEventListener("click", () => {
-  // Generate a new random name when clicked
-  playerName = selectName();
-  document.querySelector("#selectedRandomName").textContent = playerName;
-});
-
-// ------------------------------
-// Username Form Handling
-// ------------------------------
-/**
- * When the player submits their username (or chosen random name):
- * - Prevent default form submission
- * - Hide the username form
- * - Emit an 'initGame' event to the server with our chosen data
- */
-document.querySelector('#usernameForm').addEventListener('submit', (event) => {
-  event.preventDefault() // Prevents the form from refreshing
-  const itemsToHide = document.querySelectorAll('.removeAfter')
-  itemsToHide.forEach((item) => {
-    item.style.display = 'none' // Hides the whole menu
-  })
-  const itemsToShow = document.querySelectorAll('.displayAfter')
-  itemsToShow.forEach((item) => {
-    item.style.display = 'flex'
-  })
-  gameStarted = true
-
-  // Send data to the server to initialize the player
-  socket.emit("initGame", {
-    width: canvas.width,
-    height: canvas.height,
-    devicePixelRatio,
-    username: playerName,
-    className,
-  });
-});
+// // When the user clicks the <- arrow it goes to the previous class
+// document.querySelector("#classSelectorLeft").addEventListener("click", () => {
+//   className = previousClass();
+//   document.querySelector("#showClass").textContent = "Class: " + className;
+// });
 
 // ------------------------------
 // Leader Board Show Handler
