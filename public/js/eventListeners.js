@@ -25,8 +25,9 @@ window.addEventListener("click", (event) => {
     if (!player.canShoot) return // Checks to see if the frontEnd should even do the calculations
   }
 
-  const mouseX = event.clientX - canvasRect.left; // Get the mouse x cordinate relative to the canvas
-  const mouseY = event.clientY - canvasRect.top; // Get the mouse y cordinate relative to the canvas
+  const canvasRect = canvas.getBoundingClientRect();
+  const mouseX = (event.clientX - canvasRect.left) * devicePixelRatio;
+  const mouseY = (event.clientY - canvasRect.top) * devicePixelRatio;
 
   const playerPosition = {
     // Stores the local player’s current position
@@ -67,8 +68,9 @@ window.addEventListener('mousemove', (event) => {
   
   if (!player) return
 
-  const mouseX = event.clientX - canvasRect.left; // Get the mouse x cordinate relative to the canvas
-  const mouseY = event.clientY - canvasRect.top; // Get the mouse y cordinate relative to the canvas
+  const canvasRect = canvas.getBoundingClientRect();
+  const mouseX = (event.clientX - canvasRect.left) * devicePixelRatio;
+  const mouseY = (event.clientY - canvasRect.top) * devicePixelRatio;
 
   cameraX = player.x - canvas.width / pixelNumber
   cameraY = player.y - canvas.height / pixelNumber

@@ -231,6 +231,7 @@ function animate() {
     c.scale(1 / zoomOut, 1 / zoomOut)
   }
 
+  
   c.translate(-cameraX, -cameraY);
   c.drawImage(backgroundImage, 0, 0, 5000, 5000);
   if (gameStarted) miniMapCtx.clearRect(0, 0, miniMap.width, miniMap.height)
@@ -389,46 +390,6 @@ setInterval(() => {
     keyDownWeapon = -1;  
   }
 }, 15); // (default: 15)
-
-// ------------------------------
-// Class Selection Handling
-// ------------------------------
-// const classSelectors = ["Tank", "Rogue", "Mage", "Gunner"]; // Possible classes
-// let classSelection = 0; // Starts in Tank
-// let className = classSelectors[classSelection]; // Selects the class
-
-// /**
-//  * Cycles forward in the array
-//  * @returns the selected class
-//  */
-// function nextClass() {
-//   classSelection = (classSelection + 1) % classSelectors.length;
-//   return classSelectors[classSelection];
-// }
-
-// /**
-//  * Cycles Backwards in the array
-//  * @returns the selected class
-//  */
-// function previousClass() {
-//   classSelection =
-//     (classSelection - 1 + classSelectors.length) % classSelectors.length;
-//   return classSelectors[classSelection];
-// }
-
-// document.querySelector("#showClass").textContent = "Class: " + className; // Displays the first class
-
-// // When the user clicks the -> arrow it goes to the next class
-// document.querySelector("#classSelectorRight").addEventListener("click", () => {
-//   className = nextClass();
-//   document.querySelector("#showClass").textContent = "Class: " + className;
-// });
-
-// // When the user clicks the <- arrow it goes to the previous class
-// document.querySelector("#classSelectorLeft").addEventListener("click", () => {
-//   className = previousClass();
-//   document.querySelector("#showClass").textContent = "Class: " + className;
-// });
 
 // ------------------------------
 // Leader Board Show Handler

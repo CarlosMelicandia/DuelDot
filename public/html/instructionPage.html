@@ -12,13 +12,106 @@
         background-position: center;
         background-repeat: no-repeat;
         z-index: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
       }
+
+      .instruction-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0, 0, 0, 0.7);
+        border: 2px solid white;
+        border-radius: 16px;
+        padding: 2rem;
+        width: 80vw;
+        max-width: 700px;
+        color: white;
+      }
+
+      #instruction-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      #instruction-box img {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 10px;
+    }
+
+    #instruction-text {
+      font-size: 20px;
+      text-align: center;
+    }
+
+    #instruction-count {
+      margin-top: 1rem;
+      font-size: 18px;
+    }
+
+    .nav-buttons {
+      margin-top: 1rem;
+      display: flex;
+      gap: 2rem;
+    }
+
+    .nav-buttons button {
+      padding: 1vh 2vw;
+      font-size: 24px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 2px solid white;
+      border-radius: 20px;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .nav-buttons button:hover {
+      background-color: rgb(3, 23, 41);
+    }
+
+    #back-btn {
+      position: absolute;
+      bottom: 2vh;
+      left: 2vw;
+      padding: 1vh 2vw;
+      font-size: 24px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 2px solid white;
+      border-radius: 20px;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #back-btn:hover {
+      background-color: rgb(3, 23, 41);
+    }
+
     </style>
   </head>
   <body>
     <div id="instruction-page">
-      
-
+      <div class="instruction-container">
+        <div id="instruction-box">
+          <img id="instruction-img" src="../assets/instruction/instruction-one.png" alt="Instruction Image">
+          <pre id="instruction-text">Please choose a class and name before starting the game!</pre>
+        </div>
+        
+        <div id="instruction-count">Page 1/3</div>
+      </div>
+      <div class="nav-buttons">
+        <button id="prev-btn">← Prev</button>
+        <button id="next-btn">Next →</button>
+      </div>
+      <button id="back-btn">Back</button>
     </div>
+    <script src="../js/Pages/instruction.js"></script>
   </body>
 </html>
