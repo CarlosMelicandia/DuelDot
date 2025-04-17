@@ -15,8 +15,8 @@ const scoreEl = document.querySelector("#scoreEl"); // Finds the element with ID
 // ------------------------------
 const devicePixelRatio = window.devicePixelRatio || 1; // Gets the device's pixel ratio (for high-DPI displays), defaulting to 1 if unavailable
 
-canvas.width = 1024 * devicePixelRatio; // Sets the canvas’s internal width
-canvas.height = 576 * devicePixelRatio; // Sets the canvas’s internal height
+canvas.width = 1024 * devicePixelRatio; // Sets the canvas's internal width
+canvas.height = 576 * devicePixelRatio; // Sets the canvas's internal height
 
 c.scale(devicePixelRatio, devicePixelRatio); // Scales the drawing context so that drawing commands correspond to CSS pixels
 
@@ -192,6 +192,14 @@ socket.on("playerRespawn", (player) =>{
 })
 
 // ------------------------------
+// Power-up Collection Handler
+// ------------------------------
+socket.on('powerupCollected', ({ type, duration }) => {
+  // Use the PowerUpStatusDisplay instance to handle the power-up
+  powerUpStatusDisplay.addPowerUp(type, duration);
+});
+
+// ------------------------------
 // Ping Checker
 // ------------------------------
 
@@ -221,9 +229,8 @@ socket.on("pongCheck", () => {
  */
 let animationId;
 function animate() {
-  animationId = requestAnimationFrame(animate); // Tells the browser we want to perform an animation
-  // c.fillStyle = 'rgba(0, 0, 0, 0.1)' // Optional "ghosting" effect if needed
-  c.clearRect(0, 0, canvas.width, canvas.height); // Clears the entire canvas
+  animationId = requestAnimationFrame(animate);
+  c.clearRect(0, 0, canvas.width, canvas.height);
 
   const now = performance.now();
   frames++;
@@ -234,7 +241,10 @@ function animate() {
 
     document.querySelector("#fpsCounter").textContent = `FPS: ${fps}`;
   }
-  
+
+  // Update power-up status display
+  powerUpStatusDisplay.update();
+
   const frontEndPlayer = frontEndPlayers[socket.id]
 
   let cameraX = 0;

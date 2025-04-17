@@ -219,3 +219,156 @@ class PowerUpDrawing {
     c.restore();
   }
 }
+
+// Simple class to show power-up icons above inventory
+class PowerUpStatusDisplay {
+  constructor() {
+    // Create a temporary PowerUps instance to get the color definitions
+    const tempPowerUp = new PowerUps({ type: 'speed' });
+    this.glowColors = tempPowerUp.glowColors;
+    
+    // List to store active power-ups
+    this.activePowerUps = new Map();
+    
+    // Create and setup the container div
+    this.container = document.createElement('div');
+    this.container.id = 'powerUpStatus';
+    
+    // Style the container
+    this.container.style.position = 'absolute';
+    this.container.style.display = 'flex';
+    this.container.style.gap = '10px';
+    this.container.style.padding = '5px';
+    this.container.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
+    this.container.style.borderRadius = '8px';
+    this.container.style.zIndex = '1000';
+    this.container.style.bottom = '165px';
+    this.container.style.left = '910px';
+    this.container.style.transform = 'translate(-50%, 0)';
+    this.container.style.width = '230px';
+    this.container.style.justifyContent = 'center';
+
+    // Add container to game screen
+    const gameContainer = document.querySelector('div[style*="position: relative"]');
+    gameContainer.appendChild(this.container);
+  }
+
+  // Create a new power-up icon with timer
+  createStatusElement(type) {
+    // Main container for the power-up
+    const holder = document.createElement('div');
+    holder.style.position = 'relative';
+    holder.style.width = '40px';
+    holder.style.height = '40px';
+    holder.style.filter = `drop-shadow(0 0 4px ${this.glowColors[type]})`;
+    holder.style.transition = 'filter 0.3s ease';
+
+    // Add power-up image
+    const img = document.createElement('img');
+    img.src = `../assets/${type}PU.png`; // Using the same naming convention as in PowerUps class
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.borderRadius = '5px';
+    holder.appendChild(img);
+
+    // Add timer circle
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 36 36');
+    svg.style.position = 'absolute';
+    svg.style.top = '0';
+    svg.style.left = '0';
+    svg.style.width = '100%';
+    svg.style.height = '100%';
+    svg.style.transform = 'rotate(-90deg)';
+
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', '18');
+    circle.setAttribute('cy', '18');
+    circle.setAttribute('r', '16');
+    circle.setAttribute('fill', 'none');
+    circle.setAttribute('stroke', this.glowColors[type]);
+    circle.setAttribute('stroke-width', '3');
+    circle.setAttribute('stroke-dasharray', '100 100');
+    circle.setAttribute('stroke-linecap', 'round');
+    
+    svg.appendChild(circle);
+    holder.appendChild(svg);
+
+    // Make it glow more on hover
+    holder.addEventListener('mouseenter', () => {
+      holder.style.filter = `drop-shadow(0 0 8px ${this.glowColors[type]})`;
+    });
+    holder.addEventListener('mouseleave', () => {
+      holder.style.filter = `drop-shadow(0 0 4px ${this.glowColors[type]})`;
+    });
+
+    return { holder, circle };
+  }
+
+  // Add a new power-up to display
+  addPowerUp(type, duration) {
+    // Remove oldest if we already have 3 power-ups
+    if (this.activePowerUps.size >= 3) {
+      let oldestType;
+      let oldestTime = Infinity;
+      
+      this.activePowerUps.forEach((data, powerType) => {
+        if (data.endTime < oldestTime) {
+          oldestTime = data.endTime;
+          oldestType = powerType;
+        }
+      });
+      
+      if (oldestType) {
+        const oldPowerUp = this.activePowerUps.get(oldestType);
+        oldPowerUp.element.remove();
+        this.activePowerUps.delete(oldestType);
+      }
+    }
+
+    // Create and add new power-up
+    const { holder, circle } = this.createStatusElement(type);
+    this.container.appendChild(holder);
+
+    // Save power-up info
+    this.activePowerUps.set(type, {
+      element: holder,
+      circle: circle,
+      duration: duration,
+      endTime: Date.now() + duration
+    });
+  }
+
+  // Update all power-up timers
+  update() {
+    const now = Date.now();
+    
+    this.activePowerUps.forEach((powerUp, type) => {
+      const timeLeft = powerUp.endTime - now;
+      
+      // Remove expired power-ups
+      if (timeLeft <= 0) {
+        powerUp.element.style.opacity = '0';
+        powerUp.element.style.transform = 'scale(0.8)';
+        setTimeout(() => {
+          powerUp.element.remove();
+          this.activePowerUps.delete(type);
+        }, 300);
+      } else {
+        // Update timer circle
+        const progress = (timeLeft / powerUp.duration) * 100;
+        powerUp.circle.setAttribute('stroke-dasharray', `${progress} 100`);
+        
+        // Make glow stronger when almost expired
+        if (progress < 20) {
+          const glowSize = 4 + ((20 - progress) / 20) * 4;
+          powerUp.element.style.filter = `drop-shadow(0 0 ${glowSize}px ${this.glowColors[type]})`;
+        }
+      }
+    });
+  }
+}
+
+// Create one display we can use everywhere
+const powerUpStatusDisplay = new PowerUpStatusDisplay();
+window.powerUpStatusDisplay = powerUpStatusDisplay;
