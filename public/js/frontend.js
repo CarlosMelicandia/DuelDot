@@ -39,6 +39,9 @@ let globalPlayersArray = [];
 let currentPage = 1;
 let numberOfPage = 1;
 
+let cameraX = 0;
+let cameraY = 0;
+
 // ------------------------------
 // Possible Random Player Names
 // ------------------------------
@@ -62,6 +65,7 @@ const playerNames = [
   "Echo","Blitz",
   "Rift","BOB",
 ];
+let usedNames = [];
 
 // ------------------------------
 // Data Structures for Game Objects
@@ -120,16 +124,33 @@ socket.on("updatePlayers", (backEndPlayers) => {
     } else {
       frontEndPlayer = frontEndPlayers[id];
       // Updates the player equipped weapon in the front end
-      frontEndPlayer.equippedWeapon = backEndPlayer.equippedWeapon
+      const originalWeapon = backEndPlayer.equippedWeapon
+      if (!frontEndPlayer.equippedWeapon ||
+        frontEndPlayer.equippedWeapon.name !== originalWeapon.name) {
+        frontEndPlayer.equippedWeapon = new WeaponDrawing({
+          x: frontEndPlayer.x,
+          y: frontEndPlayer.y,
+          name: originalWeapon.name,
+          type: originalWeapon.type,
+          isReloaded: originalWeapon.isReloaded,
+          fireRate: originalWeapon.fireRate,
+        })
+      } else {
+        frontEndPlayer.equippedWeapon.isReloaded = originalWeapon.isReloaded
+      }
 
-      if (backEndPlayer.equippedWeapon.imagePath) {
+      if (!frontEndPlayer.equippedWeapon.isReloaded) {
+        if (frontEndPlayer.equippedWeapon.reloadStartTime == 0) {
+          frontEndPlayer.equippedWeapon.reloadStartTime = performance.now()
+        }
+      } else frontEndPlayer.equippedWeapon.reloadStartTime = 0
+      
+
+      if (frontEndPlayer.equippedWeapon.imagePath) {
         const weaponImg = new Image();
-        weaponImg.src = backEndPlayer.equippedWeapon.imagePath;
+        weaponImg.src = frontEndPlayer.equippedWeapon.imagePath;
         frontEndPlayer.equippedWeapon.image = weaponImg;
       }
-      
-      // Updates whether the player can shoot in the front end
-      frontEndPlayer.canShoot = backEndPlayer.canShoot;
 
       // Updates about the punching
       frontEndPlayer.aimAngle = backEndPlayer.aimAngle;
@@ -233,8 +254,11 @@ socket.on("pongCheck", () => {
  */
 let animationId;
 function animate() {
-  animationId = requestAnimationFrame(animate);
-  c.clearRect(0, 0, canvas.width, canvas.height);
+  animationId = requestAnimationFrame(animate); // Tells the browser we want to perform an animation
+  // c.fillStyle = 'rgba(0, 0, 0, 0.1)' // Optional "ghosting" effect if needed
+  const frontEndPlayer = frontEndPlayers[socket.id]
+
+  c.clearRect(0, 0, canvas.width, canvas.height); // Clears the entire canvas
 
   const now = performance.now();
   frames++;
@@ -250,15 +274,11 @@ function animate() {
   if (window.PowerUpDrawing) {
     PowerUpDrawing.updateActiveStatuses();
   }
-
-  const frontEndPlayer = frontEndPlayers[socket.id]
-
-  let cameraX = 0;
-  let cameraY = 0;
+  
   const zoomOut = 3
 
   c.save();
-
+  
   if (gameStarted && frontEndPlayer) {
     cameraX = frontEndPlayer.x - canvas.width / (2 * devicePixelRatio)
     cameraY = frontEndPlayer.y - canvas.height / (2 * devicePixelRatio)
@@ -267,10 +287,21 @@ function animate() {
     cameraY = (gameHeight / 2) - (canvas.height / 2 * devicePixelRatio * zoomOut)
     c.scale(1 / zoomOut, 1 / zoomOut)
   }
-
+  
   c.translate(-cameraX, -cameraY);
   c.drawImage(backgroundImage, 0, 0, 5000, 5000);
+
   if (gameStarted) miniMapCtx.clearRect(0, 0, miniMap.width, miniMap.height)
+    
+  if (frontEndPlayer ){
+    equippedWeapon = frontEndPlayer.equippedWeapon
+    if (equippedWeapon) {
+      if(!equippedWeapon.isReloaded){
+        equippedWeapon.drawReloadTimer()
+      }
+    }
+  }
+
   // Interpolate and draw each player
   for (const id in frontEndPlayers) {
     const frontEndPlayer = frontEndPlayers[id];
@@ -310,6 +341,10 @@ function animate() {
   }
 
   c.restore();
+
+  // if (frontEndPlayer) {
+  //   frontEndPlayer.equippedWeapon.drawReloadTimer()
+  // }
 }
 
 animate();
@@ -347,11 +382,11 @@ let sequenceNumber = 0;
  */
 setInterval(() => {
   // Ensure the local player exists before trying to move
-  const player = frontEndPlayers[socket.id];
-  if (!gameStarted && !player) return;
+  const frontEndPlayer = frontEndPlayers[socket.id];
+  if (!gameStarted && !frontEndPlayer) return;
 
   // Dynamically get the player's speed
-  const SPEED = 5 * player.speed;
+  const SPEED = 5 * frontEndPlayer.speed;
 
   /**
    * Player movement
@@ -400,32 +435,36 @@ setInterval(() => {
   /**
    * Inventory
    */
-  if (keys.num1.pressed && !keys.num2.pressed && keyDownWeapon < 0) {
-    sequenceNumber++;
-    playerInputs.push({ sequenceNumber, dx: 0, dy: 0 });
-    document.querySelector("#inventorySlot1").style.borderColor = "blue"; // Highlights the first Inventory Slot
-    socket.emit("weaponSelected", { keycode: "Digit1", sequenceNumber, keyDownWeapon}); // Emits the information back to the server
-    keyDownWeapon = 1;
-  }else if (!keys.num1.pressed && keyDownWeapon === 1){
-    sequenceNumber++;
-    playerInputs.push({ sequenceNumber, dx: 0, dy: 0 });
-    document.querySelector("#inventorySlot1").style.borderColor = "white"; // Highlights the first Inventory Slot
-    socket.emit("weaponSelected", { keycode: "Digit1", sequenceNumber, keyDownWeapon}); // Emits the information back to the server
-    keyDownWeapon = -1;
+  if (keys.num1.pressed) {
+    if (lastPressedKey = 1 && isRepeated){
+      document.querySelector("#inventorySlot1").style.borderColor = "white"
+      frontEndPlayer.inventorySlotSelected = -1
+    }else{
+      sequenceNumber++;
+      playerInputs.push({ sequenceNumber, dx: 0, dy: 0 });
+      document.querySelector("#inventorySlot1").style.borderColor = "blue"; // Highlights the first Inventory Slot
+      socket.emit("weaponSelected", { keycode: "Digit1", sequenceNumber }); // Emits the information back to the server
+      }
+    } else {
+    if (!keys.num1.pressed && keys.num2.pressed) {
+      document.querySelector("#inventorySlot1").style.borderColor = "white"; // Turns the inventory back to original color
+    }
   }
 
-  if (keys.num2.pressed && !keys.num1.pressed && keyDownWeapon < 0) {
-    sequenceNumber++;
-    playerInputs.push({ sequenceNumber, dx: 0, dy: 0 });
-    document.querySelector("#inventorySlot2").style.borderColor = "blue"; // Highlights the second Inventory Slot
-    socket.emit("weaponSelected", { keycode: "Digit2", sequenceNumber, keyDownWeapon }); // Emits the information back to the server
-    keyDownWeapon = 2;
-  }else if (!keys.num2.pressed && keyDownWeapon === 2) {
-    sequenceNumber++;
-    playerInputs.push({ sequenceNumber, dx: 0, dy: 0 });
-    document.querySelector("#inventorySlot2").style.borderColor = "white"; // Highlights the second Inventory Slot
-    socket.emit("weaponSelected", { keycode: "Digit2", sequenceNumber, keyDownWeapon }); // Emits the information back to the server
-    keyDownWeapon = -1;  
+  if (keys.num2.pressed) {
+    if (lastPressedKey = 2 && isRepeated){
+      document.querySelector("#inventorySlot1").style.borderColor = "white"
+      frontEndPlayer.inventorySlotSelected = -1
+    } else {
+      sequenceNumber++;
+      playerInputs.push({ sequenceNumber, dx: 0, dy: 0 });
+      document.querySelector("#inventorySlot2").style.borderColor = "blue"; // Highlights the second Inventory Slot
+      socket.emit("weaponSelected", { keycode: "Digit2", sequenceNumber }); // Emits the information back to the server
+      }
+    } else {
+    if (keys.num1.pressed && !keys.num2.pressed) {
+      document.querySelector("#inventorySlot2").style.borderColor = "white"; // Turns the inventory back to original color
+    }
   }
 }, 15); // (default: 15)
 
@@ -475,25 +514,33 @@ document.querySelector("#classSelectorLeft").addEventListener("click", () => {
 /**
  * Generate a random name that isn't already in use by another player on the client.
  * If the generated name is taken, recurse until a unique name is found.
- */
+ */ 
+
 function selectName() {
   let playerNameNumber = Math.floor(Math.random() * playerNames.length);
   let name = playerNames[playerNameNumber];
-  for (const id in frontEndPlayers) {
-    if (frontEndPlayers[id].username === name) {
-      // If name is already taken by a current player, try again
-      return selectName();
+  
+  if (usedNames.length >= playerNames.length) {
+    return "Player" + Math.floor(Math.random() * 1000)
+  }  
+
+  for (const id in frontEndPlayers){
+    if (frontEndPlayers[id].username === name){
+      return selectName()
     }
   }
-  return name;
-}
 
-let playerName = selectName();
-document.querySelector("#selectedRandomName").textContent = playerName;
+  return name
+}
+  
+playerName = selectName()
+document.querySelector("#selectedRandomName").textContent = "Select Name :)"
+
 
 document.querySelector("#randomNameBtn").addEventListener("click", () => {
   // Generate a new random name when clicked
-  playerName = selectName();
+  playerName = selectName()
+ if (document.querySelector("#selectedRandomName").style.color = "red") document.querySelector("#selectedRandomName").style.color = "#cbd5e1"
   document.querySelector("#selectedRandomName").textContent = playerName;
 });
 
@@ -508,6 +555,12 @@ document.querySelector("#randomNameBtn").addEventListener("click", () => {
  */
 document.querySelector('#usernameForm').addEventListener('submit', (event) => {
   event.preventDefault() // Prevents the form from refreshing
+  if (document.querySelector("#selectedRandomName").textContent === "Select Name :)") {
+    document.querySelector("#selectedRandomName").textContent = "Click Random Name"
+    document.querySelector("#selectedRandomName").style.color = "red"
+    return
+  }
+
   const itemsToHide = document.querySelectorAll('.removeAfter')
   itemsToHide.forEach((item) => {
     item.style.display = 'none' // Hides the whole menu

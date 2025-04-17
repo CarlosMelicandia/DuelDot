@@ -6,6 +6,8 @@ let deletedWeaponIds = []
 
 let weaponId = 0
 
+const weaponRadius = 20
+
 function spawnWeapons(backEndWeapons, io, backEndPlayers) {
   const maxX = GAME_WIDTH - 100
   const maxY = GAME_HEIGHT - 100
@@ -42,7 +44,7 @@ function spawnWeapons(backEndWeapons, io, backEndPlayers) {
       id: newWeaponId,
       x: spawnX, 
       y: spawnY,
-      radius: 10,
+      radius: weaponRadius,
       color: weaponColors[weaponToSpawn],
       name: weaponToSpawn // Changed
     })
@@ -61,7 +63,7 @@ function weaponDrop(weapon, x, y, io, backEndWeapons){
     id: newWeaponId,
     x: x, 
     y: y,
-    radius: 10,
+    radius: weaponRadius,
     color: weapon.color,
     name: weapon.name
   })
@@ -76,12 +78,11 @@ function checkCollision(backEndWeapons, io, player) {
     let weapon = backEndWeapons[i]
     let dist = Math.hypot(player.x - weapon.x, player.y - weapon.y)
 
-    if (dist < player.radius + weapon.radius + 10) {
+    if (dist < player.radius + weapon.radius) {
       const slotIndex = player.inventory.findIndex(slot => slot === null)
-      if (player.inventory[0] != null && player.inventory[1] != null) return
-
-      // console.log('Player picked up', weapon) // Test
       
+      if (player.inventory[0] != null && player.inventory[1] != null) return
+     
       const weapons = {
         pistol: Pistol,
         submachineGun: SubmachineGun,
@@ -92,8 +93,6 @@ function checkCollision(backEndWeapons, io, player) {
       const weaponEquipped = new weapons[weapon.name]() // Creates a weapon object when a player picks it up
       
       player.inventory[slotIndex] = weaponEquipped
-
-      console.log("AFter pickup Inventory:", player.inventory) // Test
       
       io.to(player.socketId).emit('equipWeapon', slotIndex, player)
 

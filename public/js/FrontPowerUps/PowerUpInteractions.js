@@ -10,21 +10,22 @@ socket.on('updatePowerUpsOnJoin', (backEndPowerUps) => {
     frontEndPowerUps = {};
     
     backEndPowerUps.forEach((powerUp) => {
-      console.log(powerUp)
       frontEndPowerUps[powerUp.id] = new PowerUpDrawing(powerUp);
     });
 });
 
-socket.on('updatePowerUps', (backEndPowerUps, powerUpData) => {
-    if (powerUpData.remove) { // If the power-up was collected, remove it
-      delete frontEndPowerUps[powerUpData.id];
-    } else {
-      if (!frontEndPowerUps[powerUpData.id]) { // Create the power-up if it doesn't exist
-        frontEndPowerUps[powerUpData.id] = new PowerUpDrawing(powerUpData); // Stores the power-up data
-      }
-    }
-});
-
-socket.on("removePowerUp", (powerUp) => {
-  delete frontEndPowerUps[powerUp.id]; // Remove from frontend state
+socket.on("spawnPowerUps", (powerUpData) => {
+  if (!frontEndPowerUps[powerUpData.id]) { // Create the power-up if it doesn't exist
+    frontEndPowerUps[powerUpData.id] = new PowerUpDrawing(powerUpData); // Stores the power-up data
+  }
 })
+
+socket.on("removePowerUp", (id) => {
+  delete frontEndPowerUps[id]
+})
+
+socket.on('updatePowerUps', (backEndPowerUps) => {
+  backEndPowerUps.forEach((powerUp) => {
+    frontEndPowerUps[powerUp.id] = new PowerUpDrawing(powerUp);
+  })
+});

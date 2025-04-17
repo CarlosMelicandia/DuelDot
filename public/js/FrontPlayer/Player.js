@@ -17,7 +17,7 @@ class Player {
    * @param {number} speed - The player's movement speed.
    * @param {int} score - The player's score.
    */
-  constructor({ x, y, radius, color, username, health, speed, score, canShoot, equippedWeapon }) {
+  constructor({ x, y, radius, color, username, health, speed, score, equippedWeapon }) {
     this.x = x
     this.y = y
     this.radius = radius
@@ -27,19 +27,92 @@ class Player {
     this.maxHealth = health // Store max health for calculations 
     this.speed = speed // Movement speed
     this.score = score
-    this.canShoot = canShoot
     this.equippedWeapon = equippedWeapon
+
+    this.inventorySlotSelected = -1
 
     this.aimAngle = 0
     this.handXMove = 0
 
     this.activeEffects = {}; // Object to track active power-up effects
-    this.lightningPoints = []; // For speed effect
-    this.shieldPulse = 0; // For shield effect
-    this.shieldPulseDir = 1;
-    this.rotation = 0; // For rotating effects
-    this.flameHeight = 0; // For fire effect
-    this.effectParticles = []; // For all effect particles
+      this.lightningPoints = []; // For speed effect
+      this.shieldPulse = 0; // For shield effect
+      this.shieldPulseDir = 1;
+      this.rotation = 0; // For rotating effects
+      this.flameHeight = 0; // For fire effect
+      this.effectParticles = []; // For all effect particles
+}
+
+/**
+   * Draws the player onto the canvas.
+   * - Displays the username centered below the player.
+   * - Draws a circular representation of the player.
+   * - Adds a glowing effect to enhance visibility.
+   * - Renders a health bar above the player.
+   */
+draw({ xPosition = 1.5, yPosition = 10, angle }) {
+  // --- Draw Username ---
+  c.font = '12px sans-serif'
+  c.fillStyle = 'white'
+  const textWidth = c.measureText(this.username).width
+  const textX = this.x - textWidth / 2
+  const textY = this.y + this.radius + 15
+  c.fillText(this.username, textX, textY)
+
+  // --- Draw Health Bar ---
+  const healthBarWidth = 40
+  const healthBarHeight = 4
+  const healthPercentage = this.health / this.maxHealth
+
+  c.fillStyle = 'rgba(255, 255, 255, 0.5)'
+  c.fillRect(this.x - healthBarWidth / 2, this.y - this.radius - 10, healthBarWidth, healthBarHeight)
+
+  const healthColor = `hsl(${healthPercentage * 120}, 100%, 50%)`
+  c.fillStyle = healthColor
+  c.fillRect(this.x - healthBarWidth / 2, this.y - this.radius - 10, healthBarWidth * healthPercentage, healthBarHeight)
+
+  // 
+  // Draw Player's Body
+  // 
+  c.save()
+  c.translate(this.x, this.y)
+  c.rotate(angle)
+
+  // Body
+  c.shadowColor = this.color
+  c.shadowBlur = 20
+  c.beginPath()
+  c.fillStyle = this.color
+  c.arc(0, 0, this.radius, 0, Math.PI * 2) // draw from center
+  c.fill()
+
+  // Draw facing indicator – optional: pointer or "eye"
+  c.beginPath()
+  c.fillStyle = 'black'
+  c.arc(this.radius * 0.7, 0, this.radius * 0.2, 0, Math.PI * 2) // a small "eye" or dot to show direction
+  c.fill()
+
+  if (this.equippedWeapon?.name === "fist"){
+    // Draw hand
+    c.beginPath()
+    c.fillStyle = this.color
+    c.arc(this.radius * xPosition, yPosition, this.radius / 3, 0, Math.PI * 2)
+    c.arc(this.radius * xPosition, -yPosition, this.radius / 3, 0, Math.PI * 2)
+    c.fill()
+  }
+
+  if (this.equippedWeapon?.name != "fist" &&
+    this.equippedWeapon?.image instanceof HTMLImageElement &&
+    this.equippedWeapon?.image.complete){
+    const img = this.equippedWeapon.topImage
+    
+    c.drawImage(img, (-this.radius * xPosition - img.width / 2) + 10, (-img.height / 2) + 20)
+  }
+
+  c.restore()
+
+  this.drawPowerupEffects();
+  
 }
 
 // Add this method to your Player class:
@@ -515,77 +588,5 @@ drawHealthEffect(remainingRatio) {
   c.fill();
   
   c.globalAlpha = 1;
-  }
-
-  /**
-   * Draws the player onto the canvas.
-   * - Displays the username centered below the player.
-   * - Draws a circular representation of the player.
-   * - Adds a glowing effect to enhance visibility.
-   * - Renders a health bar above the player.
-   */
-  draw({ xPosition = 1.5, yPosition = 10, angle }) {
-    // --- Draw Username ---
-    c.font = '12px sans-serif'
-    c.fillStyle = 'white'
-    const textWidth = c.measureText(this.username).width
-    const textX = this.x - textWidth / 2
-    const textY = this.y + this.radius + 15
-    c.fillText(this.username, textX, textY)
-  
-    // --- Draw Health Bar ---
-    const healthBarWidth = 40
-    const healthBarHeight = 4
-    const healthPercentage = this.health / this.maxHealth
-  
-    c.fillStyle = 'rgba(255, 255, 255, 0.5)'
-    c.fillRect(this.x - healthBarWidth / 2, this.y - this.radius - 10, healthBarWidth, healthBarHeight)
-  
-    const healthColor = `hsl(${healthPercentage * 120}, 100%, 50%)`
-    c.fillStyle = healthColor
-    c.fillRect(this.x - healthBarWidth / 2, this.y - this.radius - 10, healthBarWidth * healthPercentage, healthBarHeight)
-  
-    // 
-    // Draw Player's Body
-    // 
-    c.save()
-    c.translate(this.x, this.y)
-    c.rotate(angle)
-  
-    // Body
-    c.shadowColor = this.color
-    c.shadowBlur = 20
-    c.beginPath()
-    c.fillStyle = this.color
-    c.arc(0, 0, this.radius, 0, Math.PI * 2) // draw from center
-    c.fill()
-  
-    // Draw facing indicator – optional: pointer or "eye"
-    c.beginPath()
-    c.fillStyle = 'black'
-    c.arc(this.radius * 0.7, 0, this.radius * 0.2, 0, Math.PI * 2) // a small "eye" or dot to show direction
-    c.fill()
-  
-    if (this.equippedWeapon?.name === "fist"){
-      // Draw hand
-      c.beginPath()
-      c.fillStyle = this.color
-      c.arc(this.radius * xPosition, yPosition, this.radius / 3, 0, Math.PI * 2)
-      c.arc(this.radius * xPosition, -yPosition, this.radius / 3, 0, Math.PI * 2)
-      c.fill()
-    }
-  
-    if (this.equippedWeapon?.name != "fist" &&
-      this.equippedWeapon?.image instanceof HTMLImageElement &&
-      this.equippedWeapon?.image.complete){
-      const img = this.equippedWeapon.image
-      
-      c.drawImage(img, (-this.radius * xPosition - img.width / 2) + 15, (-img.height / 2) + 20)
-    }
-
-    c.restore()
-
-    this.drawPowerupEffects();
-    
   }
 }
