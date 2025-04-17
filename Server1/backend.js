@@ -50,6 +50,7 @@ const backEndPlayers = {} // List of player object objects server-side
 const backEndProjectiles = {} // List of projectile objects server-side
 const backEndWeapons = [] // List of weapon references server-side
 const backEndPowerUps = [] // List of power-ups references server-side
+const usedNames = [] // List of all used names
 
 // Assigns the canvas height and width to variables
 const GAME_WIDTH = 5000; // Default width
@@ -181,6 +182,7 @@ io.on("connection", (socket) => {
     socket.on('weaponDrop', ({keycode, sequenceNumber}) => {
     const backEndPlayer = backEndPlayers[socket.id]
 
+    if (!backEndPlayer) return
     if (!backEndPlayer.equippedWeapon || backEndPlayer.equippedWeapon.name == "fist"|| !backEndPlayer) return
 
     backEndPlayer.sequenceNumber = sequenceNumber
@@ -193,10 +195,7 @@ io.on("connection", (socket) => {
       backEndPlayer.inventory[slotIndex] = null // Set the slot to null instead of removing
     }
 
-    backEndPlayer.equippedWeapon = fist
-
-    console.log("Inventory:", backEndPlayer.inventory) // Test
-    
+    backEndPlayer.equippedWeapon = fist    
 
     weaponDrop(droppedWeapon, backEndPlayer.x, backEndPlayer.y, io, backEndWeapons)
     socket.emit('removeWeapon', backEndPlayer)

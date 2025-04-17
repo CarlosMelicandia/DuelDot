@@ -1,12 +1,11 @@
 class Weapon{
-    constructor({ name, type, damage, fireRate, velocity, imagePath }){
+    constructor({ name, type, damage, fireRate, velocity}){
         this.name = name
         this.type = type
         this.damage = damage
         this.fireRate = fireRate
         this.velocity = velocity
-        this.imagePath = imagePath
-        this.isDropped = false
+        this.isReloaded = true
     }
 }
 
@@ -17,8 +16,7 @@ class Pistol extends Weapon{
             type: "light",
             damage: 20,
             fireRate: 1,
-            velocity: 5,
-            imagePath: "../assets/topDownWeapons/subgunTop.png"});
+            velocity: 5});
     }
     
 }
@@ -30,8 +28,7 @@ class SubmachineGun extends Weapon{
             type: "light",
             damage: 10,
             fireRate: .5,
-            velocity: 5,
-            imagePath: "../assets/topDownWeapons/pistolTop.png"});
+            velocity: 5});
     }
     
 }
@@ -42,8 +39,7 @@ class Sniper extends Weapon{
             type: "heavy",
             damage: 50,
             fireRate: 4,
-            velocity: 10,
-            imagePath: "../assets/topDownWeapons/sniperTop.png"});
+            velocity: 10});
     }
     
 }
@@ -54,8 +50,7 @@ class Shuriken extends Weapon{
             type: "light",
             damage: 25,
             fireRate: 1.2,
-            velocity: 5,
-            imagePath: "../assets/topDownWeapons/shurikenTop.png"});
+            velocity: 5});
     }
 }
 

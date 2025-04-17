@@ -15,8 +15,10 @@ const scoreEl = document.querySelector("#scoreEl"); // Finds the element with ID
 // ------------------------------
 const devicePixelRatio = window.devicePixelRatio || 1; // Gets the device's pixel ratio (for high-DPI displays), defaulting to 1 if unavailable
 
-canvas.width = 1024 * devicePixelRatio; // Sets the canvas’s internal width
-canvas.height = 576 * devicePixelRatio; // Sets the canvas’s internal height
+canvas.width = 1024 * devicePixelRatio; // Sets the canvas's internal width
+canvas.height = 576 * devicePixelRatio; // Sets the canvas's internal height
+canvas.width = 1024 * devicePixelRatio; // Sets the canvas's internal width
+canvas.height = 576 * devicePixelRatio; // Sets the canvas's internal height
 
 c.scale(devicePixelRatio, devicePixelRatio); // Scales the drawing context so that drawing commands correspond to CSS pixels
 
@@ -36,6 +38,9 @@ const rowPerPage = 10;
 let globalPlayersArray = [];
 let currentPage = 1;
 let numberOfPage = 1;
+
+let cameraX = 0;
+let cameraY = 0;
 
 
 // ------------------------------
@@ -96,16 +101,33 @@ socket.on("updatePlayers", (backEndPlayers) => {
     } else {
       frontEndPlayer = frontEndPlayers[id];
       // Updates the player equipped weapon in the front end
-      frontEndPlayer.equippedWeapon = backEndPlayer.equippedWeapon
+      const originalWeapon = backEndPlayer.equippedWeapon
+      if (!frontEndPlayer.equippedWeapon ||
+        frontEndPlayer.equippedWeapon.name !== originalWeapon.name) {
+        frontEndPlayer.equippedWeapon = new WeaponDrawing({
+          x: frontEndPlayer.x,
+          y: frontEndPlayer.y,
+          name: originalWeapon.name,
+          type: originalWeapon.type,
+          isReloaded: originalWeapon.isReloaded,
+          fireRate: originalWeapon.fireRate,
+        })
+      } else {
+        frontEndPlayer.equippedWeapon.isReloaded = originalWeapon.isReloaded
+      }
 
-      if (backEndPlayer.equippedWeapon.imagePath) {
+      if (!frontEndPlayer.equippedWeapon.isReloaded) {
+        if (frontEndPlayer.equippedWeapon.reloadStartTime == 0) {
+          frontEndPlayer.equippedWeapon.reloadStartTime = performance.now()
+        }
+      } else frontEndPlayer.equippedWeapon.reloadStartTime = 0
+      
+
+      if (frontEndPlayer.equippedWeapon.imagePath) {
         const weaponImg = new Image();
-        weaponImg.src = backEndPlayer.equippedWeapon.imagePath;
+        weaponImg.src = frontEndPlayer.equippedWeapon.imagePath;
         frontEndPlayer.equippedWeapon.image = weaponImg;
       }
-      
-      // Updates whether the player can shoot in the front end
-      frontEndPlayer.canShoot = backEndPlayer.canShoot;
 
       // Updates about the punching
       frontEndPlayer.aimAngle = backEndPlayer.aimAngle;
@@ -155,19 +177,20 @@ socket.on("updatePlayers", (backEndPlayers) => {
 
 socket.on("playerRespawn", (player) =>{
   // Show respawn form
-  document.querySelector("#usernameForm").style.display = "block";
-  
-  const itemsToHide = document.querySelectorAll('.removeAfter')
-  itemsToHide.forEach((item) => {
-    item.style.display = 'flex' // Hides the whole menu
-  })
-  const itemsToShow = document.querySelectorAll('.displayAfter')
-  itemsToShow.forEach((item) => {
-    item.style.display = 'none'
-  })
+  window.location.href = "../index.html"
 
   gameStarted = false
 })
+
+// ------------------------------
+// Power-up Collection Handler
+// ------------------------------
+socket.on('powerupCollected', ({ type, duration }) => {
+  // Safely call PowerUpDrawing method
+  if (window.PowerUpDrawing) {
+    PowerUpDrawing.addActiveStatus(type, duration);
+  }
+});
 
 // ------------------------------
 // Ping Checker
@@ -203,6 +226,8 @@ function animate() {
   
   animationId = requestAnimationFrame(animate); // Tells the browser we want to perform an animation
   // c.fillStyle = 'rgba(0, 0, 0, 0.1)' // Optional "ghosting" effect if needed
+  const frontEndPlayer = frontEndPlayers[socket.id]
+
   c.clearRect(0, 0, canvas.width, canvas.height); // Clears the entire canvas
 
   const now = performance.now();
@@ -214,14 +239,15 @@ function animate() {
 
     document.querySelector("#fpsCounter").textContent = `FPS: ${fps}`;
   }
-  
-  const frontEndPlayer = frontEndPlayers[socket.id]
 
-  let cameraX = 0;
-  let cameraY = 0;
+  // Safely update power-up status timers
+  if (window.PowerUpDrawing) {
+    PowerUpDrawing.updateActiveStatuses();
+  }
+
 
   c.save();
-
+  
   if (gameStarted && frontEndPlayer) {
     cameraX = frontEndPlayer.x - canvas.width / (2 * devicePixelRatio)
     cameraY = frontEndPlayer.y - canvas.height / (2 * devicePixelRatio)
@@ -230,7 +256,18 @@ function animate() {
   
   c.translate(-cameraX, -cameraY);
   c.drawImage(backgroundImage, 0, 0, 5000, 5000);
+
   if (gameStarted) miniMapCtx.clearRect(0, 0, miniMap.width, miniMap.height)
+    
+  if (frontEndPlayer ){
+    equippedWeapon = frontEndPlayer.equippedWeapon
+    if (equippedWeapon) {
+      if(!equippedWeapon.isReloaded){
+        equippedWeapon.drawReloadTimer()
+      }
+    }
+  }
+
   // Interpolate and draw each player
   for (const id in frontEndPlayers) {
     const frontEndPlayer = frontEndPlayers[id];
@@ -270,6 +307,10 @@ function animate() {
   }
 
   c.restore();
+
+  // if (frontEndPlayer) {
+  //   frontEndPlayer.equippedWeapon.drawReloadTimer()
+  // }
 }
 
 // ------------------------------
@@ -307,11 +348,11 @@ let sequenceNumber = 0;
  */
 setInterval(() => {
   // Ensure the local player exists before trying to move
-  const player = frontEndPlayers[socket.id];
-  if (!gameStarted && !player) return;
+  const frontEndPlayer = frontEndPlayers[socket.id];
+  if (!gameStarted && !frontEndPlayer) return;
 
   // Dynamically get the player's speed
-  const SPEED = 5 * player.speed;
+  const SPEED = 5 * frontEndPlayer.speed;
 
   /**
    * Player movement
@@ -434,10 +475,10 @@ socket.on("updateKillFeed", ({ victemId, killerId, killerName, victimName, weapo
   msg.classList.add("kill-message");
   switch (weapon) {
     case "pistol":
-      image = "./assets/weapons/FirePistol.png";
+      image = "./assets/weapons/Pistol.png";
       break;
     case "submachineGun":
-      image = "./assets/weapons/ShotGun.png";
+      image = "./assets/weapons/SubmachineGun.png";
       break;
     case "sniper":
       image = "./assets/weapons/Sniper.png";
@@ -445,6 +486,10 @@ socket.on("updateKillFeed", ({ victemId, killerId, killerName, victimName, weapo
     case "shuriken":
       image = "./assets/weapons/Shuriken.png";
       break;
+    // -- We have a shotgun pic done but not implemented
+    // case "shotgun":
+    //   image = "./assets/weapons/Shotgun.png";
+    //   break;
   }
 
   if (socket.id === victemId || socket.id === killerId) {

@@ -3,10 +3,8 @@
  * When clicked, this function calculates the direction of the shot
  * relative to the player's position and sends that data to the server.
  */
-const canvasRect = canvas.getBoundingClientRect(); // Gets the top and left position of the canvas relative to the viewport
 
 // Get the camera offsets as used in animate()
-let cameraX = 0, cameraY = 0;
 let pixelNumber = 2 * devicePixelRatio;
 
 // 1 means slot 1 is selected, 2 means slot 2 is selected, -1 means no slot is selected
@@ -19,10 +17,15 @@ window.addEventListener("click", (event) => {
   // Ensure the local player exists before proceeding
   if (!player) return;
 
-  if (player.equippedWeapon.type == "melee" && player.canPunch) {
-    socket.emit('punch')// Test------------------------------------
+  const canvasRect = canvas.getBoundingClientRect(); // Gets the top and left position of the canvas relative to the viewport
+
+  const equippedWeapon = player.equippedWeapon
+
+  if (equippedWeapon.name == "fist" && player.canPunch) {
+    socket.emit('punch')
+    return
   } else{
-    if (!player.canShoot) return // Checks to see if the frontEnd should even do the calculations
+    if (!equippedWeapon.isReloaded || equippedWeapon.name == "fist") return // Checks to see if the frontEnd should even do the calculations
   }
 
   const mouseX = event.clientX - canvasRect.left
@@ -37,29 +40,45 @@ window.addEventListener("click", (event) => {
   cameraX = player.x - (canvas.width / devicePixelRatio) / 2;
   cameraY = player.y - (canvas.height / devicePixelRatio) / 2;
 
+
   // Convert mouse (screen) coordinates to game world coordinates
   const worldMouseX = mouseX + cameraX;
   const worldMouseY = mouseY + cameraY;
 
-    // Calculates the angle between the player's position to world mouse click location.
-    const angle = Math.atan2(
-      worldMouseY- playerPosition.y,
-      worldMouseX - playerPosition.x
-    );
+  // Calculates the angle between the player's position to world mouse click location.
+  const angle = Math.atan2(
+    worldMouseY - playerPosition.y,
+    worldMouseX - playerPosition.x
+  );
 
-    /**
-     * Sends a "shoot" event to the server.
-     * This informs the server that the player has fired a shot.
-     *
-     * Data sent:
-     * - `x, y`: Player’s current position.
-     * - `angle`: The angle at which the projectile should be fired.
-     */
-    socket.emit("shoot", {
-    x: playerPosition.x,
-    y: playerPosition.y,
-    angle
-    })
+  // Define the distance from the center of the player to the muzzle
+  const muzzleOffset = equippedWeapon.topImageLength
+  const sideOffset = 20
+
+  // Use trigonometry to calculate the muzzle coordinates
+  const spawnX = 
+    playerPosition.x +
+    Math.cos(angle) * muzzleOffset +
+    Math.cos(angle + Math.PI / 2) * sideOffset
+    
+  const spawnY = 
+    playerPosition.y +
+    Math.sin(angle) * muzzleOffset +
+    Math.sin(angle + Math.PI / 2) * sideOffset
+
+  /**
+   * Sends a "shoot" event to the server.
+   * This informs the server that the player has fired a shot.
+   *
+   * Data sent:
+   * - `x, y`: Player’s current position.
+   * - `angle`: The angle at which the projectile should be fired.
+   */
+  socket.emit("shoot", {
+  x: spawnX,
+  y: spawnY,
+  angle: angle
+  })
 })
 
 window.addEventListener('mousemove', (event) => {
@@ -67,12 +86,14 @@ window.addEventListener('mousemove', (event) => {
   
   if (!player || !gameStarted) return
 
+  const canvasRect = canvas.getBoundingClientRect(); // Gets the top and left position of the canvas relative to the viewport
+
   const mouseX = event.clientX - canvasRect.left;
   const mouseY = event.clientY - canvasRect.top;
 
   cameraX = player.x - (canvas.width / devicePixelRatio) / 2;
   cameraY = player.y - (canvas.height / devicePixelRatio) / 2;
-  
+
   const worldMouseX = mouseX + cameraX;
   const worldMouseY = mouseY + cameraY;
   
@@ -91,12 +112,15 @@ window.addEventListener('mousemove', (event) => {
  * Listen for keydown events and mark the corresponding key as pressed.
  * This allows for continuous movement while the key is held.
  */
+let isRepeated = false
 window.addEventListener("keydown", (event) => {
   // If the local player's data is not yet available, ignore input events
-  if (!frontEndPlayers[socket.id]) return;
+  const frontEndPlayer = frontEndPlayers[socket.id]
+  if (!frontEndPlayer) return;
 
-  if ((event.code === "Digit1" || event.code === "Digit2") && event.repeat)
-    return;
+  const canvasRect = canvas.getBoundingClientRect(); // Gets the top and left position of the canvas relative to the viewport
+
+  // if ((event.code === "Digit1" || event.code === "Digit2") && event.repeat) return
 
   switch (event.code) {
     case "KeyW":
@@ -130,6 +154,7 @@ window.addEventListener("keydown", (event) => {
         keyDown = 1;
         break;
       }else if (keyDown == 2) {
+        frontEndPlayer.inventorySlotSelected = 1
         keys.num1.pressed = true;
         keys.num2.pressed = false;
         keyDown = 1;
@@ -145,6 +170,7 @@ window.addEventListener("keydown", (event) => {
         keyDown = 2;
         break;
       }else if (keyDown == 1) {
+        frontEndPlayer.inventorySlotSelected = 2
         keys.num2.pressed = true;
         keys.num1.pressed = false;
         keyDown = 2;
@@ -204,7 +230,6 @@ window.addEventListener("keyup", (event) => {
       break
     case "Tab":
       keys.tab.pressed = false
-      // console.log("Tab up")
       break
     /*case "Digit1":
       keys.num1.pressed = false

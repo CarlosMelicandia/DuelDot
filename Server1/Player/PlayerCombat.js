@@ -9,17 +9,20 @@ const { updateLeaderBoard, updateKillFeed } = require("../backendLeaderBoard.js"
 function playerShoot(socket, backEndPlayers, backEndProjectiles){
     socket.on('shoot', ({ x, y, angle }) => { 
         const player = backEndPlayers[socket.id]
-        if (!player || player.equippedWeapon.type == "melee")return // checks that the player is alive and doesn't have a melee
+        const weapon = player.equippedWeapon;
+
+        if (!player || player.equippedWeapon.type == "melee") return // checks that the player is alive and doesn't have a melee
         
-        if (player.canShoot) { 
+        if (player.equippedWeapon.isReloaded) { 
         const fireRate = backEndPlayers[socket.id].equippedWeapon.fireRate * 1000
-        const createProjectile = (projectileAngle) => {
+
+        const createProjectile = (angle) => {
         projectileId++ // Increment the projectile ID
 
         // Calculate the velocity of the projectile based on the angle provided by the client
         const velocity = {
-            x: Math.cos(angle) * 5,  //Weapon Velocity 
-            y: Math.sin(angle) * 5   // Weapon Velocity
+            x: Math.cos(angle) * weapon.velocity,  //Weapon Velocity 
+            y: Math.sin(angle) * weapon.velocity   // Weapon Velocity
         }
 
         // Create a new server-side projectile
@@ -41,10 +44,11 @@ function playerShoot(socket, backEndPlayers, backEndProjectiles){
         }
 
         // Delay Calculation 
-        backEndPlayers[socket.id].canShoot = false
-        setTimeout(() => {
-            backEndPlayers[socket.id].canShoot = true
-        }, fireRate)
+        weapon.isReloaded = false
+        
+          setTimeout(() => {
+            weapon.isReloaded = true
+          }, fireRate)
         }
     })
 }

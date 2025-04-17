@@ -22,32 +22,33 @@ socket.on('dropWeapon', (weaponData) => {
     frontEndWeapons[weaponData.id] = new WeaponDrawing(weaponData)
 }) 
 
-socket.on('removeWeapon', (player) => { 
+socket.on('removeWeapon', (player) => { // Clears the inventory slot on join
     if (player.inventory[0] == null){ // if the first inventory is open 
-        document.querySelector('#inventorySlot1Text').textContent = " " // Show weapon in inventory
+        document.querySelector('#inventorySlot1Text').src = " " // Show weapon in inventory
     }
     if(player.inventory[1] == null){ // if the second inventory is open
-    document.querySelector('#inventorySlot2Text').textContent = " " // Shows the weapon in the second slot
+    document.querySelector('#inventorySlot2Text').src = " " // Shows the weapon in the second slot
     }
-    if (player.inventory[2] == null) {
-        document.querySelector('#inventorySlot3Text').textContent = " ";
-    }
-
 })
 
 // Waits for a weapon equip call from the server
-socket.on('equipWeapon', (slotIndex, player) => {
-    if (slotIndex === 0 && player.inventory[0] != null) {
-        document.querySelector('#inventorySlot1Text').textContent = player.inventory[0].name;
-    }
-    if (slotIndex === 1 && player.inventory[1] != null) {
-        document.querySelector('#inventorySlot2Text').textContent = player.inventory[1].name;
-    }
-    if (slotIndex === 2 && player.inventory[2] != null) {
-        document.querySelector('#inventorySlot3Text').textContent = player.inventory[2].name;
-    }
+socket.on('equipWeapon', (slotIndex, player) => { 
+    const nameOfWeapon = player.inventory[slotIndex].name;
 
-})
+    const weaponImages = {
+      pistol: "../assets/weapons/Pistol.png",
+      submachineGun: "../assets/weapons/SubmachineGun.png",
+      shuriken: "../assets/weapons/Shuriken.png",
+      sniper: "../assets/weapons/Sniper.png"
+    };
+
+    if (slotIndex === 0) {
+      document.querySelector('#inventorySlot1Img').src = weaponImages[nameOfWeapon];
+    } else if (slotIndex === 1) {
+      document.querySelector('#inventorySlot2Img').src = weaponImages[nameOfWeapon];
+    }
+});
+
 
 /**
  * ------------------------------

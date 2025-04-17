@@ -47,6 +47,7 @@
         justify-content: center;
         align-items: flex-start;
         gap: 4vw;
+        padding: 2vh 2vw;
         flex-wrap: wrap;
         height: 50%;
         width: 100%;
@@ -58,9 +59,9 @@
         gap: 3vh 4vw;
         flex-wrap: wrap;
         justify-content: center;
-        padding: 2vh 2vw;
-        min-width: 280px;
-        min-height: 280px;
+        padding: 1vh 2vw;
+        min-width: 220px;
+        min-height: 220px;
         border: 2px solid white;
         border-radius: 16px;
         transition: all 0.5s ease;
@@ -75,7 +76,7 @@
 
       .class-display img {
         width: 20vw;
-        max-width: 170px;
+        max-width: 120px;
         height: auto;
         /* border: 2px solid white;
         border-radius: 12px; */
@@ -93,7 +94,7 @@
         justify-content: flex-start;
         width: 60vw;
         max-width: 300px;
-        height: 35vh;
+        height: 50vh;
         background-color: rgba(0, 0, 0, 0.5);
         color: white;
         font-family: "VT323", monospace;
@@ -531,7 +532,7 @@
               justify-content: center;
               width: 230px;
               height: 156px;
-              bottom: 230px;
+              bottom: 225px;
               left: 910px;
               transform: translate(-50%, -50%);
               border: 5px solid red;
@@ -539,11 +540,16 @@
           > -->
           <div class="itemBorder" id="inventorySlot1">
             <div class="numbers">1</div>
-            <div class="weaponText" id="inventorySlot1Text"></div>
+            <div class="weaponText" id="inventorySlot1Text">
+            <img id="inventorySlot1Img" src=""/>
           </div>
-          <div class="itemBorder" id="inventorySlot2">
+          </div>
+          
+        <div class="itemBorder" id="inventorySlot2">
             <div class="numbers">2</div>
-            <div class="weaponText" id="inventorySlot2Text"></div>
+            <div class="weaponText" id="inventorySlot2Text">
+            <img id="inventorySlot2Img" src="" />
+          </div>
           </div>
           <div class="itemBorder" id="inventorySlot3" style="display: none">
             <div class="numbers">3</div>
@@ -618,7 +624,7 @@
     <!-- Custom Cursor Script -->
     <script>
       // Set a custom cursor for the body and canvas
-      const customCursorImage = "/assets/CrosshairCursor.png"; // Update the path if needed
+      const customCursorImage = "/assets/CrosshairCursor.png"; 
 
       // Apply the custom cursor to the body
       document.body.style.cursor = `url(${customCursorImage}) ${16} ${16}, auto`;
