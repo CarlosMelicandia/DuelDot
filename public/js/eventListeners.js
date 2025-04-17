@@ -26,17 +26,17 @@ window.addEventListener("click", (event) => {
   }
 
   const canvasRect = canvas.getBoundingClientRect();
-  const mouseX = (event.clientX - canvasRect.left) * devicePixelRatio;
-  const mouseY = (event.clientY - canvasRect.top) * devicePixelRatio;
+  const mouseX = event.clientX - canvasRect.left
+  const mouseY = event.clientY - canvasRect.top
 
   const playerPosition = {
     // Stores the local player’s current position
     x: player.x,
     y: player.y,
   };
-  
-  cameraX = player.x - canvas.width / pixelNumber;
-  cameraY = player.y - canvas.height / pixelNumber;
+
+  cameraX = player.x - (canvas.width / devicePixelRatio) / 2;
+  cameraY = player.y - (canvas.height / devicePixelRatio) / 2;
 
   // Convert mouse (screen) coordinates to game world coordinates
   const worldMouseX = mouseX + cameraX;
@@ -66,19 +66,22 @@ window.addEventListener("click", (event) => {
 window.addEventListener('mousemove', (event) => {
   const player = frontEndPlayers[socket.id]
   
-  if (!player) return
+  if (!player || !gameStarted) return
 
   const canvasRect = canvas.getBoundingClientRect();
-  const mouseX = (event.clientX - canvasRect.left) * devicePixelRatio;
-  const mouseY = (event.clientY - canvasRect.top) * devicePixelRatio;
+  const mouseX = event.clientX - canvasRect.left;
+  const mouseY = event.clientY - canvasRect.top;
 
-  cameraX = player.x - canvas.width / pixelNumber
-  cameraY = player.y - canvas.height / pixelNumber
-
+  cameraX = player.x - (canvas.width / devicePixelRatio) / 2;
+  cameraY = player.y - (canvas.height / devicePixelRatio) / 2;
+  
+  const worldMouseX = mouseX + cameraX;
+  const worldMouseY = mouseY + cameraY;
+  
   const mouseAngle = Math.atan2(
-    mouseY + cameraY - player.y,
-    mouseX + cameraX - player.x
-  )
+    worldMouseY - player.y,
+    worldMouseX - player.x
+  );
 
   socket.emit('updateHands', mouseAngle)
 })

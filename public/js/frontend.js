@@ -200,6 +200,8 @@ socket.on("pongCheck", () => {
 let animationId;
 function animate() {
   if (!gameStarted) return
+
+  console.log(canvas.width, canvas.height)
   animationId = requestAnimationFrame(animate); // Tells the browser we want to perform an animation
   // c.fillStyle = 'rgba(0, 0, 0, 0.1)' // Optional "ghosting" effect if needed
   c.clearRect(0, 0, canvas.width, canvas.height); // Clears the entire canvas
@@ -218,18 +220,13 @@ function animate() {
 
   let cameraX = 0;
   let cameraY = 0;
-  const zoomOut = 3
 
   c.save();
 
   if (gameStarted && frontEndPlayer) {
     cameraX = frontEndPlayer.x - canvas.width / (2 * devicePixelRatio)
     cameraY = frontEndPlayer.y - canvas.height / (2 * devicePixelRatio)
-  } else {
-    cameraX = (gameWidth / 2) - (canvas.width / 2 * devicePixelRatio * zoomOut) // this needs fixing IDK WTF ITS HAPPENING AND WHY ITS NOT CENTERED
-    cameraY = (gameHeight / 2) - (canvas.height / 2 * devicePixelRatio * zoomOut)
-    c.scale(1 / zoomOut, 1 / zoomOut)
-  }
+  } 
 
   
   c.translate(-cameraX, -cameraY);
