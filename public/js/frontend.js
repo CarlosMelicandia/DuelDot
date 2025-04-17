@@ -17,6 +17,8 @@ const devicePixelRatio = window.devicePixelRatio || 1; // Gets the device's pixe
 
 canvas.width = 1024 * devicePixelRatio; // Sets the canvas's internal width
 canvas.height = 576 * devicePixelRatio; // Sets the canvas's internal height
+canvas.width = 1024 * devicePixelRatio; // Sets the canvas's internal width
+canvas.height = 576 * devicePixelRatio; // Sets the canvas's internal height
 
 c.scale(devicePixelRatio, devicePixelRatio); // Scales the drawing context so that drawing commands correspond to CSS pixels
 
