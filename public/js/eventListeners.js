@@ -25,7 +25,6 @@ window.addEventListener("click", (event) => {
     if (!player.canShoot) return // Checks to see if the frontEnd should even do the calculations
   }
 
-  const canvasRect = canvas.getBoundingClientRect();
   const mouseX = event.clientX - canvasRect.left
   const mouseY = event.clientY - canvasRect.top
 
@@ -68,7 +67,6 @@ window.addEventListener('mousemove', (event) => {
   
   if (!player || !gameStarted) return
 
-  const canvasRect = canvas.getBoundingClientRect();
   const mouseX = event.clientX - canvasRect.left;
   const mouseY = event.clientY - canvasRect.top;
 
