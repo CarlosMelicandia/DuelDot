@@ -22,13 +22,19 @@ socket.on('dropWeapon', (weaponData) => {
     frontEndWeapons[weaponData.id] = new WeaponDrawing(weaponData)
 }) 
 
-socket.on('removeWeapon', (player) => { // Clears the inventory slot on join
-    if (player.inventory[0] == null){ // if the first inventory is open 
-        document.querySelector('#inventorySlot1Text').src = " " // Show weapon in inventory
-    }
-    if(player.inventory[1] == null){ // if the second inventory is open
-    document.querySelector('#inventorySlot2Text').src = " " // Shows the weapon in the second slot
-    }
+socket.on('removeWeapon', (slotIndex) => { // Clears the inventory slot on join
+  console.log(slotIndex)
+  switch (slotIndex){
+    case 0:
+      document.querySelector('#inventorySlot1Img').src = " " // Show weapon in inventory
+      break
+    case 1:
+      document.querySelector('#inventorySlot2Img').src = " " // Show weapon in inventory
+      break
+    case 2:
+      document.querySelector('#inventorySlot3Img').src = " " // Show weapon in inventory
+      break
+  }
 })
 
 // Waits for a weapon equip call from the server
@@ -42,10 +48,17 @@ socket.on('equipWeapon', (slotIndex, player) => {
       sniper: "../assets/weapons/Sniper.png"
     };
 
-    if (slotIndex === 0) {
-      document.querySelector('#inventorySlot1Img').src = weaponImages[nameOfWeapon];
-    } else if (slotIndex === 1) {
-      document.querySelector('#inventorySlot2Img').src = weaponImages[nameOfWeapon];
+    
+    switch (slotIndex){
+      case 0:
+        document.querySelector('#inventorySlot1Img').src = weaponImages[nameOfWeapon]; // Show weapon in inventory
+        break
+      case 1:
+        document.querySelector('#inventorySlot2Img').src = weaponImages[nameOfWeapon]; // Show weapon in inventory
+        break
+      case 2:
+        document.querySelector('#inventorySlot3Img').src = weaponImages[nameOfWeapon]; // Show weapon in inventory
+        break
     }
 });
 

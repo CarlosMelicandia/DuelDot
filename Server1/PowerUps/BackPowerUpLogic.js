@@ -79,6 +79,12 @@ function checkPowerUpCollision(backEndPowerUps, io, player, backEndPlayers) {
         };
         const PowerUpClass = powerUpClasses[powerUp.type];
 
+        // if (!player.activeEffects) player.activeEffects = {} REVIST TEST _-----------------
+        // player.activeEffects[powerUp.type] = {
+        //   startTime: Date.now(),
+        //   duration: powerUp.duration
+        // }
+
         if (PowerUpClass) {
             // Apply powerup effects
             const powerUpInstance = new PowerUpClass(player, powerUp.id);
@@ -150,6 +156,6 @@ function handleProjectileCollision(projectile, targetPlayer, shooterId) {
 
 module.exports = { 
   spawnPowerUps, 
-  checkPowerUpCollision  ,
+  checkPowerUpCollision,
   handleProjectileCollision
 };

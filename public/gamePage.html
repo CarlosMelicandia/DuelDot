@@ -504,25 +504,23 @@
       </div>
 
       <!-- Inventory slots -->
-                <div
-            id="inventoryArea"
-            style="
-              
-              position: absolute;
-              bottom: 0px;
-              left: 910px;
-              transform: translateX(-50%);
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              justify-content: center;
-              width: 230px;
-              height: 145px;
-              z-index: 5;
-            "
-          >
-
-          <!-- <div
+      <div
+        id="inventoryArea"
+        style="
+          position: absolute;
+          bottom: 0px;
+          left: 910px;
+          transform: translateX(-50%);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          width: 230px;
+          height: 145px;
+          z-index: 5;
+        "
+      >
+        <!-- <div
             id="inventoryArea"
             style="
               position: relative;
@@ -538,23 +536,24 @@
               border: 5px solid red;
             "
           > -->
-          <div class="itemBorder" id="inventorySlot1">
-            <div class="numbers">1</div>
-            <div class="weaponText" id="inventorySlot1Text">
-            <img id="inventorySlot1Img" src=""/>
+        <div class="itemBorder" id="inventorySlot1">
+          <div class="numbers">1</div>
+          <div class="weaponText" id="inventorySlot1Text">
+            <img id="inventorySlot1Img" src="" />
           </div>
-          </div>
-          
+        </div>
+
         <div class="itemBorder" id="inventorySlot2">
-            <div class="numbers">2</div>
-            <div class="weaponText" id="inventorySlot2Text">
+          <div class="numbers">2</div>
+          <div class="weaponText" id="inventorySlot2Text">
             <img id="inventorySlot2Img" src="" />
           </div>
-          </div>
-          <div class="itemBorder" id="inventorySlot3" style="display: none">
-            <div class="numbers">3</div>
-            <div class="weaponText" id="inventorySlot3Text"></div>
-          </div>
+        </div>
+        <div class="itemBorder" id="inventorySlot3" style="display: none">
+          <div class="numbers">3</div>
+          <div class="weaponText" id="inventorySlot3Text"></div>
+          <img id="inventorySlot3Img" src="" />
+        </div>
       </div>
 
       <!-- Kill Feed -->
@@ -564,21 +563,23 @@
     <!--Name/Class Selection Screen-->
     <div id="start-page">
       <div class="selection-container">
-        <div class="class-display" id="class-box">
-          <button id="tank-class">
-            <img src="./assets/class/Tank.png" alt="Tank" />
-          </button>
-          <button id="rogue-class">
-            <img src="./assets/class/Rogue.png" alt="Rogue" />
-          </button>
-          <button id="mage-class">
-            <img src="./assets/class/Mage.png" alt="Mage" />
-          </button>
-          <button id="gunner-class">
-            <img src="./assets/class/Gunner.png" alt="Gunner" />
-          </button>
+        <div>
+          <h1 style="color: white; text-align: center">CLASSES</h1>
+          <div class="class-display" id="class-box">
+            <button id="tank-class">
+              <img src="./assets/class/Tank.png" alt="Tank" />
+            </button>
+            <button id="rogue-class">
+              <img src="./assets/class/Rogue.png" alt="Rogue" />
+            </button>
+            <button id="mage-class">
+              <img src="./assets/class/Mage.png" alt="Mage" />
+            </button>
+            <button id="gunner-class">
+              <img src="./assets/class/Gunner.png" alt="Gunner" />
+            </button>
+          </div>
         </div>
-
         <div class="stat-display" id="stat-box">
           <div id="stat-title"></div>
           <canvas id="stat-chart" width="300" height="300"></canvas>
@@ -624,7 +625,7 @@
     <!-- Custom Cursor Script -->
     <script>
       // Set a custom cursor for the body and canvas
-      const customCursorImage = "/assets/CrosshairCursor.png"; 
+      const customCursorImage = "/assets/CrosshairCursor.png";
 
       // Apply the custom cursor to the body
       document.body.style.cursor = `url(${customCursorImage}) ${16} ${16}, auto`;

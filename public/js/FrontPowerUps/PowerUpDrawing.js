@@ -230,7 +230,7 @@ if (typeof PowerUpDrawing === 'undefined') {
       statusBox.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
       statusBox.style.borderRadius = '8px';
       statusBox.style.zIndex = '1000';
-      statusBox.style.bottom = '165px';
+      statusBox.style.bottom = '142px';
       statusBox.style.left = '910px';
       statusBox.style.transform = 'translate(-50%, 0)';
       statusBox.style.width = '230px';

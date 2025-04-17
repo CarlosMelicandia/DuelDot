@@ -50,7 +50,6 @@ const backEndPlayers = {} // List of player object objects server-side
 const backEndProjectiles = {} // List of projectile objects server-side
 const backEndWeapons = [] // List of weapon references server-side
 const backEndPowerUps = [] // List of power-ups references server-side
-const usedNames = [] // List of all used names
 
 // Assigns the canvas height and width to variables
 const GAME_WIDTH = 5000; // Default width
@@ -136,28 +135,22 @@ io.on("connection", (socket) => {
       case "Digit1":
         if (keyDownWeapon < 0 && backEndPlayer.inventory[0]) {
           backEndPlayer.equippedWeapon = backEndPlayer.inventory[0];
-          backEndPlayer.canShoot = true;
         }else if (keyDownWeapon === 1 && backEndPlayer.inventory[0]) {
           backEndPlayer.equippedWeapon = fist;
-          backEndPlayer.canShoot = false;
         }
         break
       case "Digit2":       
         if (keyDownWeapon < 0 && backEndPlayer.inventory[1]) {
           backEndPlayer.equippedWeapon = backEndPlayer.inventory[1];
-          backEndPlayer.canShoot = true;
         }else if (keyDownWeapon === 2 && backEndPlayer.inventory[1]) {
           backEndPlayer.equippedWeapon = fist;
-          backEndPlayer.canShoot = false;
         }
         break
       case "Digit3":
         if (keyDownWeapon < 0 && backEndPlayer.inventory[2]) {
           backEndPlayer.equippedWeapon = backEndPlayer.inventory[2];
-          backEndPlayer.canShoot = true;
         }else if (keyDownWeapon === 3 && backEndPlayer.inventory[2]) {
           backEndPlayer.equippedWeapon = fist;
-          backEndPlayer.canShoot = false;
         }
         break
 
@@ -182,12 +175,11 @@ io.on("connection", (socket) => {
     socket.on('weaponDrop', ({keycode, sequenceNumber}) => {
     const backEndPlayer = backEndPlayers[socket.id]
 
-    if (!backEndPlayer) return
     if (!backEndPlayer.equippedWeapon || backEndPlayer.equippedWeapon.name == "fist"|| !backEndPlayer) return
 
     backEndPlayer.sequenceNumber = sequenceNumber
     const droppedWeapon = backEndPlayer.equippedWeapon
-    console.log("Dropped:", droppedWeapon) // TEST
+    // console.log("Dropped:", droppedWeapon) // TEST
     
     const slotIndex = backEndPlayer.inventory.findIndex(slot => slot === droppedWeapon)
     
@@ -195,10 +187,13 @@ io.on("connection", (socket) => {
       backEndPlayer.inventory[slotIndex] = null // Set the slot to null instead of removing
     }
 
-    backEndPlayer.equippedWeapon = fist    
+    backEndPlayer.equippedWeapon = fist
+
+    console.log("Inventory:", backEndPlayer.inventory) // Test
+    
 
     weaponDrop(droppedWeapon, backEndPlayer.x, backEndPlayer.y, io, backEndWeapons)
-    socket.emit('removeWeapon', backEndPlayer)
+    socket.emit('removeWeapon', slotIndex)
   })
 
   socket.on('pickUpWeapon', ({keycode, sequenceNumber}) => {

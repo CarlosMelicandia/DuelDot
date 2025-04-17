@@ -209,6 +209,7 @@ document.getElementById("submit-btn").addEventListener("click", (event) => {
     username: playerName,
     className,
   });
+  const powerUpBar = document.getElementById("powerUpStatus")
   if (className === "Gunner") {
     document.querySelector("#inventorySlot3").style.display = "flex";
     const inventory = document.querySelector("#inventoryArea");
@@ -216,18 +217,25 @@ document.getElementById("submit-btn").addEventListener("click", (event) => {
       window.getComputedStyle(inventory).bottom,
       10
     ); // Get numeric bottom
-    const newBottom = currentBottom;
-    inventory.style.bottom = newBottom + "px";
-
+    inventory.style.bottom = currentBottom + "px";
+    
     const currentHeight = parseInt(
       window.getComputedStyle(inventory).height,
       10
     ); // Get numeric bottom
     const newHeight = currentHeight + 70;
     inventory.style.height = newHeight + "px";
+
+    
+    const currentPUBottom = parseInt(
+      window.getComputedStyle(powerUpBar).height,
+      10 ); // Get numeric bottom
+    const newPU = currentPUBottom + 70;
+    powerUpBar.style.bottom = newHeight + "px";
   } else {
     document.querySelector("#inventorySlot3").style.display = "none";
     // document.querySelector("#inventoryArea").style.height = "156px"; // reset height for other classes
+    // powerUpBar.style.bottom = '165px';
   }
 });
 

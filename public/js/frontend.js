@@ -135,7 +135,8 @@ socket.on("updatePlayers", (backEndPlayers) => {
       frontEndPlayer.canPunch = backEndPlayer.canPunch;
 
       // Update player health in the frontend
-      frontEndPlayer.health = backEndPlayer.health;
+      frontEndPlayer.health = backEndPlayer.health
+      // frontEndPlayer.activeEffects = backEndPlayer.activeEffects TEST REVISit ----------------------
 
       // Update player score in the frontend
       frontEndPlayer.score = backEndPlayer.score;

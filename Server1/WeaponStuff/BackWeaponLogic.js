@@ -80,9 +80,9 @@ function checkCollision(backEndWeapons, io, player) {
 
     if (dist < player.radius + weapon.radius) {
       const slotIndex = player.inventory.findIndex(slot => slot === null)
-      
-      if (player.inventory[0] != null && player.inventory[1] != null) return
-     
+      // console.log(player.class) //Debugging :(((((
+      if (slotIndex == -1) return
+
       const weapons = {
         pistol: Pistol,
         submachineGun: SubmachineGun,
@@ -94,6 +94,7 @@ function checkCollision(backEndWeapons, io, player) {
       
       player.inventory[slotIndex] = weaponEquipped
       
+      console.log(player.inventory)
       io.to(player.socketId).emit('equipWeapon', slotIndex, player)
 
       backEndWeapons.splice(i, 1) // Remove weapon from array

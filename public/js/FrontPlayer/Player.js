@@ -35,12 +35,12 @@ class Player {
     this.handXMove = 0
 
     this.activeEffects = {}; // Object to track active power-up effects
-      this.lightningPoints = []; // For speed effect
-      this.shieldPulse = 0; // For shield effect
-      this.shieldPulseDir = 1;
-      this.rotation = 0; // For rotating effects
-      this.flameHeight = 0; // For fire effect
-      this.effectParticles = []; // For all effect particles
+    this.lightningPoints = []; // For speed effect
+    this.shieldPulse = 0; // For shield effect
+    this.shieldPulseDir = 1;
+    this.rotation = 0; // For rotating effects
+    this.flameHeight = 0; // For fire effect
+    this.effectParticles = []; // For all effect particles
 }
 
 /**
@@ -106,7 +106,7 @@ draw({ xPosition = 1.5, yPosition = 10, angle }) {
     this.equippedWeapon?.image.complete){
     const img = this.equippedWeapon.topImage
     
-    c.drawImage(img, (-this.radius * xPosition - img.width / 2) + 10, (-img.height / 2) + 20)
+    c.drawImage(img, (-this.radius * xPosition - img.width / 2) + 20, (-img.height / 2) + 20)
   }
 
   c.restore()
@@ -115,7 +115,6 @@ draw({ xPosition = 1.5, yPosition = 10, angle }) {
   
 }
 
-// Add this method to your Player class:
 applyPowerup(type, duration) {
   // Store the powerup info
   this.activeEffects[type] = {

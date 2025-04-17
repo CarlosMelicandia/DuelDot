@@ -153,10 +153,11 @@ window.addEventListener("keydown", (event) => {
         keys.num1.pressed = true;
         keyDown = 1;
         break;
-      }else if (keyDown == 2) {
+      }else if (keyDown == 2 || keyDown == 3) {
         frontEndPlayer.inventorySlotSelected = 1
         keys.num1.pressed = true;
         keys.num2.pressed = false;
+        keys.num3.pressed = false
         keyDown = 1;
         break;
       }else {
@@ -169,10 +170,11 @@ window.addEventListener("keydown", (event) => {
         keys.num2.pressed = true;
         keyDown = 2;
         break;
-      }else if (keyDown == 1) {
+      }else if (keyDown == 1 || keyDown == 3) {
         frontEndPlayer.inventorySlotSelected = 2
-        keys.num2.pressed = true;
         keys.num1.pressed = false;
+        keys.num2.pressed = true;
+        keys.num3.pressed = false
         keyDown = 2;
         break;
       }else {
@@ -185,9 +187,10 @@ window.addEventListener("keydown", (event) => {
       if (keyDown == -1) {
         keys.num3.pressed = true;
         keyDown = 3;
-      }else if (keyDown == 1) {
-        keys.num2.pressed = true;
+      }else if (keyDown == 1 || keyDown == 2) {
         keys.num1.pressed = false;
+        keys.num2.pressed = false;
+        keys.num3.pressed = true
         keyDown = 3;
         break;
       } else {
@@ -195,8 +198,6 @@ window.addEventListener("keydown", (event) => {
         keyDown = -1;
       }
       break;
-
-
   }
 });
 
