@@ -200,8 +200,7 @@ socket.on("pongCheck", () => {
 let animationId;
 function animate() {
   if (!gameStarted) return
-
-  console.log(canvas.width, canvas.height)
+  
   animationId = requestAnimationFrame(animate); // Tells the browser we want to perform an animation
   // c.fillStyle = 'rgba(0, 0, 0, 0.1)' // Optional "ghosting" effect if needed
   c.clearRect(0, 0, canvas.width, canvas.height); // Clears the entire canvas

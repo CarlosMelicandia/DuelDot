@@ -1,44 +1,62 @@
 const playerNames = [
-  "Shadow","Raven",
-  "Phoenix","Blaze",
-  "Viper","Maverick",
-  "Rogue","Hunter",
-  "Nova","Zephyr",
-  "Falcon","Titan",
-  "Specter","Cyclone",
-  "Inferno","Reaper",
-  "Stalker","Venom",
-  "Glitch","Banshee",
-  "Shadowstrike","Onyx",
-  "Rebel","Fury",
-  "Apex","Crimson",
-  "Nightfall","Saber",
-  "Tempest","Lightning",
-  "Bullet","Vortex",
-  "Echo","Blitz",
-  "Rift","BOB",
+  "Shadow",
+  "Raven",
+  "Phoenix",
+  "Blaze",
+  "Viper",
+  "Maverick",
+  "Rogue",
+  "Hunter",
+  "Nova",
+  "Zephyr",
+  "Falcon",
+  "Titan",
+  "Specter",
+  "Cyclone",
+  "Inferno",
+  "Reaper",
+  "Stalker",
+  "Venom",
+  "Glitch",
+  "Banshee",
+  "Shadowstrike",
+  "Onyx",
+  "Rebel",
+  "Fury",
+  "Apex",
+  "Crimson",
+  "Nightfall",
+  "Saber",
+  "Tempest",
+  "Lightning",
+  "Bullet",
+  "Vortex",
+  "Echo",
+  "Blitz",
+  "Rift",
+  "BOB",
 ];
 
 const tankStats = [
-  (150 / 150) * 10,  // health
-  (17 / 20) * 10,    // radius
-  (0.5 / 2.0) * 10   // speed
+  (150 / 150) * 10, // health
+  (17 / 20) * 10, // radius
+  (0.5 / 2.0) * 10, // speed
 ];
 const rogueStats = [
-  (80 / 150) * 10,  // health
-  (9 / 20) * 10,    // radius
-  (1.4 / 2.0) * 10   // speed
-]
+  (80 / 150) * 10, // health
+  (9 / 20) * 10, // radius
+  (1.4 / 2.0) * 10, // speed
+];
 const mageStats = [
-  (80 / 150) * 10,   // health
-  (12 / 20) * 10,    // radius
-  (1.4 / 2.0) * 10   // speed
-]
+  (80 / 150) * 10, // health
+  (12 / 20) * 10, // radius
+  (1.4 / 2.0) * 10, // speed
+];
 const gunnerStats = [
-  (100 / 150) * 10,  // health
-  (14 / 20) * 10,    // radius
-  (1.0 / 2.0) * 10   // speed
-]
+  (100 / 150) * 10, // health
+  (14 / 20) * 10, // radius
+  (1.0 / 2.0) * 10, // speed
+];
 
 let className = ""; // Variable to store the selected class name
 let radarChart = null; // Use this variable to check if chart already exists
@@ -79,26 +97,26 @@ document.querySelector("#random-btn").addEventListener("click", () => {
 // Class Selection Handling
 // ------------------------------
 document.getElementById("tank-class").addEventListener("click", () => {
-  document.querySelector('.stat-display').style.display = 'block';
-  drawRadarChart('Tank', tankStats, "red");
+  document.querySelector(".stat-display").style.display = "block";
+  drawRadarChart("Tank", tankStats, "red");
   classReady = true; // Set the classReady flag to true
   className = "Tank"; // Store the selected class name
 });
 document.getElementById("rogue-class").addEventListener("click", () => {
-  document.querySelector('.stat-display').style.display = 'block';
-  drawRadarChart('Rogue', rogueStats, "blue");
+  document.querySelector(".stat-display").style.display = "block";
+  drawRadarChart("Rogue", rogueStats, "blue");
   classReady = true; // Set the classReady flag to true
   className = "Rogue"; // Store the selected class name
 });
 document.getElementById("mage-class").addEventListener("click", () => {
-  document.querySelector('.stat-display').style.display = 'block';
-  drawRadarChart('Mage', mageStats, "purple");
+  document.querySelector(".stat-display").style.display = "block";
+  drawRadarChart("Mage", mageStats, "purple");
   classReady = true; // Set the classReady flag to true
   className = "Mage"; // Store the selected class name
 });
 document.getElementById("gunner-class").addEventListener("click", () => {
-  document.querySelector('.stat-display').style.display = 'block';
-  drawRadarChart('Gunner', gunnerStats, "gray");
+  document.querySelector(".stat-display").style.display = "block";
+  drawRadarChart("Gunner", gunnerStats, "gray");
   classReady = true; // Set the classReady flag to true
   className = "Gunner"; // Store the selected class name
 });
@@ -107,26 +125,28 @@ document.getElementById("gunner-class").addEventListener("click", () => {
 // Statistic Display Handling
 // ------------------------------
 function drawRadarChart(label, stats, color) {
-  document.getElementById('stat-title').textContent = label;
-  document.getElementById('stat-title').style.color = color;
-  const ctx = document.getElementById('stat-chart').getContext('2d');
-  
+  document.getElementById("stat-title").textContent = label;
+  document.getElementById("stat-title").style.color = color;
+  const ctx = document.getElementById("stat-chart").getContext("2d");
+
   if (radarChart) {
     radarChart.destroy(); // Destroy the previous chart if it exists
   }
 
   radarChart = new Chart(ctx, {
-    type: 'radar',
+    type: "radar",
     data: {
-      labels: ['Health', 'Radius', 'Speed'],
-      datasets: [{
-        label: label,
-        data: stats,
-        backgroundColor: 'rgba(255, 99, 132, 0.2)', // Change per class
-        borderColor: 'rgba(255, 99, 132, 1)',
-        borderWidth: 2,
-        pointBackgroundColor: 'white',
-      }]
+      labels: ["Health", "Radius", "Speed"],
+      datasets: [
+        {
+          label: label,
+          data: stats,
+          backgroundColor: "rgba(255, 99, 132, 0.2)", // Change per class
+          borderColor: "rgba(255, 99, 132, 1)",
+          borderWidth: 2,
+          pointBackgroundColor: "white",
+        },
+      ],
     },
     options: {
       responsive: true,
@@ -137,27 +157,27 @@ function drawRadarChart(label, stats, color) {
           suggestedMax: 10,
           ticks: {
             stepSize: 2,
-            backdropColor: 'transparent',
-            color: '#fff'
+            backdropColor: "transparent",
+            color: "#fff",
           },
           pointLabels: {
-            color: '#fff',
+            color: "#fff",
             font: {
-              size: 14
-            }
+              size: 14,
+            },
           },
           grid: {
-            color: 'rgba(255, 255, 255, 0.3)'
+            color: "rgba(255, 255, 255, 0.3)",
           },
           angleLines: {
-            color: 'rgba(255, 255, 255, 0.3)'
-          }
-        }
+            color: "rgba(255, 255, 255, 0.3)",
+          },
+        },
       },
       plugins: {
         legend: { display: false },
-      }
-    }
+      },
+    },
   });
 }
 
@@ -168,16 +188,16 @@ document.getElementById("submit-btn").addEventListener("click", (event) => {
   event.preventDefault(); // Prevents the form from refreshing
   if (!nameReady || !classReady) {
     document.getElementById("warning-message").style.display = "block"; // Show the start menu again
-    document.getElementById("warning-message").textContent = "Please select a class and name before starting the game!";
+    document.getElementById("warning-message").textContent =
+      "Please select a class and name before starting the game!";
     document.getElementById("warning-message").style.color = "red"; // Set warning message color to red
     return;
   }
-  
+
   gameStarted = true; // Set the gameStarted flag to true
-  
+
   document.querySelector("#start-page").style.display = "none"; // Hide the start menu
   document.querySelector(".displayAfter").style.display = "block"; // Show the game page
-
 
   animate(); // Start the game animation
 
@@ -188,18 +208,28 @@ document.getElementById("submit-btn").addEventListener("click", (event) => {
     devicePixelRatio,
     username: playerName,
     className,
-
-
   });
   if (className === "Gunner") {
     document.querySelector("#inventorySlot3").style.display = "flex";
-    document.querySelector("#inventoryArea").style.height = "300px"; // expand container height
+    const inventory = document.querySelector("#inventoryArea");
+    const currentBottom = parseInt(
+      window.getComputedStyle(inventory).bottom,
+      10
+    ); // Get numeric bottom
+    const newBottom = currentBottom;
+    inventory.style.bottom = newBottom + "px";
+
+    const currentHeight = parseInt(
+      window.getComputedStyle(inventory).height,
+      10
+    ); // Get numeric bottom
+    const newHeight = currentHeight + 70;
+    inventory.style.height = newHeight + "px";
   } else {
     document.querySelector("#inventorySlot3").style.display = "none";
-    document.querySelector("#inventoryArea").style.height = "156px"; // reset height for other classes
+    // document.querySelector("#inventoryArea").style.height = "156px"; // reset height for other classes
   }
 });
-
 
 // ------------------------------
 // Back Button Handling
@@ -207,4 +237,3 @@ document.getElementById("submit-btn").addEventListener("click", (event) => {
 document.getElementById("back-btn").addEventListener("click", () => {
   window.location.href = "../index.html"; // Redirect to the main menu
 });
-
