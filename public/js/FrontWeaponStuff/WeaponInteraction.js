@@ -32,20 +32,23 @@ socket.on('removeWeapon', (player) => { // Clears the inventory slot on join
 })
 
 // Waits for a weapon equip call from the server
-socket.on('equipWeapon', (slotIndex, player) => {
-    const nameOfWeapon = player.inventory[slotIndex].name
+socket.on('equipWeapon', (slotIndex, player) => { 
+    const nameOfWeapon = player.inventory[slotIndex].name;
+
     const weaponImages = {
       pistol: "../assets/weapons/Pistol.png",
       submachineGun: "../assets/weapons/SubmachineGun.png",
       shuriken: "../assets/weapons/Shuriken.png",
       sniper: "../assets/weapons/Sniper.png"
+    };
+
+    if (slotIndex === 0) {
+      document.querySelector('#inventorySlot1Img').src = weaponImages[nameOfWeapon];
+    } else if (slotIndex === 1) {
+      document.querySelector('#inventorySlot2Img').src = weaponImages[nameOfWeapon];
     }
-    if (slotIndex == 0){ // if the first inventory is open 
-      document.querySelector('#inventorySlot1Text').src = weaponImages[nameOfWeapon] // Show weapon in inventory
-    }else if(slotIndex == 1){ // if the second inventory is open
-        document.querySelector('#inventorySlot2Text').src = weaponImages[nameOfWeapon] // Shows the weapon in the second slot
-    }   
-})
+});
+
 
 /**
  * ------------------------------

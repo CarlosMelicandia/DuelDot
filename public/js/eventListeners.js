@@ -3,7 +3,6 @@
  * When clicked, this function calculates the direction of the shot
  * relative to the player's position and sends that data to the server.
  */
-const canvasRect = canvas.getBoundingClientRect(); // Gets the top and left position of the canvas relative to the viewport
 
 // Get the camera offsets as used in animate()
 let pixelNumber = 2 * devicePixelRatio;
@@ -15,9 +14,10 @@ let keyDown = -1;
 window.addEventListener("click", (event) => {
   const player = frontEndPlayers[socket.id]
   
-  
   // Ensure the local player exists before proceeding
   if (!player) return;
+
+  const canvasRect = canvas.getBoundingClientRect(); // Gets the top and left position of the canvas relative to the viewport
 
   const equippedWeapon = player.equippedWeapon
 
@@ -28,17 +28,18 @@ window.addEventListener("click", (event) => {
     if (!equippedWeapon.isReloaded || equippedWeapon.name == "fist") return // Checks to see if the frontEnd should even do the calculations
   }
 
-  const mouseX = event.clientX - canvasRect.left; // Get the mouse x cordinate relative to the canvas
-  const mouseY = event.clientY - canvasRect.top; // Get the mouse y cordinate relative to the canvas
+  const mouseX = event.clientX - canvasRect.left
+  const mouseY = event.clientY - canvasRect.top
 
   const playerPosition = {
     // Stores the local player’s current position
     x: player.x,
     y: player.y,
   };
-  
-  cameraX = player.x - canvas.width / pixelNumber;
-  cameraY = player.y - canvas.height / pixelNumber;
+
+  cameraX = player.x - (canvas.width / devicePixelRatio) / 2;
+  cameraY = player.y - (canvas.height / devicePixelRatio) / 2;
+
 
   // Convert mouse (screen) coordinates to game world coordinates
   const worldMouseX = mouseX + cameraX;
@@ -52,7 +53,7 @@ window.addEventListener("click", (event) => {
 
   // Define the distance from the center of the player to the muzzle
   const muzzleOffset = equippedWeapon.topImageLength
-  const sideOffset = 10;
+  const sideOffset = 20
 
   // Use trigonometry to calculate the muzzle coordinates
   const spawnX = 
@@ -61,9 +62,9 @@ window.addEventListener("click", (event) => {
     Math.cos(angle + Math.PI / 2) * sideOffset
     
   const spawnY = 
-  playerPosition.y +
-  Math.sin(angle) * muzzleOffset +
-  Math.sin(angle + Math.PI / 2) * sideOffset
+    playerPosition.y +
+    Math.sin(angle) * muzzleOffset +
+    Math.sin(angle + Math.PI / 2) * sideOffset
 
   /**
    * Sends a "shoot" event to the server.
@@ -83,18 +84,23 @@ window.addEventListener("click", (event) => {
 window.addEventListener('mousemove', (event) => {
   const player = frontEndPlayers[socket.id]
   
-  if (!player) return
+  if (!player || !gameStarted) return
 
-  const mouseX = event.clientX - canvasRect.left; // Get the mouse x cordinate relative to the canvas
-  const mouseY = event.clientY - canvasRect.top; // Get the mouse y cordinate relative to the canvas
+  const canvasRect = canvas.getBoundingClientRect(); // Gets the top and left position of the canvas relative to the viewport
 
-  cameraX = player.x - canvas.width / pixelNumber
-  cameraY = player.y - canvas.height / pixelNumber
+  const mouseX = event.clientX - canvasRect.left;
+  const mouseY = event.clientY - canvasRect.top;
 
+  cameraX = player.x - (canvas.width / devicePixelRatio) / 2;
+  cameraY = player.y - (canvas.height / devicePixelRatio) / 2;
+
+  const worldMouseX = mouseX + cameraX;
+  const worldMouseY = mouseY + cameraY;
+  
   const mouseAngle = Math.atan2(
-    mouseY + cameraY - player.y,
-    mouseX + cameraX - player.x
-  )
+    worldMouseY - player.y,
+    worldMouseX - player.x
+  );
 
   socket.emit('updateHands', mouseAngle)
 })
@@ -111,6 +117,8 @@ window.addEventListener("keydown", (event) => {
   // If the local player's data is not yet available, ignore input events
   const frontEndPlayer = frontEndPlayers[socket.id]
   if (!frontEndPlayer) return;
+
+  const canvasRect = canvas.getBoundingClientRect(); // Gets the top and left position of the canvas relative to the viewport
 
   // if ((event.code === "Digit1" || event.code === "Digit2") && event.repeat) return
 

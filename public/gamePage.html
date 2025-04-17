@@ -1,0 +1,602 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=VT323&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+        margin: 0;
+        background: black;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        overflow: hidden;
+      }
+
+      input::placeholder {
+        color: #94a3b8;
+      }
+
+      /* Name and Class Selection Screen */
+      #start-page {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('./assets/MainMenu.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        z-index: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 4vh 2vw;
+      }
+
+      .selection-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 4vw;
+        padding: 2vh 2vw;
+        flex-wrap: wrap;
+        height: 50%;
+        width: 100%;
+      }
+
+      .class-display {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 3vh 4vw; 
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 1vh 2vw;
+        min-width: 220px;
+        min-height: 220px;
+        border: 2px solid white;
+        border-radius: 16px;
+        transition: all 0.5s ease;
+      }
+
+      .class-display button {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+      }
+
+      .class-display img {
+        width: 20vw;
+        max-width: 120px;
+        height: auto;
+        /* border: 2px solid white;
+        border-radius: 12px; */
+        transition: transform 0.3s ease;
+      }
+
+      .class-display img:hover {
+        transform: scale(1.1);
+      }
+
+      .stat-display {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        width: 60vw;
+        max-width: 300px;
+        height: 50vh;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        font-family: 'VT323', monospace;
+        border: 2px solid white;
+        border-radius: 12px;
+        padding: 1rem;
+        box-sizing: border-box;
+      }
+
+      #stat-title {
+        color: white;
+        font-size: 40px;
+        font-family: 'VT323', monospace;
+        text-align: center;
+        width: 100%;
+      }
+
+      .submit-display {
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        padding: 2vh 2vw;
+        z-index: 2;
+      }
+
+      #submit-btn {
+        padding: 1vh 2vw;
+        font-size: 24px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border: 2px solid white;
+        border-radius: 20px;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      #submit-btn:hover {
+        background-color: rgb(3, 23, 41);
+      }
+
+      .back-display {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        padding: 2vh 2vw;
+        z-index: 2;
+      }
+
+      #back-btn {
+        padding: 1vh 2vw;
+        font-size: 24px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border: 2px solid white;
+        border-radius: 20px;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      #back-btn:hover {
+        background-color: rgb(3, 23, 41);
+      }
+
+      .name-display {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2vh; 
+        font-family: 'VT323', monospace;
+      }
+
+      #name-box {
+        width: 60vw;
+        max-width: 400px;
+        height: 6vh;
+        font-size: 28px;
+        color: white;
+        background-color: rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        border-radius: 20px;
+        border: 2px solid white;
+      }
+
+      .button-row {
+        display: flex;
+        gap: 2vw;
+      }
+
+      .button-row button {
+        padding: 1vh 2vw;
+        font-size: 24px;
+        background-color: rgba(255, 255, 255, 0);
+        border: 2px solid white;
+        border-radius: 20px;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .button-row button:hover {
+        background-color: rgb(3, 23, 41);
+      }
+
+      #warning-message {
+        display: none;
+        font-size: 24px;
+        text-align: center;
+        margin-top: 1vh; 
+      }
+      /* End */
+
+      .canvas {
+        width: 1024px;
+        height: 576px;
+        border: 2px solid #ccccd5;
+      }
+
+      .small-leaderboard {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        color: white;
+        padding: 8px;
+        font-size: 18px;
+        font-weight: 200;
+        user-select: none;
+        background: rgba(0, 0, 0, 0.8);
+        border-radius: 5px;
+      }
+
+      .itemBorder {
+        display: flex;
+        box-sizing: border-box;
+        width: 220px;
+        height: 70px;
+        border: 1px solid white;
+        background: rgba(69, 67, 67, 0.5);
+        align-items: center;
+        justify-content: center;
+        flex-direction: row;
+        font-family: taken;
+        font-size: 20px;
+        position: relative;
+      }
+
+      .numbers {
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        margin: 0;
+        padding: 0;
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      .weaponText {
+        color: white;
+        font-size: 25px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+      }
+
+      /* Leaderboard Container */
+      .leaderboard {
+        display: none;
+        justify-content: center;
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        width: 80%;
+        max-width: 600px;
+        margin: 20px auto;
+        border-radius: 12px;
+        padding: 15px;
+        z-index: 1;
+      }
+
+      /* Table Styles */
+      .leaderboard-table {
+        margin: auto;
+        width: 98%;
+        border-collapse: collapse;
+        background: rgba(95, 89, 89, 0.507);
+      }
+
+      #leaderboard-header th {
+        font-size: 20px;
+        font-weight: 300;
+        padding: 12px;
+        color: white;
+        text-align: center;
+        vertical-align: middle;
+        border-bottom: 1px solid #444;
+      }
+
+      .leaderboard-table td {
+        font-size: 16px;
+        font-weight: 200;
+        padding: 8px;
+        color: white;
+        text-align: center;
+        vertical-align: middle;
+        background: rgba(0, 0, 0, 0.452);
+      }
+
+      .pagination-footer {
+        margin: auto;
+        width: 564px;
+        padding: 12px;
+        font-size: 20px;
+        font-weight: 300;
+        color: white;
+        text-align: center;
+        vertical-align: middle;
+        background: rgba(95, 89, 89, 0.507);
+        border-top: 1px solid #444;
+      }
+
+      .miniMap,
+      .miniMapC {
+        user-select: none;
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        border: 3px solid white;
+        border-radius: 0%;
+        width: 150px;
+        height: 150px;
+        object-fit: contain;
+        background-color: white;
+        overflow: hidden; /* Keeps the grid within the circle */
+        z-index: 0;
+      }
+
+      .miniMapC {
+        z-index: 1;
+        background-image: url("./assets/background.png");
+      }
+
+      .displayAfter {
+        display: none;
+      }
+
+      .removeAfter {
+        display: flex;
+      }
+
+      h1 {
+        margin-top: 0;
+        margin-bottom: 15px;
+      }
+      p{
+        margin-bottom: 2px;
+      }
+      h1, p {
+        letter-spacing: 2px;
+      }
+
+      /* Killfeed container */
+      #killFeed {
+        position: absolute;
+        bottom: 10px;
+        left: 20px;
+        width: 200px;
+        font-family: "VT323", monospace;
+        color: #fff;
+        pointer-events: none;
+        user-select: none;
+      }
+
+      /* Individual kill messages */
+      .kill-message {
+        margin: 2px 0;
+        background-color: rgba(0, 0, 0, 0.651);
+        padding: 10px 10px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        opacity: 1;
+        animation: fadeOut 5s forwards;
+      }
+
+      .kill-message img {
+        height: auto;
+      }
+
+      /* Fade out animation */
+      @keyframes fadeOut {
+        0% {
+          opacity: 1;
+        }
+        70% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+          transform: translateX(20px);
+        }
+      }
+    </style>
+  </head>
+  
+  <body
+    style="
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: black;
+      font-family: 'VT323', monospace;">
+      
+    
+    <!-- Game Container -->
+    <div class="displayAfter"  style="position: relative; width: 1024px; height: 576px">
+      <!-- The Game Canvas -->
+      <canvas class="canvas" id="canvas"></canvas>
+      <!-- MiniMap -->
+      <canvas class="miniMapC" id="miniMapC"></canvas>
+      <img
+        src="./assets/background.png"
+        class="miniMap"
+        id="miniMap"
+        alt="Map"
+      />
+
+      <!-- Small Leaderboard-->
+      <div class="small-leaderboard">
+        <div>
+          <div style="margin-bottom: 8px; font-size: 30px; font-weight: 400">
+            LeaderBoard
+          </div>
+          <div id="update-sleaderboard"></div>
+        </div>
+      </div>
+
+      <!-- Big Leader Board -->
+      <div class="leaderboard">
+        <!--<div
+          style="
+            background-image: linear-gradient(to right, #00d9ff, #0062ff);
+            padding: 2%;
+            border-radius: 1cap;">
+          <h1>Leaderboard</h1>
+        </div> -->
+        <table class="leaderboard-table">
+          <thead>
+            <tr id="leaderboard-header">
+              <th>Rank</th>
+              <th>Name</th>
+              <th>Kills</th>
+              <th>Class</th>
+            </tr>
+          </thead>
+          <tbody id="player-labels"></tbody>
+        </table>
+
+        <div id="leaderboard-page-selector" class="pagination-footer">
+          <button id="prev-page" class="page-button">&lt</button>
+          <span id="page-number" class="page-number">1/1</span>
+          <button id="next-page" class="page-button">&gt</button>
+        </div>
+
+        <!-- Big Leader Board End -->
+      </div>
+      <canvas></canvas>
+
+      <div
+        id="fpsCounter"
+        style="
+          position: absolute;
+          top: 10px; 
+          left: 170px;
+          color: white;
+          font-family: monospace;
+          z-index: 3;">FPS: --
+        </div>
+
+        <div 
+        id="pingDisplay" 
+        style="
+        position:absolute; 
+        top:30px; 
+        left:170px; 
+        color:white; 
+        font-family:monospace;
+        z-index: 2;">Ping: --</div>
+
+      <!-- Inventory slots -->
+      <div
+        id="inventoryArea"
+        style="
+          position: relative;
+          flex-direction: column;
+          align-items: center;
+          justify-content: space-evenly;
+          width: 230px;
+          height: 156px;
+          bottom: 225px;
+          left: 910px;
+          transform: translate(-50%, -50%);
+        "
+      >
+
+        <div class="itemBorder" id="inventorySlot1">
+          <div class="numbers">1</div>
+          <div class="weaponText" id="inventorySlot1Text">
+            <img id="inventorySlot1Img" src=""/>
+          </div>
+        </div>
+        
+        <div class="itemBorder" id="inventorySlot2">
+          <div class="numbers">2</div>
+          <div class="weaponText" id="inventorySlot2Text">
+            <img id="inventorySlot2Img" src="" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Kill Feed -->
+      <div class="killFeed" id="killFeed"></div>
+    </div>
+
+    <!--Name/Class Selection Screen-->
+    <div id="start-page">
+      <div class="selection-container">
+        <div class="class-display" id="class-box">
+          <button id="tank-class">
+            <img src="./assets/class/Tank.png" alt="Tank" />
+          </button>
+          <button id="rogue-class">
+            <img src="./assets/class/Rogue.png" alt="Rogue" />
+          </button>
+          <button id="mage-class">
+            <img src="./assets/class/Mage.png" alt="Mage" />
+          </button>
+          <button id="gunner-class">
+            <img src="./assets/class/Gunner.png" alt="Gunner" />
+          </button>
+        </div>
+
+        <div class="stat-display" id="stat-box">
+          <div id="stat-title"></div>
+          <canvas id="stat-chart" width="300" height="300"></canvas>
+        </div>
+      </div>
+
+      <div class="submit-display">
+        <button id="submit-btn">Submit</button>
+      </div>
+
+      <div class="back-display">
+        <button id="back-btn">Back</button>
+      </div>
+
+      <div class="name-display">
+        <div id="name-box"></div>
+        <div class="button-row name-box">
+          <button id="random-btn">Random</button>
+        </div>
+        <div id="warning-message"></div>
+      </div>
+    </div>
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.2/gsap.min.js"
+      integrity="sha512-kVlGhj2qFy+KBCFuvjBJTGUMxbdqJKs4yK2jh0e0VPhWUPiPC87bzm4THmaaIee3Oj7j6sDpTTgm2EPPiESqBg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="./js/frontend.js"></script>
+    <script src="./js/Pages/startMenu.js"></script>
+    <script src="./js/Leaderboard.js"></script>
+    <script src="./js/Minimap.js"></script>
+    <script src="./js/FrontPlayer/Player.js"></script>
+    <script src="./js/FrontPowerUps/PowerUpDrawing.js"></script>
+    <script src="./js/FrontPowerUps/PowerUpInteractions.js"></script>
+    <script src="./js/FrontWeaponStuff/WeaponDrawning.js"></script>
+    <script src="./js/FrontWeaponStuff/WeaponInteraction.js"></script>
+    <script src="./js/FrontWeaponStuff/Projectile.js"></script>
+    <script src="./js/eventListeners.js"></script>
+    <!-- Custom Cursor Script -->
+    <script>
+      // Set a custom cursor for the body and canvas
+      const customCursorImage = "/assets/CrosshairCursor.png"; 
+
+      // Apply the custom cursor to the body
+      document.body.style.cursor = `url(${customCursorImage}) ${16} ${16}, auto`;
+
+      // Apply the custom cursor to the canvas
+      canvas.style.cursor = `url(${customCursorImage}) ${16} ${16}, auto`;
+    </script>
+  </body>
+</html>

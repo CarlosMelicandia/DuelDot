@@ -1,533 +1,82 @@
 <html>
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link
       href="https://fonts.googleapis.com/css2?family=VT323&display=swap"
       rel="stylesheet"
     />
     <style>
-      body {
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        text-rendering: optimizeLegibility;
-        margin: 0;
-        background: black;
-        -webkit-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-      }
-
-      input::placeholder {
-        color: #94a3b8;
-      }
-
-      .canvas {
-        width: 1024px;
-        height: 576px;
-        border: 2px solid #ccccd5;
-      }
-
-      .small-leaderboard {
+      #title-menu {
         position: absolute;
-        top: 10px;
-        right: 10px;
-        color: white;
-        padding: 8px;
-        font-size: 18px;
-        font-weight: 200;
-        user-select: none;
-        background: rgba(0, 0, 0, 0.8);
-        border-radius: 5px;
-      }
-
-      .itemBorder {
-        display: flex;
-        box-sizing: border-box;
-        width: 220px;
-        height: 70px;
-        border: 1px solid white;
-        background: rgba(69, 67, 67, 0.5);
-        align-items: center;
-        justify-content: center;
-        flex-direction: row;
-        font-family: taken;
-        font-size: 20px;
-        position: relative;
-      }
-
-      .numbers {
-        position: absolute;
-        top: 5px;
-        left: 5px;
-        margin: 0;
-        padding: 0;
-        color: white;
-        font-size: 12px;
-        font-weight: bold;
-      }
-
-      .weaponText {
-        color: white;
-        font-size: 25px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 100%;
-      }
-
-      /* Leaderboard Container */
-      .leaderboard {
-        display: none;
-        /* align-items: center; */
-        justify-content: center;
-        position: absolute;
-        top: 0;
-        right: 0;
-        /* bottom: 0; */
-        left: 0;
-        width: 80%;
-        max-width: 600px;
-        margin: 20px auto;
-        /* background: rgba(0, 0, 0, 0.288); */
-        border-radius: 12px;
-        padding: 15px;
-        /*box-shadow: 0 8px 16px rgba(95, 89, 89, 0.507);*/
-        /*color: rgb(255, 255, 255);*/
+        top: 5vh;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 20vw;
+        height: auto;
         z-index: 1;
       }
 
-      /* Table Styles */
-      .leaderboard-table {
-        margin: auto;
-        width: 98%;
-        border-collapse: collapse;
-        background: rgba(95, 89, 89, 0.507);
-      }
-      /*.leaderboard-table thead {
-        background: #5d5d69;
-      }*/
-
-      #leaderboard-header th {
-        font-size: 20px;
-        font-weight: 300;
-        padding: 12px;
-        color: white;
-        text-align: center;
-        vertical-align: middle;
-        border-bottom: 1px solid #444;
-      }
-
-      .leaderboard-table td {
-        font-size: 16px;
-        font-weight: 200;
-        padding: 8px;
-        color: white;
-        text-align: center;
-        vertical-align: middle;
-        background: rgba(0, 0, 0, 0.452);
-      }
-
-      .pagination-footer {
-        margin: auto;
-        width: 564px;
-        padding: 12px;
-        font-size: 20px;
-        font-weight: 300;
-        color: white;
-        text-align: center;
-        vertical-align: middle;
-        background: rgba(95, 89, 89, 0.507);
-        border-top: 1px solid #444;
-      }
-
-      .miniMap,
-      .miniMapC {
-        user-select: none;
+      #main-menu {
         position: absolute;
-        top: 10px;
-        left: 10px;
-        border: 3px solid white;
-        border-radius: 0%;
-        width: 150px;
-        height: 150px;
-        object-fit: contain;
-        background-color: white;
-        overflow: hidden; /* Keeps the grid within the circle */
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('../assets/MainMenu.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
         z-index: 0;
       }
 
-      .miniMapC {
-        z-index: 1;
-        background-image: url("./assets/background.png");
-      }
-
-      .displayAfter {
-        display: none;
-      }
-
-      .removeAfter {
-        display: flex;
-      }
-
-      h1 {
-        margin-top: 0;
-        margin-bottom: 15px;
-      }
-      p{
-        margin-bottom: 2px;
-      }
-      h1, p {
-        letter-spacing: 2px;
-      }
-
-      /* Killfeed container */
-      #killFeed {
+      .start-menu {
         position: absolute;
-        bottom: 10px;
-        left: 20px;
-        width: 200px;
-        font-family: "VT323", monospace;
-        color: #fff;
-        pointer-events: none;
-        user-select: none;
-      }
-
-      /* Individual kill messages */
-      .kill-message {
-        margin: 2px 0;
-        background-color: rgba(0, 0, 0, 0.651);
-        padding: 10px 10px;
-        border-radius: 10px;
+        top: 60vh;
+        left: 50vw;
+        transform: translate(-50%, -50%);
         display: flex;
+        flex-direction: column;
         align-items: center;
-        justify-content: center;
-        gap: 16px;
-        opacity: 1;
-        animation: fadeOut 5s forwards;
+        gap: 2vh;
       }
 
-      .kill-message img {
-        height: auto;
+      .start-menu button {
+        width: 20vw;
+        height: 10vh;
+        padding: 1vh 2vw;
+        border: none;
+        font-weight: bold;
+        font-family: 'VT323', monospace;
+        font-size: 2rem;
+        color: black;
+        background-color: rgba(255, 255, 255, 0);
+        border-radius: 20px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, color 0.3s ease;
       }
 
-      /* Fade out animation */
-      @keyframes fadeOut {
-        0% {
-          opacity: 1;
-        }
-        70% {
-          opacity: 1;
-        }
-        100% {
-          opacity: 0;
-          transform: translateX(20px);
-        }
+      .start-menu button:hover {
+        background-color: rgb(3, 23, 41);
+        color: white;
       }
     </style>
   </head>
-  <body
-    style="
-      margin: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      background: black;
-      font-family: 'VT323', monospace;">
-    <!-- Game Container -->
-    <div style="position: relative; width: 1024px; height: 576px">
-      <!-- The Game Canvas -->
-      <canvas class="canvas" id="canvas"></canvas>
-
-      <!-- MiniMap -->
-      <canvas class="miniMapC displayAfter" id="miniMapC"></canvas>
-      <img
-        src="./assets/background.png"
-        class="miniMap displayAfter"
-        id="miniMap"
-        alt="Map"
-      />
-
-      <!-- Small Leaderboard-->
-      <div class="small-leaderboard">
-        <div>
-          <div style="margin-bottom: 8px; font-size: 30px; font-weight: 400">
-            LeaderBoard
-          </div>
-          <div id="update-sleaderboard"></div>
-        </div>
+  <body>
+    <img src="../assets/DuelDot.png" id="title-menu"/>
+    
+    <div id="main-menu">
+      <div class="start-menu">
+        <button id="start-page">Start</button>
+        <button id="instruction-page">Instruction</button>
       </div>
-
-      <!-- Big Leader Board -->
-      <div class="leaderboard">
-        <!--<div
-          style="
-            background-image: linear-gradient(to right, #00d9ff, #0062ff);
-            padding: 2%;
-            border-radius: 1cap;">
-          <h1>Leaderboard</h1>
-        </div> -->
-        <table class="leaderboard-table">
-          <thead>
-            <tr id="leaderboard-header">
-              <th>Rank</th>
-              <th>Name</th>
-              <th>Kills</th>
-              <th>Class</th>
-            </tr>
-          </thead>
-          <tbody id="player-labels"></tbody>
-        </table>
-
-        <div id="leaderboard-page-selector" class="pagination-footer">
-          <button id="prev-page" class="page-button">&lt</button>
-          <span id="page-number" class="page-number">1/1</span>
-          <button id="next-page" class="page-button">&gt</button>
-        </div>
-
-        <!-- Big Leader Board End -->
-      </div>
-      <canvas></canvas>
-
-      <div
-        id="fpsCounter"
-        style="
-          position: absolute;
-          top: 10px; 
-          left: 170px;
-          color: white;
-          font-family: monospace;
-          z-index: 3;">FPS: --
-        </div>
-
-        <div 
-        id="pingDisplay" 
-        style="
-        position:absolute; 
-        top:30px; 
-        left:170px; 
-        color:white; 
-        font-family:monospace;
-        z-index: 2;">Ping: --</div>
-
-      <!-- Inventory slots -->
-      <div
-        class = "displayAfter"
-        id="inventoryArea"
-        style="
-          position: relative;
-          flex-direction: column;
-          align-items: center;
-          justify-content: space-evenly;
-          width: 230px;
-          height: 156px;
-          bottom: 230px;
-          left: 910px;
-          transform: translate(-50%, -50%);
-        "
-      >
-        <div class="itemBorder" id="inventorySlot1">
-          <div class="numbers">1</div>
-          <img src = "" class="weaponText" id="inventorySlot1Text"/>
-        </div>
-        <div class="itemBorder" id="inventorySlot2">
-          <div class="numbers">2</div>
-          <img src = "" class="weaponText" id="inventorySlot2Text"/>
-        </div>
-      </div>
-
-      <!-- Kill Feed -->
-      <div class="killFeed" id="killFeed"></div>
-
-      <!-- Instruction Menu -->
-       <div 
-       class = "removeAfter"
-       id = "instructions"
-       style = "
-        display: flex;
-        position: absolute;
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: center;
-        height: 260px;
-        width: 200px;
-        top: 50%;
-        left: 270px;
-        transform: translate(-50%, -50%);
-        background-image: linear-gradient(to right, rgba(6, 182, 212, 0.5), rgba(59, 130, 246, 0.5));
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        padding: 10px;
-        color: white;">
-        <h1>How To Play</h1>
-        <p>W,A,S,D: Movement</p>
-        <p>F: Pick up guns</p>
-        <p>Q: Drop Weapons</p>
-        <p>1: Item Slot 1</p>
-        <p>2: Item Slot 2</p>
-        <p>Left-Click: Shoot/Punch</p>
-      </div>
-
-      <!-- Username and Class Selection Form -->
-      <div
-        class = "removeAfter"
-        id = "menu"
-        style=" 
-          position: absolute;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          text-align: center;">
-
-        <!-- Shows the username -->
-        <form id="usernameForm">
-          <div
-            id="selectedRandomName"
-            type="text"
-            style="
-              width: 227px;
-              padding: 10px;
-              box-sizing: border-box;
-              border-radius: 5px;
-              border: none;
-              background: #475569;
-              color: #cbd5e1;
-              text-align: center;
-            "
-          ></div>
-
-          <!-- Class Selector Buttons-->
-          <div
-            style="
-              margin-top: 8px;
-              display: flex;
-              align-items: center;
-              gap: 10px;
-            "
-          >
-            <!-- Left Button Class -->
-            <button
-              type="button"
-              id="classSelectorLeft"
-              style="
-                padding: 10px;
-                border-radius: 5px;
-                border: none;
-                background-image: linear-gradient(to right, #06b6d4, #3b82f6);
-                color: white;
-                cursor: pointer;
-              "
-            >
-              ←
-            </button>
-
-            <!-- Shows Selected Class -->
-            <button
-              type="button"
-              id="showClass"
-              style="
-                width: 140px;
-                padding: 10px;
-                border-radius: 5px;
-                box-sizing: border-box;
-                border: none;
-                background: linear-gradient(to right, #06b6d4, #3b82f6);
-                color: white;
-                font-weight: bold;
-                text-transform: uppercase;
-                cursor: default;
-              "
-            ></button>
-
-            <!-- Right Button Class -->
-            <button
-              type="button"
-              id="classSelectorRight"
-              style="
-                padding: 10px;
-                border-radius: 5px;
-                border: none;
-                background-image: linear-gradient(to right, #06b6d4, #3b82f6);
-                color: white;
-                cursor: pointer;
-              "
-            >
-              →
-            </button>
-          </div>
-
-          <!-- Action Buttons -->
-          <div style="margin-top: 8px; display: flex; gap: 8px">
-            <!-- Start Button -->
-            <button
-              type="submit"
-              style="
-                padding: 8px 20px;
-                border-radius: 5px;
-                border: none;
-                background: linear-gradient(to right, #06b6d4, #3b82f6);
-                color: white;
-                font-weight: bold;
-                text-transform: uppercase;
-                cursor: pointer;
-              "
-            >
-              Start!
-            </button>
-
-            <!-- Random Name Button -->
-            <button
-              type="button"
-              id="randomNameBtn"
-              style="
-                padding: 8px 15px;
-                border-radius: 5px;
-                border: none;
-                background: linear-gradient(to right, #06b6d4, #3b82f6);
-                color: white;
-                font-weight: bold;
-                text-transform: uppercase;
-                cursor: pointer;
-              "
-            >
-              Random Name
-            </button>
-          </div>
-        </form>
-      </div>
-      <!-- username input end -->
     </div>
-
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.2/gsap.min.js"
-      integrity="sha512-kVlGhj2qFy+KBCFuvjBJTGUMxbdqJKs4yK2jh0e0VPhWUPiPC87bzm4THmaaIee3Oj7j6sDpTTgm2EPPiESqBg=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
-    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
-    <script src="./js/frontend.js"></script>
-    <script src="./js/Leaderboard.js"></script>
-    <script src="./js/Minimap.js"></script>
-    <script src="./js/FrontPlayer/Player.js"></script>
-    <script src="./js/FrontPowerUps/PowerUpDrawing.js"></script>
-    <script src="./js/FrontPowerUps/PowerUpInteractions.js"></script>
-    <script src="./js/FrontWeaponStuff/WeaponDrawning.js"></script>
-    <script src="./js/FrontWeaponStuff/WeaponInteraction.js"></script>
-    <script src="./js/FrontWeaponStuff/Projectile.js"></script>
-    <script src="./js/eventListeners.js"></script>
-    <!-- Custom Cursor Script -->
     <script>
-      // Set a custom cursor for the body and canvas
-      const customCursorImage = "/assets/CrosshairCursor.png"; // Update the path if needed
-
-      // Apply the custom cursor to the body
-      document.body.style.cursor = `url(${customCursorImage}) ${16} ${16}, auto`;
-
-      // Apply the custom cursor to the canvas
-      canvas.style.cursor = `url(${customCursorImage}) ${16} ${16}, auto`;
+      document.getElementById('start-page').addEventListener('click', () => {
+        window.location.href = 'gamePage.html';
+      });
+      document.getElementById('instruction-page').addEventListener('click', () => {
+        window.location.href = 'html/instructionPage.html';
+      });
     </script>
   </body>
 </html>

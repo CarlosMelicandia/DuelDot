@@ -134,17 +134,21 @@ io.on("connection", (socket) => {
 
     switch (keycode) {
       case "Digit1":
-        if (backEndPlayer.inventory[0]){
-          backEndPlayer.equippedWeapon = backEndPlayer.inventory[0] // adds the weapon to their first slot in inventory
-        } else if (backEndPlayer.equippedWeapon.name != "Fist"){ // Goes back to fist if inventory slot is empty
-          backEndPlayer.equippedWeapon = fist
+        if (keyDownWeapon < 0 && backEndPlayer.inventory[0]) {
+          backEndPlayer.equippedWeapon = backEndPlayer.inventory[0];
+          backEndPlayer.canShoot = true;
+        }else if (keyDownWeapon === 1 && backEndPlayer.inventory[0]) {
+          backEndPlayer.equippedWeapon = fist;
+          backEndPlayer.canShoot = false;
         }
         break
       case "Digit2":       
-       if (backEndPlayer.inventory[1]){
-          backEndPlayer.equippedWeapon = backEndPlayer.inventory[1] // adds the weapon to their second slot in inventory
-        } else if (backEndPlayer.equippedWeapon.name != "Fist"){ // Goes back to fist if inventory slot is empty
-          backEndPlayer.equippedWeapon = fist
+        if (keyDownWeapon < 0 && backEndPlayer.inventory[1]) {
+          backEndPlayer.equippedWeapon = backEndPlayer.inventory[1];
+          backEndPlayer.canShoot = true;
+        }else if (keyDownWeapon === 2 && backEndPlayer.inventory[1]) {
+          backEndPlayer.equippedWeapon = fist;
+          backEndPlayer.canShoot = false;
         }
         break
     }
@@ -153,6 +157,7 @@ io.on("connection", (socket) => {
   socket.on('weaponDrop', ({keycode, sequenceNumber}) => {
     const backEndPlayer = backEndPlayers[socket.id]
 
+    if (!backEndPlayer) return
     if (!backEndPlayer.equippedWeapon || backEndPlayer.equippedWeapon.name == "fist"|| !backEndPlayer) return
 
     backEndPlayer.sequenceNumber = sequenceNumber
