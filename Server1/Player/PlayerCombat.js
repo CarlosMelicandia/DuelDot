@@ -105,6 +105,11 @@ function playerProjectile(backEndProjectiles, backEndPlayers, io, gameWidth, gam
       ) {
           // Find the shooter (who fired the projectile)
         const shooter = backEndPlayers[projectile.playerId];
+          //If the target is invincible (Tank shield), skip damage
+          if (backEndPlayer.invincible) {
+              delete backEndProjectiles[id]
+              break // ← exit player loop early
+          }
         if(shooter){
         const equippedWeapon = shooter.equippedWeapon
 

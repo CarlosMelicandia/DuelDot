@@ -188,7 +188,16 @@ document.getElementById("submit-btn").addEventListener("click", (event) => {
     devicePixelRatio,
     username: playerName,
     className,
+
+
   });
+  if (className === "Gunner") {
+    document.querySelector("#inventorySlot3").style.display = "flex";
+    document.querySelector("#inventoryArea").style.height = "300px"; // expand container height
+  } else {
+    document.querySelector("#inventorySlot3").style.display = "none";
+    document.querySelector("#inventoryArea").style.height = "156px"; // reset height for other classes
+  }
 });
 
 

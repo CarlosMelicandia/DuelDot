@@ -12,7 +12,7 @@ class Tank extends BasePlayer {
     constructor(props) {
         super(props) // Calls BasePlayer constructor
         this.class = "Tank"
-        
+
         // Class Stats
         this.health = 150
         this.maxHealth = 150
@@ -24,7 +24,27 @@ class Tank extends BasePlayer {
         this.lightWpnMtp = 1.3
         this.heavyWpnMtp = 1.6
         this.magicWpnMtp = .2
+        this.invincible = false
+        this.lastShieldTime = 0; // timestamp tracking
+    }
+
+    activateShield() {
+        const now = Date.now();
+
+        // 15-second cooldown check
+        if (now - this.lastShieldTime < 15000 || this.invincible) return;
+
+        this.invincible = true;
+        this.lastShieldTime = now;
+
+        console.log(`${this.username} activated Tank shield`);
+
+        setTimeout(() => {
+            this.invincible = false;
+            console.log(`${this.username}'s shield wore off`);
+        }, 5000);
+
+
     }
 }
-
 module.exports = Tank // Exports the class for use in other files

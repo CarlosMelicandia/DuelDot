@@ -24,6 +24,22 @@ class Mage extends BasePlayer {
         this.lightWpnMtp = 1.0
         this.heavyWpnMtp = 1.0
         this.magicWpnMtp = 1.0
+
+        // Ability tracking
+        this.lastHealTime = 0
+    }
+
+    attemptHeal() {
+        const now = Date.now()
+        const cooldown = 20000 // 20 seconds
+
+        if (now - this.lastHealTime < cooldown) return
+
+        this.lastHealTime = now
+        this.health = Math.min(this.health + 25, this.maxHealth)
+        console.log(`${this.username} healed to ${this.health}/${this.maxHealth}`)
+
+
     }
 }
 

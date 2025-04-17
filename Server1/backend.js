@@ -150,10 +150,35 @@ io.on("connection", (socket) => {
           backEndPlayer.canShoot = false;
         }
         break
+      case "Digit3":
+        if (keyDownWeapon < 0 && backEndPlayer.inventory[2]) {
+          backEndPlayer.equippedWeapon = backEndPlayer.inventory[2];
+          backEndPlayer.canShoot = true;
+        }else if (keyDownWeapon === 3 && backEndPlayer.inventory[2]) {
+          backEndPlayer.equippedWeapon = fist;
+          backEndPlayer.canShoot = false;
+        }
+        break
+
     }
   })
 
-  socket.on('weaponDrop', ({keycode, sequenceNumber}) => {
+  socket.on('abilityActivated', () => {
+    const player = backEndPlayers[socket.id]
+    if (!player) return
+
+    // ️ Tank Ability
+    if (player.class === 'Tank' && typeof player.activateShield === 'function') {
+      player.activateShield()
+    }
+
+    // Mage: Heal
+    if (player.class === 'Mage' && typeof player.attemptHeal === 'function') {
+      player.attemptHeal()
+    }
+  })
+
+    socket.on('weaponDrop', ({keycode, sequenceNumber}) => {
     const backEndPlayer = backEndPlayers[socket.id]
 
     if (!backEndPlayer.equippedWeapon || backEndPlayer.equippedWeapon.name == "fist"|| !backEndPlayer) return

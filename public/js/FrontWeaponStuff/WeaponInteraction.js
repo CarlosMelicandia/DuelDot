@@ -29,16 +29,24 @@ socket.on('removeWeapon', (player) => {
     if(player.inventory[1] == null){ // if the second inventory is open
     document.querySelector('#inventorySlot2Text').textContent = " " // Shows the weapon in the second slot
     }
+    if (player.inventory[2] == null) {
+        document.querySelector('#inventorySlot3Text').textContent = " ";
+    }
+
 })
 
 // Waits for a weapon equip call from the server
 socket.on('equipWeapon', (slotIndex, player) => {
-    if (player.inventory[0] != null  && player.inventory[1] == null){ // if the first inventory is open 
-      document.querySelector('#inventorySlot1Text').textContent = player.inventory[slotIndex].name // Show weapon in inventory
+    if (slotIndex === 0 && player.inventory[0] != null) {
+        document.querySelector('#inventorySlot1Text').textContent = player.inventory[0].name;
     }
-    if(player.inventory[0] != null && player.inventory[1] != null){ // if the second inventory is open
-        document.querySelector('#inventorySlot2Text').textContent = player.inventory[slotIndex].name // Shows the weapon in the second slot
-    }   
+    if (slotIndex === 1 && player.inventory[1] != null) {
+        document.querySelector('#inventorySlot2Text').textContent = player.inventory[1].name;
+    }
+    if (slotIndex === 2 && player.inventory[2] != null) {
+        document.querySelector('#inventorySlot3Text').textContent = player.inventory[2].name;
+    }
+
 })
 
 /**

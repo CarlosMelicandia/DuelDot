@@ -111,6 +111,10 @@ window.addEventListener("keydown", (event) => {
     case "KeyD":
       keys.d.pressed = true
       break;
+    case "KeyE":
+      keys.e.pressed = true
+      break;
+
     case 'KeyQ':
       keys.q.pressed = true
       break
@@ -150,6 +154,23 @@ window.addEventListener("keydown", (event) => {
         keyDown = -1;
         break;
       }
+
+    case "Digit3":
+      if (keyDown == -1) {
+        keys.num3.pressed = true;
+        keyDown = 3;
+      }else if (keyDown == 1) {
+        keys.num2.pressed = true;
+        keys.num1.pressed = false;
+        keyDown = 3;
+        break;
+      } else {
+        keys.num3.pressed = false;
+        keyDown = -1;
+      }
+      break;
+
+
   }
 });
 
@@ -171,6 +192,9 @@ window.addEventListener("keyup", (event) => {
       break
     case "KeyD":
       keys.d.pressed = false
+      break
+    case "KeyE":
+      keys.e.pressed = false
       break
     case 'KeyQ':
       keys.q.pressed = false

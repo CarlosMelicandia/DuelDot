@@ -78,7 +78,7 @@ function checkCollision(backEndWeapons, io, player) {
 
     if (dist < player.radius + weapon.radius + 10) {
       const slotIndex = player.inventory.findIndex(slot => slot === null)
-      if (player.inventory[0] != null && player.inventory[1] != null) return
+      if (player.inventory[0] != null && player.inventory[1] != null && player.inventory[2] != null) return
 
       // console.log('Player picked up', weapon) // Test
       

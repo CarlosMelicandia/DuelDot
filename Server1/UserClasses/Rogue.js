@@ -16,6 +16,16 @@ class Rogue extends BasePlayer {
         this.lightWpnMtp = 1.0
         this.heavyWpnMtp = 1.0
         this.magicWpnMtp = 1.0
+
+
+        this.baseSpeed = this.speed
+        this.killSpeedMultiplier = 1
+        this.powerupSpeedMultiplier = 1
+
+        this.updateSpeed = function () {
+            this.speed = this.baseSpeed * this.killSpeedMultiplier * this.powerupSpeedMultiplier
+        }
+
     }
 }
 

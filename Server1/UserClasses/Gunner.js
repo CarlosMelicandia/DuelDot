@@ -24,6 +24,8 @@ class Gunner extends BasePlayer {
         this.lightWpnMtp = 1.0
         this.heavyWpnMtp = 1.0
         this.magicWpnMtp = 1.0
+
+        this.inventory = [null, null, null] //
     }
 }
 

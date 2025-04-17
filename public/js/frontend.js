@@ -286,10 +286,12 @@ const keys = {
   s: { pressed: false },
   d: { pressed: false },
   q: { pressed: false },
+  e: { pressed: false },
   f: { pressed: false },
   tab: { pressed: false },
   num1: { pressed: false },
   num2: { pressed: false },
+  num3: { pressed: false }
 };
 
 /**
@@ -340,6 +342,12 @@ setInterval(() => {
     socket.emit("keydown", { keycode: "KeyD", sequenceNumber });
   }
 
+  if (keys.e.pressed) {
+    sequenceNumber++;
+    playerInputs.push({ sequenceNumber, dx: 0, dy: 0 });
+    socket.emit("abilityActivated", { sequenceNumber });
+  }
+
   /**
    * Interact with Weapons
    */
@@ -385,6 +393,20 @@ setInterval(() => {
     document.querySelector("#inventorySlot2").style.borderColor = "white"; // Highlights the second Inventory Slot
     socket.emit("weaponSelected", { keycode: "Digit2", sequenceNumber, keyDownWeapon }); // Emits the information back to the server
     keyDownWeapon = -1;  
+  }
+
+  if (keys.num3.pressed && !keys.num1.pressed && !keys.num2.pressed && keyDownWeapon < 0) {
+    sequenceNumber++;
+    playerInputs.push({ sequenceNumber, dx: 0, dy: 0 });
+    document.querySelector("#inventorySlot3").style.borderColor = "blue";
+    socket.emit("weaponSelected", { keycode: "Digit3", sequenceNumber, keyDownWeapon });
+    keyDownWeapon = 3;
+  } else if (!keys.num3.pressed && keyDownWeapon === 3) {
+    sequenceNumber++;
+    playerInputs.push({ sequenceNumber, dx: 0, dy: 0 });
+    document.querySelector("#inventorySlot3").style.borderColor = "white";
+    socket.emit("weaponSelected", { keycode: "Digit3", sequenceNumber, keyDownWeapon });
+    keyDownWeapon = -1;
   }
 }, 15); // (default: 15)
 
