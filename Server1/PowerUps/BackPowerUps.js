@@ -18,13 +18,23 @@ class PowerUp {
 
     // Check if player can add another powerup (max 3)
     canApplyPowerup() {
-        // Count active powerups (exclude health which is instant)
-        const activeCount = Object.values(this.player.activePowerups)
-            .filter(p => p.active && p.endTime > Date.now())
+        // Health powerups can always be applied
+        if (this.type === "health") return true;
+    
+        const activePowerups = this.player.activePowerups || {};
+    
+        // Check if the same powerup type is already active and hasn't expired
+        const existing = activePowerups[this.type];
+        if (existing && existing.active && existing.endTime > Date.now()) {
+            return false;
+        }
+    
+        // Count other active powerups (excluding expired and health)
+        const activeCount = Object.entries(activePowerups)
+            .filter(([key, p]) => p.active && p.endTime > Date.now() && key !== "health")
             .length;
-        
-        // Return true if below limit or this is a health powerup (instant effect)
-        return activeCount < 3 || this.type === "health";
+    
+        return activeCount < 3;
     }
 }
 
@@ -167,7 +177,7 @@ class Damage extends PowerUp {
 
     apply() {
         // Check if player can have another powerup
-        if (!this.canApplyPowerup() || this.player.activePowerups.damage?.active) {
+        if (!this.canApplyPowerup()) {
             return false; // Could not apply
         }
 
@@ -175,7 +185,6 @@ class Damage extends PowerUp {
         this.player.damageMultiplier *= this.damageMultiplier
 
         // Store powerup info
-        
         this.player.activePowerups.damage = {
             active: true,
             endTime: Date.now() + this.duration
