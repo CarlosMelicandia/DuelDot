@@ -131,12 +131,11 @@ socket.on("updatePlayers", (backEndPlayers) => {
 
       // Updates about the punching
       frontEndPlayer.aimAngle = backEndPlayer.aimAngle;
-      frontEndPlayer.handXMove = backEndPlayer.handX; // TEST
+      frontEndPlayer.handXMove = backEndPlayer.handX; 
       frontEndPlayer.canPunch = backEndPlayer.canPunch;
 
       // Update player health in the frontend
       frontEndPlayer.health = backEndPlayer.health
-      // frontEndPlayer.activeEffects = backEndPlayer.activeEffects TEST REVISit ----------------------
 
       // Update player score in the frontend
       frontEndPlayer.score = backEndPlayer.score;
@@ -487,6 +486,9 @@ socket.on("updateKillFeed", ({ victemId, killerId, killerName, victimName, weapo
     case "shuriken":
       image = "./assets/weapons/Shuriken.png";
       break;
+      case "wand":
+        image = "./assets/weapons/MageWand.png";
+        break;
     // -- We have a shotgun pic done but not implemented
     // case "shotgun":
     //   image = "./assets/weapons/Shotgun.png";

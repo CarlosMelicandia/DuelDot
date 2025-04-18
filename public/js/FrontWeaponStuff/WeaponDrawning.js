@@ -18,6 +18,7 @@ class WeaponDrawing {
             "submachineGun": "../assets/weapons/SubmachineGun.png",
             "sniper": "../assets/weapons/Sniper.png",
             "shuriken": "../assets/weapons/Shuriken.png",
+            "wand": "../assets/weapons/MageWand.png",
             "fist": ""
         };
 
@@ -26,6 +27,7 @@ class WeaponDrawing {
             "submachineGun": "../assets/topDownWeapons/subgunTop.png",
             "sniper": "../assets/topDownWeapons/sniperTop.png",
             "shuriken": "../assets/topDownWeapons/shurikenTop.png",
+            "wand": "../assets/topDownWeapons/wandTop.png",
             "fist": ""
         }
         
@@ -34,7 +36,8 @@ class WeaponDrawing {
             "pistol": 2.5,
             "submachineGun": 2.0,
             "sniper": 2.8,
-            "shuriken": 1.5
+            "shuriken": 1.5,
+            "wand": 2.5
         };
         
         // Changes size of icons when spawning in

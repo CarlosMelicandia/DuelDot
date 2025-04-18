@@ -14,16 +14,16 @@ class Mage extends BasePlayer {
         this.class = "Mage" 
 
         // Class Stats
-        this.health = 80 
-        this.maxHealth = 80 
+        this.health = 120
+        this.maxHealth = 100
         this.radius = 12 
         this.color = 'purple' 
-        this.speed = 1.4 
+        this.speed = 1
 
         // Weapon multipliers
         this.lightWpnMtp = 1.0
-        this.heavyWpnMtp = 1.0
-        this.magicWpnMtp = 1.0
+        this.heavyWpnMtp = 0.5
+        this.magicWpnMtp = 1.5
 
         // Ability tracking
         this.lastHealTime = 0
@@ -44,3 +44,4 @@ class Mage extends BasePlayer {
 }
 
 module.exports = Mage // Exports the class for use in other files
+//

@@ -41,8 +41,7 @@ class Speed extends PowerUp {
     apply() {
         // Check if player can have another powerup
         if (!this.canApplyPowerup()) {
-            console.log(`Player already has maximum powerups. Cannot apply ${this.type}.`);
-            return false; // Could not apply
+            return false;
         }
 
         console.log(`Applying ${this.type} powerup to player.`);
@@ -168,16 +167,15 @@ class Damage extends PowerUp {
 
     apply() {
         // Check if player can have another powerup
-        if (!this.canApplyPowerup()) {
-            console.log(`Player already has maximum powerups. Cannot apply ${this.type}.`);
+        if (!this.canApplyPowerup() || this.player.activePowerups.damage?.active) {
             return false; // Could not apply
         }
 
         // Apply damage multiplier
-        this.player.damageMultiplier = (this.player.damageMultiplier || 1) + this.damageMultiplier;
+        this.player.damageMultiplier *= this.damageMultiplier
 
         // Store powerup info
-        this.player.activePowerups = this.player.activePowerups || {};
+        
         this.player.activePowerups.damage = {
             active: true,
             endTime: Date.now() + this.duration
@@ -191,7 +189,7 @@ class Damage extends PowerUp {
 
     removalEffect() {
         
-        this.player.damageMultiplier -= this.damageMultiplier;
+        this.player.damageMultiplier /= this.damageMultiplier;
 
         if (this.player.activePowerups && this.player.activePowerups.damage) {
             this.player.activePowerups.damage.active = false;

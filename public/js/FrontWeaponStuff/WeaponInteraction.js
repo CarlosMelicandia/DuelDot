@@ -23,7 +23,6 @@ socket.on('dropWeapon', (weaponData) => {
 }) 
 
 socket.on('removeWeapon', (slotIndex) => { // Clears the inventory slot on join
-  console.log(slotIndex)
   switch (slotIndex){
     case 0:
       document.querySelector('#inventorySlot1Img').src = " " // Show weapon in inventory
@@ -45,7 +44,8 @@ socket.on('equipWeapon', (slotIndex, player) => {
       pistol: "../assets/weapons/Pistol.png",
       submachineGun: "../assets/weapons/SubmachineGun.png",
       shuriken: "../assets/weapons/Shuriken.png",
-      sniper: "../assets/weapons/Sniper.png"
+      sniper: "../assets/weapons/Sniper.png",
+      wand: "../assets/weapons/MageWand.png"
     };
 
     

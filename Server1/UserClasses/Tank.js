@@ -18,12 +18,12 @@ class Tank extends BasePlayer {
         this.maxHealth = 150
         this.radius = 17
         this.color = 'red'
-        this.speed = .5
+        this.speed = .7
 
         // Weapon multipliers
         this.lightWpnMtp = 1.3
         this.heavyWpnMtp = 1.6
-        this.magicWpnMtp = .2
+        this.magicWpnMtp = 0.5
         this.invincible = false
         this.lastShieldTime = 0; // timestamp tracking
     }
@@ -48,3 +48,4 @@ class Tank extends BasePlayer {
     }
 }
 module.exports = Tank // Exports the class for use in other files
+//

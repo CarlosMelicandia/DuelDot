@@ -24,8 +24,6 @@ class BasePlayer {
       this.hasMultiShot = false
       this.damageMultiplier = 1
       this.shieldAmount = 0
-      this.hasPowerUp = false
-      this.activePowerup = null
       this.originalSpeed = this.speed
 
       // Hand Properties

@@ -15,8 +15,8 @@ class Pistol extends Weapon{
             name: "pistol", 
             type: "light",
             damage: 20,
-            fireRate: 1,
-            velocity: 5});
+            fireRate: .7,
+            velocity: 8});
     }
     
 }
@@ -28,7 +28,7 @@ class SubmachineGun extends Weapon{
             type: "light",
             damage: 10,
             fireRate: .5,
-            velocity: 5});
+            velocity: 9});
     }
     
 }
@@ -38,8 +38,8 @@ class Sniper extends Weapon{
             name:"sniper",
             type: "heavy",
             damage: 50,
-            fireRate: 4,
-            velocity: 10});
+            fireRate: 3,
+            velocity: 14});
     }
     
 }
@@ -48,9 +48,19 @@ class Shuriken extends Weapon{
         super({
             name: "shuriken",
             type: "light",
-            damage: 25,
+            damage: 15,
+            fireRate: 1.1,
+            velocity: 10});
+    }
+}
+class Wand extends Weapon{
+    constructor(){
+        super({
+            name: "wand",
+            type: "magic",
+            damage: 30,
             fireRate: 1.2,
-            velocity: 5});
+            velocity: 7});
     }
 }
 
@@ -71,6 +81,7 @@ module.exports = {
     SubmachineGun,
     Sniper,
     Shuriken,
+    Wand,
     Fist
 }
 

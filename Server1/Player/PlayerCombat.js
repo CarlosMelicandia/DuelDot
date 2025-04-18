@@ -129,9 +129,10 @@ function playerProjectile(backEndProjectiles, backEndPlayers, io, gameWidth, gam
         }
         const weaponMtp = weaponMtps[equippedWeapon.type] // Obtains the specific weapon multiplier based on th weapons type
         const damageMultiplier = shooter.damageMultiplier 
+          
+        const totalDamage = equippedWeapon.damage * weaponMtp * damageMultiplier
 
-        let totalDamage = equippedWeapon.damage * weaponMtp * damageMultiplier
-
+        console.log(totalDamage)
         // Check if the target has a shield
         if (backEndPlayer.shieldAmount > 0) {
           if (totalDamage <= backEndPlayer.shieldAmount) {
@@ -143,14 +144,6 @@ function playerProjectile(backEndProjectiles, backEndPlayers, io, gameWidth, gam
             totalDamage -= backEndPlayer.shieldAmount
             backEndPlayer.shieldAmount = 0
           }
-        }
-
-          if (shooter && equippedWeapon) {
-            const totalDamage =
-            equippedWeapon.damage * weaponMtp // Calculates the total damage based on multiplier
-            backEndPlayer.health -= totalDamage
-          } else {
-          console.log(`Error: Shooter or equipped weapon is undefined.`)
         }
 
         // Apply remaining damage to health

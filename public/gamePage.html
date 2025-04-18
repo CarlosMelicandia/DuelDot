@@ -622,16 +622,34 @@
     <script src="./js/FrontWeaponStuff/WeaponInteraction.js"></script>
     <script src="./js/FrontWeaponStuff/Projectile.js"></script>
     <script src="./js/eventListeners.js"></script>
+    
     <!-- Custom Cursor Script -->
     <script>
-      // Set a custom cursor for the body and canvas
       const customCursorImage = "/assets/CrosshairCursor.png";
-
-      // Apply the custom cursor to the body
-      document.body.style.cursor = `url(${customCursorImage}) ${16} ${16}, auto`;
-
-      // Apply the custom cursor to the canvas
-      canvas.style.cursor = `url(${customCursorImage}) ${16} ${16}, auto`;
+      const hotSpotX = 16; // Adjust to match your cursor image's hotspot
+      const hotSpotY = 16;
+    
+      // Apply the custom cursor
+      document.body.style.cursor = `url(${customCursorImage}) ${hotSpotX} ${hotSpotY}, auto`;
+    
+      // Create a red dot that follows the cursor
+      // const cursorDebug = document.createElement("div");
+      // cursorDebug.style.position = "fixed";
+      // cursorDebug.style.width = "6px";
+      // cursorDebug.style.height = "6px";
+      // cursorDebug.style.background = "red";
+      // cursorDebug.style.border = "1px solid white";
+      // cursorDebug.style.borderRadius = "50%";
+      // cursorDebug.style.zIndex = "9999";
+      // cursorDebug.style.pointerEvents = "none"; // So it doesn't block clicks
+      // document.body.appendChild(cursorDebug);
+    
+      // Update the red dot position on mouse move
+      // document.addEventListener("mousemove", (e) => {
+        // cursorDebug.style.left = `${e.clientX}px`;
+        // cursorDebug.style.top = `${e.clientY}px`;
+      // });
     </script>
+    
   </body>
 </html>

@@ -56,7 +56,7 @@ function spawnPowerUps(backEndPowerUps, io, backEndPlayers) {
 
     // Notify clients
     io.emit("spawnPowerUps", powerUpData);
-  }, 15000); // Slowing down spawn interval
+  }, 1000); // Slowing down spawn interval (default: 15000)
 }
 
 // ------------------------------
@@ -79,12 +79,6 @@ function checkPowerUpCollision(backEndPowerUps, io, player, backEndPlayers) {
         };
         const PowerUpClass = powerUpClasses[powerUp.type];
 
-        // if (!player.activeEffects) player.activeEffects = {} REVIST TEST _-----------------
-        // player.activeEffects[powerUp.type] = {
-        //   startTime: Date.now(),
-        //   duration: powerUp.duration
-        // }
-
         if (PowerUpClass) {
             // Apply powerup effects
             const powerUpInstance = new PowerUpClass(player, powerUp.id);
@@ -100,7 +94,7 @@ function checkPowerUpCollision(backEndPowerUps, io, player, backEndPlayers) {
 
                 // Remove powerup from backend and notify frontend
                 backEndPowerUps.splice(i, 1);
-                io.emit("removePowerUp", { id: powerUp.id, remove: true });
+                io.emit("removePowerUp", (powerUp.id));
 
                 // Restart spawning if needed
                 if (backEndPowerUps.length < 13 && !spawning) {

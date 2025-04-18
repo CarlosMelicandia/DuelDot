@@ -122,11 +122,6 @@ applyPowerup(type, duration) {
     duration: duration,
     particles: []
   };
-  
-  // Generate initial effect elements
-  if (type === "speed") {
-    this.lightningPoints = this.generateLightningPoints();
-  }
 }
 
 // Add these helper methods to your Player class:
@@ -174,6 +169,7 @@ createEffectParticle(type) {
   
   switch (type) {
     case "speed":
+      this.lightningPoints = this.generateLightningPoints();
       angle = Math.random() * Math.PI * 2;
       distance = Math.random() * this.radius * 0.8;
       vx = Math.cos(angle) * (Math.random() * 2 + 1);

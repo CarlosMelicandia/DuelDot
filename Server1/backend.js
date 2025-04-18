@@ -179,7 +179,6 @@ io.on("connection", (socket) => {
 
     backEndPlayer.sequenceNumber = sequenceNumber
     const droppedWeapon = backEndPlayer.equippedWeapon
-    // console.log("Dropped:", droppedWeapon) // TEST
     
     const slotIndex = backEndPlayer.inventory.findIndex(slot => slot === droppedWeapon)
     
@@ -188,9 +187,6 @@ io.on("connection", (socket) => {
     }
 
     backEndPlayer.equippedWeapon = fist
-
-    console.log("Inventory:", backEndPlayer.inventory) // Test
-    
 
     weaponDrop(droppedWeapon, backEndPlayer.x, backEndPlayer.y, io, backEndWeapons)
     socket.emit('removeWeapon', slotIndex)

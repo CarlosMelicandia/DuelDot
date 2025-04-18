@@ -8,14 +8,14 @@ class Rogue extends BasePlayer {
         // Class Stats
         this.health = 80
         this.maxHealth = 80
-        this.radius = 9
+        this.radius = 12
         this.color = 'blue'
         this.speed = 1.4
 
         // Weapon multipliers
-        this.lightWpnMtp = 1.0
-        this.heavyWpnMtp = 1.0
-        this.magicWpnMtp = 1.0
+        this.lightWpnMtp = 1.4
+        this.heavyWpnMtp = 0.5
+        this.magicWpnMtp = 1.1
 
 
         this.baseSpeed = this.speed
@@ -30,3 +30,4 @@ class Rogue extends BasePlayer {
 }
 
 module.exports = Rogue
+//

@@ -37,30 +37,30 @@ const playerNames = [
   "BOB",
 ];
 
-const tankStats = [
+  tankStats = [
   (150 / 150) * 10, // health
   (17 / 20) * 10, // radius
-  (0.5 / 2.0) * 10, // speed
+  (0.7 / 2.0) * 10, // speed
 ];
-const rogueStats = [
+  rogueStats = [
   (80 / 150) * 10, // health
   (9 / 20) * 10, // radius
   (1.4 / 2.0) * 10, // speed
 ];
-const mageStats = [
-  (80 / 150) * 10, // health
+ mageStats = [
+  (120 / 150) * 10, // health
   (12 / 20) * 10, // radius
-  (1.4 / 2.0) * 10, // speed
+  (1 / 2.0) * 10, // speed
 ];
-const gunnerStats = [
+ gunnerStats = [
   (100 / 150) * 10, // health
   (14 / 20) * 10, // radius
-  (1.0 / 2.0) * 10, // speed
+  (1.2 / 2.0) * 10, // speed
 ];
 
 let className = ""; // Variable to store the selected class name
 let radarChart = null; // Use this variable to check if chart already exists
-let nameReady = false; // Flag to check if the player has seleceted a name
+let nameReady = false; // Flag to check if the player has selected a name
 let classReady = false; // Flag to check if the player has selected a class
 // ------------------------------
 // Username Form Handling

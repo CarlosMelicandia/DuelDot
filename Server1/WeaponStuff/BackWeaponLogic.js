@@ -1,4 +1,4 @@
-const { Pistol, SubmachineGun, Sniper, Shuriken } = require("./Weapons")
+const { Pistol, SubmachineGun, Sniper, Shuriken, Wand} = require("./Weapons")
 
 const GAME_WIDTH = 5000 // Default width
 const GAME_HEIGHT = 5000 // Default height
@@ -29,13 +29,15 @@ function spawnWeapons(backEndWeapons, io, backEndPlayers) {
     let spawnX = Math.random() * (maxX - min) + min 
     let spawnY = Math.random() * (maxY - min) + min
 
-    const weaponSpawn = ["pistol", "submachineGun", "sniper", "shuriken"]
+    const weaponSpawn = ["pistol", "submachineGun", "sniper", "shuriken","wand"]
     let weaponToSpawn = weaponSpawn[Math.floor(Math.random() * weaponSpawn.length)]
     let weaponColors = {
       "pistol": "red",
       "submachineGun": "blue",
       "sniper": "yellow",
-      "shuriken": "orange"
+      "shuriken": "orange",
+      "wand": "purple"
+
     }
 
     let newWeaponId = deletedWeaponIds.length > 0 ? deletedWeaponIds.shift() : weaponId++
@@ -87,7 +89,8 @@ function checkCollision(backEndWeapons, io, player) {
         pistol: Pistol,
         submachineGun: SubmachineGun,
         sniper: Sniper,
-        shuriken: Shuriken
+        shuriken: Shuriken,
+        wand: Wand,
       }
       
       const weaponEquipped = new weapons[weapon.name]() // Creates a weapon object when a player picks it up

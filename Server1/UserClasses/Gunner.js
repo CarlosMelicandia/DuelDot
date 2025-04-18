@@ -18,15 +18,16 @@ class Gunner extends BasePlayer {
         this.maxHealth = 100
         this.radius = 14
         this.color = 'grey' 
-        this.speed = 1 
+        this.speed = 1.2 
 
         // Weapon multipliers
-        this.lightWpnMtp = 1.0
-        this.heavyWpnMtp = 1.0
-        this.magicWpnMtp = 1.0
+        this.lightWpnMtp = 1.3
+        this.heavyWpnMtp = 1.3
+        this.magicWpnMtp = 0.7
 
         this.inventory = [null, null, null] 
     }
 }
 
 module.exports = Gunner // Exports the class for use in other files
+//
