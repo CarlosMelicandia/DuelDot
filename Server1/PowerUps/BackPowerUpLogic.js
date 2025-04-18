@@ -87,9 +87,17 @@ function checkPowerUpCollision(backEndPowerUps, io, player, backEndPlayers) {
             if (powerUpInstance.canApplyPowerup()) {
                 powerUpInstance.apply();
 
+                // Emit to the player who collected it
                 io.to(player.socketId).emit('powerupCollected', { 
-                  type: powerUp.type, 
-                  duration: powerUpInstance.duration 
+                    type: powerUp.type, 
+                    duration: powerUpInstance.duration
+                });
+
+                // NEW: Emit to all clients about which player collected what powerup
+                io.emit('otherPlayerPowerup', {
+                    playerId: player.socketId,
+                    type: powerUp.type,
+                    duration: powerUpInstance.duration
                 });
 
                 // Remove powerup from backend and notify frontend

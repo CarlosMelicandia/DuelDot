@@ -227,7 +227,7 @@ if (typeof PowerUpDrawing === 'undefined') {
       statusBox.style.display = 'flex';
       statusBox.style.gap = '10px';
       statusBox.style.padding = '5px';
-      statusBox.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
+      statusBox.style.backgroundColor = 'transparent';
       statusBox.style.borderRadius = '8px';
       statusBox.style.zIndex = '1000';
       statusBox.style.bottom = '142px';

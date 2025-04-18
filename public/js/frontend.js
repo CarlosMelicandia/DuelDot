@@ -185,11 +185,26 @@ socket.on("playerRespawn", (player) =>{
 // ------------------------------
 // Power-up Collection Handler
 // ------------------------------
+socket.on('otherPlayerPowerup', ({ playerId, type, duration }) => {
+    // Only apply the effect if:
+    // 1. The player exists in our front-end
+    // 2. It's not our own player
+    if (frontEndPlayers[playerId] && playerId !== socket.id) {
+        frontEndPlayers[playerId].applyPowerup(type, duration);
+    }
+});
+
 socket.on('powerupCollected', ({ type, duration }) => {
-  // Safely call PowerUpDrawing method
-  if (window.PowerUpDrawing) {
-    PowerUpDrawing.addActiveStatus(type, duration);
-  }
+    // This now only handles the local player's powerups
+    const localPlayer = frontEndPlayers[socket.id];
+    if (localPlayer) {
+        localPlayer.applyPowerup(type, duration);
+    }
+    
+    // Update the UI status
+    if (window.PowerUpDrawing) {
+        PowerUpDrawing.addActiveStatus(type, duration);
+    }
 });
 
 // ------------------------------
