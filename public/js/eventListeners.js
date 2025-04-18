@@ -51,7 +51,6 @@ window.addEventListener("click", (event) => {
     worldMouseX - playerPosition.x
     
   );
-  console.log(angle)
 
   // Define the distance from the center of the player to the muzzle
   const muzzleOffset = equippedWeapon.topImageLength;

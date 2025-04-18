@@ -125,30 +125,32 @@ function playerProjectile(backEndProjectiles, backEndPlayers, io, gameWidth, gam
         const weaponMtps = { // List of all possible weapon multipliers
           light: shooter.lightWpnMtp,
           heavy: shooter.heavyWpnMtp,
-          magic: shooter.MagicWpnMtp
+          magic: shooter.magicWpnMtp
         }
         const weaponMtp = weaponMtps[equippedWeapon.type] // Obtains the specific weapon multiplier based on th weapons type
         const damageMultiplier = shooter.damageMultiplier 
           
         const totalDamage = equippedWeapon.damage * weaponMtp * damageMultiplier
 
-        console.log(totalDamage)
+        console.log(backEndPlayer) // Test
+
+        let remainingDamage = totalDamage
         // Check if the target has a shield
         if (backEndPlayer.shieldAmount > 0) {
-          if (totalDamage <= backEndPlayer.shieldAmount) {
+          if (remainingDamage <= backEndPlayer.shieldAmount) {
             // Shield absorbs all damage
-            backEndPlayer.shieldAmount -= totalDamage
-            totalDamage = 0
+            backEndPlayer.shieldAmount -= remainingDamage
+            remainingDamage = 0
           } else {
             // Shield absorbs part of the damage
-            totalDamage -= backEndPlayer.shieldAmount
+            remainingDamage -= backEndPlayer.shieldAmount
             backEndPlayer.shieldAmount = 0
           }
         }
 
         // Apply remaining damage to health
-        if (totalDamage > 0) { // Checks if this line is needed
-          backEndPlayer.health -= totalDamage
+        if (remainingDamage > 0) { // Checks if this line is needed
+          backEndPlayer.health -= remainingDamage
         }
         if (shooter.hasFire) { 
           // Fire effect is active, so we start applying periodic damage

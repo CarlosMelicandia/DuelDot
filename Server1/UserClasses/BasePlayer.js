@@ -35,9 +35,7 @@ class BasePlayer {
       // Default properties
       this.health = 0
       this.maxHealth = 0
-      this.radius = 0 // Player's hit box radius (set by subclasses)
-      this.health = 0 // Current health (set by subclasses)
-      this.maxHealth = 0 // Maximum health value (set by subclasses)
+      this.radius = 0 // Player's hit box radius (set by subclasses)s)
       this.speed = 0 // Movement speed (set by subclasses)
       this.originalSpeed = 0
 

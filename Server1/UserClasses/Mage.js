@@ -22,7 +22,7 @@ class Mage extends BasePlayer {
 
         // Weapon multipliers
         this.lightWpnMtp = 1.0
-        this.heavyWpnMtp = 0.5
+        this.heavyWpnMtp = 0.8
         this.magicWpnMtp = 1.5
 
         // Ability tracking
@@ -37,9 +37,6 @@ class Mage extends BasePlayer {
 
         this.lastHealTime = now
         this.health = Math.min(this.health + 25, this.maxHealth)
-        console.log(`${this.username} healed to ${this.health}/${this.maxHealth}`)
-
-
     }
 }
 

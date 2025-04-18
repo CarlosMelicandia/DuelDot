@@ -101,61 +101,58 @@ function checkPowerUpCollision(backEndPowerUps, io, player, backEndPlayers) {
                     spawning = true;
                     spawnPowerUps(backEndPowerUps, io);
                 }
-            } else {
-                console.log(`Player ${player.id} has too many active powerups. PowerUp ID=${powerUp.id} remains.`);
-            }
+            } 
         }
     }
   }
 }
 
 
-// Modify the projectile collision handler to account for shield and damage multipliers
-function handleProjectileCollision(projectile, targetPlayer, shooterId) {
-  // Find the shooter player
-  const shooter = backEndPlayers[shooterId];
+// // Modify the projectile collision handler to account for shield and damage multipliers
+// function handleProjectileCollision(projectile, targetPlayer, shooterId) {
+//   // Find the shooter player
+//   const shooter = backEndPlayers[shooterId];
   
-  if (!shooter) return 0; // Return if shooter doesn't exist
+//   if (!shooter) return 0; // Return if shooter doesn't exist
   
-  const equippedWeapon = shooter.equippedWeapon;
+//   const equippedWeapon = shooter.equippedWeapon;
   
-  if (!equippedWeapon) return 0; // Return if no weapon equipped
+//   if (!equippedWeapon) return 0; // Return if no weapon equipped
   
-  const weaponMtps = {
-    light: shooter.lightWpnMtp,
-    heavy: shooter.heavyWpnMtp,
-    magic: shooter.MagicWpnMtp
-  };
+//   const weaponMtps = {
+//     light: shooter.lightWpnMtp,
+//     heavy: shooter.heavyWpnMtp,
+//     magic: shooter.magicWpnMtp
+//   };
   
-  const weaponMtp = weaponMtps[equippedWeapon.type] || 1;
+//   const weaponMtp = weaponMtps[equippedWeapon.type] || 1;
   
-  // Apply damage multiplier from powerup
-  const damageMultiplier = shooter.damageMultiplier || 1;
+//   // Apply damage multiplier from powerup
+//   const damageMultiplier = shooter.damageMultiplier || 1;
   
-  // Calculate total damage
-  let totalDamage = equippedWeapon.damage * weaponMtp * damageMultiplier;
+//   // Calculate total damage
+//   let totalDamage = equippedWeapon.damage * weaponMtp * damageMultiplier;
   
-  // Apply damage considering shield
-  if (targetPlayer.shieldAmount > 0) {
-    if (totalDamage <= targetPlayer.shieldAmount) {
-      targetPlayer.shieldAmount -= totalDamage;
-      totalDamage = 0; // Shield absorbed all damage
-    } else {
-      totalDamage -= targetPlayer.shieldAmount; // Shield absorbed part of damage
-      targetPlayer.shieldAmount = 0;
-    }
-  }
+//   // Apply damage considering shield
+//   if (targetPlayer.shieldAmount > 0) {
+//     if (totalDamage <= targetPlayer.shieldAmount) {
+//       targetPlayer.shieldAmount -= totalDamage;
+//       totalDamage = 0; // Shield absorbed all damage
+//     } else {
+//       totalDamage -= targetPlayer.shieldAmount; // Shield absorbed part of damage
+//       targetPlayer.shieldAmount = 0;
+//     }
+//   }
   
-  // Only apply damage to health if there's any left after shield
-  if (totalDamage > 0) {
-    targetPlayer.health -= totalDamage;
-  }
+//   // Only apply damage to health if there's any left after shield
+//   if (totalDamage > 0) {
+//     targetPlayer.health -= totalDamage;
+//   }
   
-  return totalDamage;
-}
+//   return totalDamage;
+// }
 
 module.exports = { 
   spawnPowerUps, 
   checkPowerUpCollision,
-  handleProjectileCollision
 };

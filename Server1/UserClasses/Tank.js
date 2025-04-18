@@ -37,11 +37,8 @@ class Tank extends BasePlayer {
         this.invincible = true;
         this.lastShieldTime = now;
 
-        console.log(`${this.username} activated Tank shield`);
-
         setTimeout(() => {
             this.invincible = false;
-            console.log(`${this.username}'s shield wore off`);
         }, 5000);
 
 

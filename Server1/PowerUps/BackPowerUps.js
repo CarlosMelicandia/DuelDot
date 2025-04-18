@@ -44,18 +44,14 @@ class PowerUp {
 
 class Speed extends PowerUp {
     constructor(player, id) {
-        super("SpeedUp", "speed", 30000, player, id);
+        super("SpeedUp", "speed", 5000, player, id);
         this.speedMultiplier = 1.8; // Speed increase factor
     }
 
     apply() {
         // Check if player can have another powerup
-        if (!this.canApplyPowerup()) {
-            return false;
-        }
+        if (!this.canApplyPowerup()) return 
 
-        console.log(`Applying ${this.type} powerup to player.`);
-        
         // Save original speed if it hasn't been stored
         if (!this.player.originalSpeed) this.player.originalSpeed = this.player.speed;
 
@@ -92,15 +88,13 @@ class Speed extends PowerUp {
 
 class MultiShot extends PowerUp {
     constructor(player, id) {
-        super("MultiShot", "multiShot", 15000, player, id);
+        super("MultiShot", "multiShot", 3000, player, id);
     }
 
     apply() {
         // Check if player can have another powerup
-        if (!this.canApplyPowerup()) {
-            console.log(`Player already has maximum powerups. Cannot apply ${this.type}.`);
-            return false; // Could not apply
-        }
+        if (!this.canApplyPowerup()) return 
+        
 
         this.player.hasMultiShot = true; // Enable multishot mode
 
@@ -171,15 +165,13 @@ class Health extends PowerUp {
 
 class Damage extends PowerUp {
     constructor(player, id) {
-        super("Damage", "damage", 15000, player, id);
+        super("Damage", "damage", 5000, player, id);
         this.damageMultiplier = 2; // Doubles damage
     }
 
     apply() {
         // Check if player can have another powerup
-        if (!this.canApplyPowerup()) {
-            return false; // Could not apply
-        }
+        if (!this.canApplyPowerup()) return false; 
 
         // Apply damage multiplier
         this.player.damageMultiplier *= this.damageMultiplier
@@ -212,18 +204,20 @@ class Damage extends PowerUp {
 
 class Shield extends PowerUp {
     constructor(player, id) {
-        super("Shield", "shield", 15000, player, id);
+        super("Shield", "shield", 6000, player, id);
         this.shieldPoints = 50; // Amount of shield points
     }
 
     apply() {
         // Check if player can have another powerup
-        if (!this.canApplyPowerup()) {
-            console.log(`Player already has maximum powerups. Cannot apply ${this.type}.`);
-            return false; // Could not apply
-        }
+        if (!this.canApplyPowerup()) return false
 
-        this.player.shield = (this.player.shield || 0) + this.shieldPoints; // Add shield points
+        if (typeof this.player.shieldAmount !== "number") {
+            this.player.shieldAmount = 0;
+          }
+          
+
+        this.player.shieldAmount += this.shieldPoints; // Add shield points
 
         // Store powerup info
         this.player.activePowerups = this.player.activePowerups || {};
@@ -231,6 +225,8 @@ class Shield extends PowerUp {
             active: true,
             endTime: Date.now() + this.duration
         };
+        console.log("Shield Player === Backend:", this.player === backEndPlayers[this.player.socketId]);
+ // TEST
 
         // Schedule removal effect
         setTimeout(() => {
@@ -249,15 +245,12 @@ class Shield extends PowerUp {
 
 class Rapid extends PowerUp {
     constructor(player, id) {
-        super("Rapid", "rapid", 15000, player, id);
+        super("Rapid", "rapid", 3000, player, id);
     }
 
     apply() {
         // Check if player can have another powerup
-        if (!this.canApplyPowerup()) {
-            console.log(`Player already has maximum powerups. Cannot apply ${this.type}.`);
-            return false; // Could not apply
-        }
+        if (!this.canApplyPowerup()) return false
 
         this.player.hasRapidFire = true; // Enable rapid fire mode
 
@@ -288,15 +281,12 @@ class Rapid extends PowerUp {
 
 class Fire extends PowerUp {
     constructor(player, id) {
-        super("Fire", "fire", 15000, player, id);
+        super("Fire", "fire", 5000, player, id);
     }
 
     apply() {
         // Check if player can have another powerup
-        if (!this.canApplyPowerup()) {
-            console.log(`Player already has maximum powerups. Cannot apply ${this.type}.`);
-            return false; // Could not apply
-        }
+        if (!this.canApplyPowerup()) return false
 
         this.player.hasFire = true; // Enable fire effect
 
