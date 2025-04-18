@@ -26,6 +26,15 @@ socket.on("removePowerUp", (id) => {
 
 socket.on('updatePowerUps', (backEndPowerUps) => {
   backEndPowerUps.forEach((powerUp) => {
-    frontEndPowerUps[powerUp.id] = new PowerUpDrawing(powerUp);
-  })
+    if (!frontEndPowerUps[powerUp.id]) {
+      frontEndPowerUps[powerUp.id] = new PowerUpDrawing(powerUp);
+    } else {
+      // Update position and other properties but keep animation state
+      const existingPowerUp = frontEndPowerUps[powerUp.id];
+      existingPowerUp.x = powerUp.x;
+      existingPowerUp.y = powerUp.y;
+      existingPowerUp.radius = powerUp.radius;
+      existingPowerUp.type = powerUp.type;
+    }
+  });
 });

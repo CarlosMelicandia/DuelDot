@@ -22,7 +22,6 @@ const { playerPunch, playerShoot, playerProjectile } = require("./Player/PlayerC
 const http = require("http"); // Import Node's built-in HTTP module
 const server = http.createServer(app); // Create an HTTP server using the Express app
 const { Server } = require("socket.io"); // Import the Socket.IO Server class
-const { PowerUp } = require('./PowerUps/BackPowerUps.js')
 
 /**
  * Creates a Socket.io server instance

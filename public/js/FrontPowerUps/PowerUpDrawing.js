@@ -10,8 +10,8 @@ if (typeof PowerUpDrawing === 'undefined') {
       this.image = new Image();
       this.pulseSize = 0;
       this.pulseDirection = 1;
-      this.maxPulseSize = 2;
-      this.pulseSpeed = 0.3;
+      this.maxPulseSize = 3;
+      this.pulseSpeed = 0.2;
       this.rotation = 0;
       this.particles = [];
       this.particleTimer = 0;
@@ -24,12 +24,12 @@ if (typeof PowerUpDrawing === 'undefined') {
       }
 
       // Apply type-specific configuration
-      const config = PowerUpDrawing.typeConfig[this.type] || PowerUpDrawing.typeConfig.speed;
-      this.particleRate = config.particleRate;
-      this.particleLifespan = config.particleLifespan;
-      this.rotationSpeed = config.rotationSpeed;
-      this.pulseSpeed = config.pulseSpeed;
-      this.glowIntensity = config.glowIntensity;
+      const baseConfig = PowerUpDrawing.typeConfig[this.type] || PowerUpDrawing.typeConfig.speed;
+      this.particleRate = Math.max(2, baseConfig.particleRate - 1);
+      this.particleLifespan = baseConfig.particleLifespan * 1.5;
+      this.rotationSpeed = baseConfig.rotationSpeed * 1.2;
+      this.pulseSpeed = baseConfig.pulseSpeed * 0.8;
+      this.glowIntensity = baseConfig.glowIntensity * 1.3;
     }
 
     // Static properties
