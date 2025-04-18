@@ -233,7 +233,6 @@ class Shield extends PowerUp {
     }
 
     removalEffect() {
-        
     }
 }
 

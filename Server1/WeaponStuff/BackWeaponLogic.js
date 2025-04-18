@@ -55,7 +55,7 @@ function spawnWeapons(backEndWeapons, io, backEndPlayers) {
     backEndWeapons.push(weaponData)
 
     io.emit("updateWeapons", weaponData)
-  }, 5000) // Sets the time rate at which weapons spawn (Default = 2000)
+  }, 7000) // Sets the time rate at which weapons spawn (Default = 2000)
 }
 
 function weaponDrop(weapon, x, y, io, backEndWeapons){
