@@ -8,8 +8,23 @@ class PowerUp {
         this.type = type; // Type identifier for the powerup
         this.duration = duration; // Duration in milliseconds
         this.player = player; // The player who picked up the powerup
-        this.activePowerups = {}; // Store active powerups
+
+        if (!this.player.activePowerups) {
+            this.player.activePowerups = {};
+        }
+
         this.id = id; // Unique ID for tracking
+    }
+
+    // Check if player can add another powerup (max 3)
+    canApplyPowerup() {
+        // Count active powerups (exclude health which is instant)
+        const activeCount = Object.values(this.player.activePowerups)
+            .filter(p => p.active && p.endTime > Date.now())
+            .length;
+        
+        // Return true if below limit or this is a health powerup (instant effect)
+        return activeCount < 3 || this.type === "health";
     }
 }
 
@@ -24,6 +39,12 @@ class Speed extends PowerUp {
     }
 
     apply() {
+        // Check if player can have another powerup
+        if (!this.canApplyPowerup()) {
+            console.log(`Player already has maximum powerups. Cannot apply ${this.type}.`);
+            return false; // Could not apply
+        }
+
         console.log(`Applying ${this.type} powerup to player.`);
         
         // Save original speed if it hasn't been stored
@@ -66,6 +87,12 @@ class MultiShot extends PowerUp {
     }
 
     apply() {
+        // Check if player can have another powerup
+        if (!this.canApplyPowerup()) {
+            console.log(`Player already has maximum powerups. Cannot apply ${this.type}.`);
+            return false; // Could not apply
+        }
+
         this.player.hasMultiShot = true; // Enable multishot mode
 
         // Store powerup info for tracking
@@ -140,6 +167,12 @@ class Damage extends PowerUp {
     }
 
     apply() {
+        // Check if player can have another powerup
+        if (!this.canApplyPowerup()) {
+            console.log(`Player already has maximum powerups. Cannot apply ${this.type}.`);
+            return false; // Could not apply
+        }
+
         // Apply damage multiplier
         this.player.damageMultiplier = (this.player.damageMultiplier || 1) + this.damageMultiplier;
 
@@ -177,6 +210,12 @@ class Shield extends PowerUp {
     }
 
     apply() {
+        // Check if player can have another powerup
+        if (!this.canApplyPowerup()) {
+            console.log(`Player already has maximum powerups. Cannot apply ${this.type}.`);
+            return false; // Could not apply
+        }
+
         this.player.shield = (this.player.shield || 0) + this.shieldPoints; // Add shield points
 
         // Store powerup info
@@ -207,6 +246,12 @@ class Rapid extends PowerUp {
     }
 
     apply() {
+        // Check if player can have another powerup
+        if (!this.canApplyPowerup()) {
+            console.log(`Player already has maximum powerups. Cannot apply ${this.type}.`);
+            return false; // Could not apply
+        }
+
         this.player.hasRapidFire = true; // Enable rapid fire mode
 
         // Store powerup info
@@ -224,6 +269,7 @@ class Rapid extends PowerUp {
 
     removalEffect() {
         if (this.player.activePowerups && this.player.activePowerups.rapidFire) {
+            this.player.hasRapidFire = false;
             this.player.activePowerups.rapidFire.active = false;
         }
     }
@@ -239,6 +285,12 @@ class Fire extends PowerUp {
     }
 
     apply() {
+        // Check if player can have another powerup
+        if (!this.canApplyPowerup()) {
+            console.log(`Player already has maximum powerups. Cannot apply ${this.type}.`);
+            return false; // Could not apply
+        }
+
         this.player.hasFire = true; // Enable fire effect
 
         // Store powerup info
@@ -263,6 +315,14 @@ class Fire extends PowerUp {
     }
 }
 
+function getActivePowerupCount(player) {
+    if (!player || !player.activePowerups) return 0;
+    
+    return Object.values(player.activePowerups)
+        .filter(p => p.active && p.endTime > Date.now())
+        .length;
+}
+
 // ------------------------------
 // Export PowerUp Classes for Backend Use
 // ------------------------------
@@ -276,4 +336,5 @@ module.exports = {
     Rapid,
     Fire,
     PowerUp,
+    getActivePowerupCount,
 };

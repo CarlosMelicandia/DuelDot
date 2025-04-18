@@ -14,7 +14,12 @@ function playerShoot(socket, backEndPlayers, backEndProjectiles){
         if (!player || player.equippedWeapon.type == "melee") return // checks that the player is alive and doesn't have a melee
         
         if (player.equippedWeapon.isReloaded) { 
-        const fireRate = backEndPlayers[socket.id].equippedWeapon.fireRate * 1000
+        let fireRate = 0;
+        if (!player.hasRapidFire) {
+          fireRate = backEndPlayers[socket.id].equippedWeapon.fireRate * 1000
+        } else {
+          fireRate = backEndPlayers[socket.id].equippedWeapon.fireRate * 1000 / 10
+        }
 
         const createProjectile = (angle) => {
         projectileId++ // Increment the projectile ID

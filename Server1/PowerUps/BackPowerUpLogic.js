@@ -88,21 +88,27 @@ function checkPowerUpCollision(backEndPowerUps, io, player, backEndPlayers) {
         if (PowerUpClass) {
             // Apply powerup effects
             const powerUpInstance = new PowerUpClass(player, powerUp.id);
-            powerUpInstance.apply();
 
-            io.to(player.socketId).emit('powerupCollected', { 
-              type: powerUp.type, 
-              duration: powerUpInstance.duration 
-            });
+            // 👉 Check if the powerup can be applied before removing it
+            if (powerUpInstance.canApplyPowerup()) {
+                powerUpInstance.apply();
 
-            // Remove powerup from backend and notify frontend
-            backEndPowerUps.splice(i, 1);
-            io.emit("removePowerUp", powerUp.id);
+                io.to(player.socketId).emit('powerupCollected', { 
+                  type: powerUp.type, 
+                  duration: powerUpInstance.duration 
+                });
 
-            // Check if spawning should restart
-            if (backEndPowerUps.length < 20 && !spawning) {
-                spawning = true;
-                spawnPowerUps(backEndPowerUps, io, backEndPlayers); // Restart spawning
+                // Remove powerup from backend and notify frontend
+                backEndPowerUps.splice(i, 1);
+                io.emit("removePowerUp", { id: powerUp.id, remove: true });
+
+                // Restart spawning if needed
+                if (backEndPowerUps.length < 13 && !spawning) {
+                    spawning = true;
+                    spawnPowerUps(backEndPowerUps, io);
+                }
+            } else {
+                console.log(`Player ${player.id} has too many active powerups. PowerUp ID=${powerUp.id} remains.`);
             }
         }
     }
