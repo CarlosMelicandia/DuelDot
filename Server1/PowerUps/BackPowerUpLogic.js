@@ -56,7 +56,7 @@ function spawnPowerUps(backEndPowerUps, io, backEndPlayers) {
 
     // Notify clients
     io.emit("spawnPowerUps", powerUpData);
-  }, 1000); // Slowing down spawn interval (default: 15000)
+  }, 15000); // Slowing down spawn interval (default: 15000)
 }
 
 // ------------------------------

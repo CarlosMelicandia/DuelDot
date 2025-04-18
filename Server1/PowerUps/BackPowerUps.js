@@ -225,8 +225,6 @@ class Shield extends PowerUp {
             active: true,
             endTime: Date.now() + this.duration
         };
-        console.log("Shield Player === Backend:", this.player === backEndPlayers[this.player.socketId]);
- // TEST
 
         // Schedule removal effect
         setTimeout(() => {
