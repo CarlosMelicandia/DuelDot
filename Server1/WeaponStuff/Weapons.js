@@ -16,7 +16,7 @@ class Pistol extends Weapon{
             type: "light",
             damage: 20,
             fireRate: .7,
-            velocity: 8});
+            velocity: 9});
     }
     
 }
@@ -28,7 +28,7 @@ class SubmachineGun extends Weapon{
             type: "light",
             damage: 10,
             fireRate: .5,
-            velocity: 9});
+            velocity: 10});
     }
     
 }
@@ -50,7 +50,7 @@ class Shuriken extends Weapon{
             type: "light",
             damage: 15,
             fireRate: 1.1,
-            velocity: 10});
+            velocity: 11});
     }
 }
 class Wand extends Weapon{
@@ -60,7 +60,7 @@ class Wand extends Weapon{
             type: "magic",
             damage: 30,
             fireRate: 1.2,
-            velocity: 7});
+            velocity: 8});
     }
 }
 
