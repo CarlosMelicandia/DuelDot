@@ -27,12 +27,6 @@ A fast-paced **2D shooter** where you control a circle and battle against other 
 
 ---
 
-## 📸 Screenshots & Demo
-
-*Screenshots and gameplay demo coming soon*
-
----
-
 ## ▶️ How to Run
 
 ### Quick Start (Single-Player)
